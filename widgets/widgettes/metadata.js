@@ -20,7 +20,7 @@ AKT.widgets.metadata.setup = function (widget) {
 		
 		var metadata = kb._metadata;
 		
-        var project = kb._metadata.projects;
+        var name = kb._metadata.name;
         var file = kb._metadata.file;
         var title = kb._metadata.title;
         var description = kb._metadata.description;
@@ -31,7 +31,7 @@ AKT.widgets.metadata.setup = function (widget) {
         var methods = kb._metadata.methods;
         var timing = kb._metadata.timing;
 */
-        var project = 'Tutorial 2';
+        var name = 'Tutorial 2';
         var title = 'Bandy et al slash-and-burn paper';
         var description = 'This knowledge base is based on Bandy et al (1993) paper on "The worldwide problem of slash-and-burn agriculture"';
         var author = 'Bandy, D.E., Garrity, D.P. and Sanchez, P.A.';
@@ -41,7 +41,7 @@ AKT.widgets.metadata.setup = function (widget) {
         var methods = 'Literature review';
         var timing = '1993';
 		
-        $(widget.element).find('.textarea_project').val(AKT.state.current_kb);
+        $(widget.element).find('.textarea_name').val(AKT.state.current_kb);
         $(widget.element).find('.textarea_title').val(title);
         $(widget.element).find('.textarea_description').val(description);
         $(widget.element).find('.textarea_author').val(author);
@@ -62,7 +62,7 @@ AKT.widgets.metadata.setup = function (widget) {
         var kb = AKT.KBs[kbId];
 
         // Put current form text fields into working variables.
-        var project = $(widget.element).find('.textarea_project').val();
+        var name = $(widget.element).find('.textarea_name').val();
         var file = $(widget.element).find('.textarea_file').val();
         var title = $(widget.element).find('.textarea_title').val();
         var description = $(widget.element).find('.textarea_description').val();
@@ -74,7 +74,7 @@ AKT.widgets.metadata.setup = function (widget) {
         var timing = $(widget.element).find('.textarea_timing').val();
 
         // Use these variables to update the kb._metadata properties...
-        kb._metadata.project = project;
+        kb._metadata.name = name;
         kb._metadata.file = file;
         kb._metadata.title = title;
         kb._metadata.description = description;
@@ -98,7 +98,7 @@ AKT.widgets.metadata.setup = function (widget) {
             element:widget.element,
             finds:['.button_update'],
             values:[
-                {value:project,        find:'.textarea_project',     type:'textarea'}, 
+                {value:name,        find:'.textarea_name',     type:'textarea'}, 
                 {value:file,           find:'.textarea_file',        type:'textarea'}, 
                 {value:title,          find:'.textarea_title',       type:'textarea'}, 
                 {value:description,    find:'.textarea_description', type:'textarea'}, 
@@ -127,7 +127,7 @@ AKT.widgets.metadata.display = function (widget) {
 
     var widgetContent = $(widget.element).find('.content');
 
-    $(widgetContent).find('.textarea_project').val(kbId);
+    $(widgetContent).find('.textarea_name').val(kbId);
     $(widgetContent).find('.textarea_file').val(kb._metadata.file);
     $(widgetContent).find('.textarea_title').val(kb._metadata.title);
     $(widgetContent).find('.textarea_description').val(kb._metadata.description);
@@ -155,8 +155,8 @@ AKT.widgets.metadata.html = `
 
             <div class="w3-row w3-border">
                 <div class="w3-container w3-half" style="padding:2px;">
-                    <legend style="line-height:14px;">Project name</legend>
-                    <textarea class="textarea_project" style="resize:vertical;overflow:hidden; width:100%; height:22px;">Freddy</textarea>
+                    <legend style="line-height:14px;">KB name</legend>
+                    <textarea class="textarea_name" disabled style="resize:vertical;overflow:hidden; width:100%; height:22px;">Freddy</textarea>
                 </div>
                 <div class="w3-container w3-half" style="padding:2px;">
                     <legend style="line-height:14px;">File name</legend>
