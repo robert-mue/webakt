@@ -41,7 +41,7 @@ AKT.widgets.metadata.setup = function (widget) {
         var methods = 'Literature review';
         var timing = '1993';
 		
-        $(widget.element).find('.textarea_project').val(project);
+        $(widget.element).find('.textarea_project').val(AKT.state.current_kb);
         $(widget.element).find('.textarea_title').val(title);
         $(widget.element).find('.textarea_description').val(description);
         $(widget.element).find('.textarea_author').val(author);
@@ -127,7 +127,7 @@ AKT.widgets.metadata.display = function (widget) {
 
     var widgetContent = $(widget.element).find('.content');
 
-    $(widgetContent).find('.textarea_project').val(kb._metadata.project);
+    $(widgetContent).find('.textarea_project').val(kbId);
     $(widgetContent).find('.textarea_file').val(kb._metadata.file);
     $(widgetContent).find('.textarea_title').val(kb._metadata.title);
     $(widgetContent).find('.textarea_description').val(kb._metadata.description);
