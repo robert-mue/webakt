@@ -113,6 +113,7 @@ AKT.widgets.images.display = function (widget) {
     $(widget.element).draggable({containment:'#workspace',handle:".titlebar"});
     $(widget.element).css({display:'block'});
 
+    $(widget.element).find('.div_images').empty();
     for (var id in kb._images) {
         console.log(formaltermId,id);
         //if (formaltermId === 'akata' && (id==='ciat1026' || id==='ciat1027')) {
@@ -121,8 +122,8 @@ AKT.widgets.images.display = function (widget) {
             var divImage = $('<div class="div_image" data-id="'+id+'" style="float:left; border:solid 4px #d0d0d0;margin:1px;" title="'+caption+'"></div>');
             var imgImage = $('<img class="img_image" crossorigin="anonymous" style="width:150px; height:150px;border:solid 1px black"></img>');
             var divId = $('<div style=width:150px;height:14px;>'+id+'</div>');
-            var divLabel = $('<div style=width:150px;height:48px;line-height:12px;>'+caption.substr(0,65)+'...</div>');
-            $(divImage).append(imgImage).append(divId).append(divLabel);
+            var divCaption = $('<div style=width:150px;height:48px;line-height:12px;>'+caption.substr(0,65)+'...</div>');
+            $(divImage).append(imgImage).append(divId).append(divCaption);
             $(widget.element).find('.div_images').append(divImage);
             //var url = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR33JS988Kp1SL184AFRpm1uVCV7p2s4d1zew&usqp=CAU';
             //var url ='https://live.staticflickr.com/65535/51133666863_4fce15b5aa_z.jpg';
