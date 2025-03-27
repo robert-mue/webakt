@@ -9,6 +9,8 @@ class Action {
         this._selector =   spec.selector;
         this._type =       spec.type;
         this._message =    spec.message; 
+        this._before =    spec.before; 
+        this._after =    spec.after; 
         this._prompt =     spec.prompt;
         this._value =      spec.value;
     }
@@ -20,6 +22,8 @@ class Action {
             selector: this._selector,
             type: this._type,
             message:this._message,
+            before:this._before,
+            after:this._after,
             prompt:this._prompt,
             value: this._value
         }
@@ -37,6 +41,7 @@ class Action {
         if (eventType === 'click'){
 
             if (this._value && typeof this._value === 'string') {
+                console.log('\n@@@@@ ',this._value+' @@@@');
                 this._selector += '.'+this._value;
                 var values = null;
                 //var values = this._value;    // TODO Check: Not sure about this...

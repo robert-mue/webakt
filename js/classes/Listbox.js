@@ -226,6 +226,8 @@ class Listbox {
             //    optionValue = this.value;
             //}
             
+            $(this).find('input[type=checkbox]').prop('checked',true);
+
             var key = $(this).attr('data-key');
             if (!value || key === value) {
                 $(divElement).find('tr:even').css({background:'white'});
@@ -250,14 +252,19 @@ class Listbox {
                 });
     */
                 var action = new Action({
+                    file:       'Listbox.js',
+                    function:   "$(divElement).find('.tr_listbox').on('click', function (event, value) {}",
                     element_id: args.widget_element[0].id,
                     selector:   '.tr_listbox',
-                    type:      'click',
-                    message:    'webakt.js, function AKT.myListBox(): Clicked on a myListBox table row in '+args.widget_element[0].id,
+                    type:       'click',
+                    message:    'Clicked on a Listbox table row in '+args.widget_element[0].id,
                     prompt:     'Click on the <b>'+$(this)[0].dataset.key+'</b> item in the listbox',
+                    before:     'About to select <b>'+$(this)[0].dataset.key+'</b> by clicking its checkbox.',
+                    after:      'Selected <b>'+$(this)[0].dataset.key+'</b> by clickng its checkbox.',
                     value:      key
                 });
                 AKT.action_list.add(action);
+
                 AKT.event_records.push(action._event);
                 AKT.setEventRecords('event_records', AKT.event_records);
             }

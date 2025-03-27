@@ -131,6 +131,11 @@ class Topic {
         var kbId = AKT.state.current_kb;
         var kb = AKT.kbs[kbId];
 
+        if (this._search_term === '') {
+            var search2 = '';
+            return search2;
+        }
+
         var searchExpression = this._search_term;
 
         //searchExpression = "trees and ( soil or water )";

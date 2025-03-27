@@ -196,16 +196,31 @@ AKT.widgets.collection.setup = function (widget) {
     // ===================================================================================
     // Buttons to invoke operations on the Listbox (New/view/Edit/Delete/SelectAll/Invert)
 
-    $(widget.element).find('.button_new').on('click', function (event) {   // View button
+    $(widget.element).find('.button_new').on('click', function (event) {   // New button
         console.log('\n*** Click event on New button');
         event.stopPropagation();
 
-        if (itemType === 'topic') {
-            // NO!  Mechanism for creating a new topic is currently (Nov 2024) via the 
+        if (itemType === 'topicxxx') {
+            //      Mechanism for creating a new topic is currently (Nov 2024) via the 
             //      Boolean search panel.
             //      Note that the topic ID is sent to the Statements filter, not the Boolean expression.
+            //      However (March 2025) it is still allowed, so that it can be the top node in a topic hierarchy.
             alert('You currently cannot create a new Topic this way.\nPlease got to the Boolean Search command in the KB menu.');
         } else {
+/*
+            var action = new Action({
+                element_id: widget.element[0].id,
+                selector:   '.button_new',
+                type:       'click',
+                file:       'collection.js',
+                function:   "$(widget.element).find('.button_new').on('click', function (event) {}",
+                message:    'Clicked on New button in a collection panel.',
+                before:      'About to click on New button.',
+                after:       'Just clicked on New button.',
+               prompt:     'prompt'
+            });
+            AKT.action_list.add(action);
+*/
             openDetailsPanel(widget,'new');
         }
     });
@@ -214,6 +229,20 @@ AKT.widgets.collection.setup = function (widget) {
     $(widget.element).find('.button_view').on('click', function (event) {   // View button
         console.log('\n*** Click event on View button');
         event.stopPropagation();
+/*
+        var action = new Action({
+            element_id: widget.element[0].id,
+            selector:   '.button_view',
+            type:       'click',
+            file:       'collection.js',
+            function:   "$(widget.element).find('.button_view').on('click', function (event) {}",
+            message:    'Clicked on View button in a collection panel.',
+            before:     'About to click on View button.',
+            after:      'Just clicked on View button.',
+            prompt:     'prompt'
+        });
+        AKT.action_list.add(action);
+*/
         openDetailsPanel(widget,'view');
     });
 
@@ -221,7 +250,20 @@ AKT.widgets.collection.setup = function (widget) {
     $(widget.element).find('.button_edit').on('click', function (event) {   // Edit button
         console.log('\n*** Click event on Edit button');
         event.stopPropagation();
-
+/*
+        var action = new Action({
+            element_id: widget.element[0].id,
+            selector:   '.button_edit',
+            type:       'click',
+            file:       'collection.js',
+            function:   "$(widget.element).find('.button_edit').on('click', function (event) {}",
+            message:    'Clicked on Edit button in a collection panel.',
+            before:     'About to click on Edit button.',
+            after:      'Just clicked on Edit button.',
+            prompt:     'prompt'
+        });
+        AKT.action_list.add(action);
+*/
         openDetailsPanel(widget,'edit');
     });
 
@@ -292,6 +334,20 @@ AKT.widgets.collection.setup = function (widget) {
 
         var itemType = widget.options.item_type;
 
+        var selector = '.button_'+mode;
+        var action = new Action({
+            element_id: widget.element[0].id,
+            selector:   '.button_'+mode,
+            type:       'click',
+            file:       'collection.js',
+            function:   "$(widget.element).find('.button_"+mode+").on('click', function (event) {}",
+            message:    'Clicked on '+mode+' button in a collection panel.',
+            before:     'About to click on '+mode+' button.',
+            after:      'Just clicked on mode button.',
+            prompt:     'prompt'
+        });
+        AKT.action_list.add(action);
+
         var kbId = kb._id;
 
         if (mode==='view' || mode==='edit') {
@@ -353,7 +409,7 @@ AKT.widgets.collection.setup = function (widget) {
             widget_name:  widgetName,
             position:     {left:'650px',top:'20px'},
             size:         {width:'580px',height:'450px'},
-            shift_key:    event.shiftKey,
+            //shift_key:    event.shiftKey,
             options:      options
         });
     }

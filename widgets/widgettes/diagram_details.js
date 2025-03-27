@@ -956,6 +956,8 @@ what I'll do.
             }
         });
 
+        console.log(7601,sourceId,targetId);
+
         var kbId = AKT.state.current_kb;
 
         var dialog = $(widget.element).find('.link_causes1way_dialog');

@@ -1189,12 +1189,16 @@ class Statement {
                 nodeJson = nodeJson[1];   // *** TODO *** Fix this hack - the causal link
                         // between nodes is right, but we must capture the negation.
             }
+        
+            var value = null;
             if (nodeJson[0] === 'att_value') {
                 nodeJson[0] = 'attribute';  // Here is where we make only change from statement to node syntax.
                 var truncated = nodeJson.slice(0,-1);  // Removes the last element, i.e. the value element.
+                value = nodeJson[3];
             } else if (nodeJson[0] === 'attribute'){
                 truncated = nodeJson.slice(0,-1);
-            } else {
+                value = nodeJson[3];
+           } else {
                 truncated = nodeJson;
             }
 
@@ -1205,20 +1209,25 @@ class Statement {
                 });
                 var nodeId = filtered.join('_');   // Concatenates into a string.
                 var node = {
-                    id:   nodeId,
-                    label:nodeId,
-                    json: truncated,
-                    type: nodeJson[0]==='attribute' ? 'attribute' : nodeJson[0]
+                    id:    nodeId,
+                    label: nodeId,
+                    json:  truncated,
+                    type:  nodeJson[0]==='attribute' ? 'attribute' : nodeJson[0],
+                    value: value    // NOTE: The same node can appear several times, but the value
+                                    // can change, depending on the statement.   Therefore, the value
+                                    // is passed back purely for the current causal statement, and should
+                                    // should be discarded/ignored subsequently.
                 };  
                 return node;
 
             } else {
                 var nodeId = truncated;
                 var node = {
-                    id:   nodeId,
-                    label:nodeId,
-                    json: nodeJson,
-                    type: 'attribute'
+                    id:    nodeId,
+                    label: nodeId,
+                    json:  nodeJson,
+                    type:  'attribute',
+                    value: value     // See note above.
                 };  
                 return node;
             }

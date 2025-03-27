@@ -162,6 +162,19 @@ AKT.widgets.statement_details.setup = function (widget) {
             options:{kbId:kbId, opened_by_widgie:widget}
         });
 
+        var action = new Action({
+            element_id: widget.element[0].id,
+            selector:   '.button_template',
+            type:       'click',
+            file:       'statement_details.js',
+            function:   "$(widget.element).find('.button_template).on('click', function (event) {}",
+            message:    'Clicked on Template button in a statement_details panel.',
+            before:     'About to click on Template button.',
+            after:      'Just clicked on Template button.',
+            prompt:     'prompt'
+        });
+        AKT.action_list.add(action);
+
     });
 
 
@@ -384,6 +397,19 @@ AKT.widgets.statement_details.setup = function (widget) {
         } else if (widget.options.mode==='edit') {
             AKT.trigger('item_changed_event',{kb:kb,item_type:'statement',item:statement});
         }
+
+        console.log(widget.element);
+        var action = new Action({
+            element_id: widget.element[0].id,
+            selector:   '.button_update',
+            type:       'click',
+            file:       'statement_details.js',
+            function:   "$(widget.element).find('.button_update').on('click', function() {});",
+            message:    'Clicked on the Update button',
+            prompt:     'prompt'
+        });
+        AKT.action_list.add(action);
+
 
         $('#message').text('The Statements list has been updated');
 	});

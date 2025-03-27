@@ -26,7 +26,7 @@ AKT.recordEvent = function (eventRecord) {
 
     var element = eventRecord.element;
 
-    console.log(111,eventRecord);
+    console.log('AKT.recordEvent(eventRecord}:',eventRecord);
     AKT.state.events.counter += 1;
 
     eventRecord.element_id = eventRecord.element[0].id;
@@ -231,4 +231,8 @@ AKT.oneStep = function () {
         AKT.state.stepping_through_recording = false;
     }
 }
+
+$('button').on('click',function(event,aaa) {
+    console.log('--- button event:',event,aaa);
+});
 

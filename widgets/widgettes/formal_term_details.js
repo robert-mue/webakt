@@ -135,6 +135,20 @@ AKT.widgets.formal_term_details.setup = function (widget) {
             options:{kbId:AKT.state.current_kb,item_type:'statement',filters:{formal_term:{[tempFormalTerm._id]:true}}}
         });
 
+        var action = new Action({
+            element_id: widget.element[0].id,
+            selector:   '.button_statements',
+            type:       'click',
+            file:       'formal_term_details.js',
+            function:   "$(widget.element).find('.button_statements').on('click', function() {})",
+            message:    'Clicked on the Statements button in the formal_term_details.js widgette.',
+            prompt:     'prompt',
+            value:      tempFormalTerm._id
+        });
+        console.log(9001,action);
+        AKT.action_list.add(action);
+
+/*
         AKT.recordEvent({
             file:'formal_term_details.js',
             function:'AKT.widgets.formal_term_details.setup()',
@@ -144,7 +158,7 @@ AKT.widgets.formal_term_details.setup = function (widget) {
             value: tempFormalTerm._id,
             message:'Clicked on the Statements button in the formal_term_details panel.'
         });
-
+*/
     });
 
 
@@ -164,6 +178,18 @@ AKT.widgets.formal_term_details.setup = function (widget) {
             //options:{kbId:kbId, filters:{formal_term:true,formal_term_value:tempFormalTerm._id}}
             options:{kbId:kbId, filters:{}}
         });
+
+        var action = new Action({
+            element_id: widget.element[0].id,
+            selector:   '.button_images',
+            type:       'click',
+            file:       'formal_term_details.js',
+            function:   "$(widget.element).find('.button_images').on('click', function() {})",
+            message:    'Clicked on the Images button in the formal_term_details.js widgette.',
+            prompt:     'prompt',
+            value:      tempFormalTerm._id
+        });
+        AKT.action_list.add(action);
 
         AKT.recordEvent({
             file:'formal_term_details.js',

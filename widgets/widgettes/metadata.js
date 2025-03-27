@@ -12,7 +12,7 @@ AKT.widgets.metadata.setup = function (widget) {
 	
 	
     $(widget.element).find('.button_wizard').on('click', function() {
-        event.stopPropagation();
+        //event.stopPropagation();
         console.debug('Clicked on Wizard button');
 
 /*
@@ -111,6 +111,19 @@ AKT.widgets.metadata.setup = function (widget) {
             ],
             message:'Clicked on .button_update in metadata.js.'
         });
+
+        console.log(widget.element);
+        var action = new Action({
+            element_id: widget.element[0].id,
+            selector:   '.button_update',
+            type:       'click',
+            file:       'metadata.js',
+            function:   "$(widget.element).find('.button_update').on('click', function (event) {}",
+            message:    'Clicked on the Update button in the metadata.js widgette.',
+            prompt:     'prompt',
+            value:      kb._metadata
+        });
+        AKT.action_list.add(action);
 
         $('#message').html('Metadata has been updated');
 

@@ -221,10 +221,34 @@ class Panel {
         $('#panel_list').find('.'+panelId).on('click',function() {
             var zindex = AKT.incrementZindex('Panel.js: click. dialogId:',panelId,'\nOptions:',options);
             $('#'+panelId).css({display:'block','z-index':zindex});
-        });
+             var action = new Action({
+                element_id: 'panel_list',
+                selector:   '.'+panelId,
+                type:       'click',
+                file:       'Panel.js',
+                function:   "$('#panel_list').find('.'+panelId).on('click',function() {}",
+                message:    'Clicked on '+panelId+' in the panel_list.',
+                before:      'About to click on panel panel list item.',
+                after:       'Just clicked on panel list item.',
+               prompt:     'prompt'
+            });
+            AKT.action_list.add(action);
+       });
 
         $('#'+panelId).find('.dialog_minimise_button').on('click', function () {
             $('#'+panelId).css({display:'none'});
+            var action = new Action({
+                element_id: panelId,
+                selector:   '.dialog_minimise_button',
+                type:       'click',
+                file:       'Panel.js',
+                function:   "$('#'+panelId).find('.dialog_minimise_button').on('click', function () {}",
+                message:    'Clicked on -, the panel minimise button',
+                before:      'About to click on panel minimise button.',
+                after:       'Just clicked on panel minimise button.',
+                prompt:     'prompt'
+            });
+            AKT.action_list.add(action);
         });
 
         $('#'+panelId).find('.dialog_close_button').on('click', function () {
@@ -232,6 +256,18 @@ class Panel {
             $('#'+panelId).remove();
             $('#'+panelId)[dialogId]('destroy');
             $('#'+panelId).css({display:'none'});
+            var action = new Action({
+                element_id: panelId,
+                selector:   '.dialog_close_button',
+                type:       'click',
+                file:       'Panel.js',
+                function:   "$('#'+panelId).find('.dialog_close_button').on('click', function () {}",
+                message:    'Clicked on X, the panel close button',
+                before:      'About to click on panel close button.',
+                after:       'Just clicked on panel close button.',
+               prompt:     'prompt'
+            });
+            AKT.action_list.add(action);
         });
 
         $('#div_help').on('click',function() {
@@ -354,8 +390,9 @@ class Panel {
 
         // --------------------------------------------------------------------------
         // Dec 2022 Trying to revive doing event-recording in Panelise() !
-
+/*
         $('button:not(.inwidget_recording)').on('click', function (event) {
+            console.log(4501,'button:click',event);
             var panelId = $(panelDiv).attr('id');
             var elementClass = event.target.classList[0];
 
@@ -369,9 +406,10 @@ class Panel {
 
             AKT.action_list.add(action);   // Only actually does add it if (AKT.state.event_recording && !AKT.state.playing_events) is true.
         });
-
+*/
 
         $('select').on('change', function (event) {
+            console.log(4502,'select:change');
             var panelId = $(panelDiv).attr('id');
             var elementClass = event.target.classList[0];
             var selectedOption = $(widge.element).find('.'+elementClass).find(":selected").val();
@@ -389,7 +427,8 @@ class Panel {
             AKT.action_list.add(action);   // Only actually does add it if (AKT.state.event_recording && !AKT.state.playing_events)
         });
 
-        $('input').on('change', function (event) {
+        $('input').on('changexxx', function (event) {  // March 2025 Disabled as it doesn't actually do anything useful.
+            console.log(4503,'input:change');
             var panelId = $(panelDiv).attr('id');
             var elementClass = event.target.classList[0];
             var selectedOption = $(widge.element).find('.'+elementClass).val();

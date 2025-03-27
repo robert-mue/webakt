@@ -178,7 +178,11 @@ AKT.menusClickHandler = function (div) {
             element_id: 'menus',
             selector:   '#'+menuItemId+' > a',
             type:       'click',
-            message:    'menu_manager.js, function AKT.menusClickHandler(): Clicked on a menubar menu header:: '+menuItemId,
+            file:       'menu_manager.js',
+            function:   'AKT.menusClickHandler(div)',
+            message:    'Clicked on a menubar menu header:: '+menuItemId,
+            before:     'About to click on '+menuItemId,
+            after:      'Just clicked on '+menuItemId,
             prompt:     prompt
         });
         AKT.action_list.add(action);
@@ -204,7 +208,22 @@ AKT.menusClickHandler = function (div) {
         }
         AKT.eventRecord.push(step1);
         AKT.eventRecord.push(step2);
-
+/*
+        AKT.recordEvent({
+            event:'highlight',
+            element:widget.element,
+            finds:['#'+menuItemId+' > a'],
+            values:[],
+            message:'Clicked on menu #'+menuItemId+' > a'
+        });
+        AKT.recordEvent({
+            event:'click',
+            element:widget.element,
+            finds:['#'+menuItemId+' > a'],
+            values:[],
+            message:'Clicked on Clicked on menu #'+menuItemId+' > a'
+        });
+*/
         if (AKT.menuHandler[menuItemId]) {
             if (AKT.state.playing_events && menuItemId === 'menu_file_newkb') {
                 var value = AKT.event_records[2].value;  // TODO: remove this awful hack!  Get current record somehow.

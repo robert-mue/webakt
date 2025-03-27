@@ -62,7 +62,7 @@ class ActionList {
                 this._actions = this.getActionListFromLocalStorage('webakt_actions_'+id);
             }
             AKT.state.stepCounter = 0;
-            var firstEventMessage = this._actions[0]._prompt;
+            var firstEventMessage = this._actions[0]._before;
             $('#message').html(firstEventMessage);
             AKT.state.startedStepping = true;
             return;
@@ -71,8 +71,8 @@ class ActionList {
         AKT.action_list.oneStep(AKT.action_list._actions);
         var iStep = AKT.state.stepCounter;
         if (iStep < this._actions.length) {
-            var nextEventMessage = this._actions[iStep]._prompt;
-            $('#message').html(nextEventMessage);
+            var nextEventMessage = this._actions[iStep]._before;
+            $('#message').html(iStep+': '+nextEventMessage);
         }
     }
 
@@ -91,9 +91,13 @@ class ActionList {
 
 
     oneStep = function (actions) {
+        console.log('\n==== ',actions);
         $('button').css('background','#d0d0d0');
-        var iStep = AKT.state.stepCounter;
-        actions[iStep].triggerEvent(actions);
+        var istep = AKT.state.stepCounter;
+        //alert(actions[istep]._before);
+        $('#message').html(actions[istep]._before);
+        actions[istep].triggerEvent(actions);
+        //alert(actions[istep]._after);
         AKT.state.stepCounter += 1;
         if (AKT.state.stepCounter >= actions.length) {
             clearInterval(AKT.timer);

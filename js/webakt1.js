@@ -192,6 +192,12 @@ el1.addEventListener('click', async () => {
         alert('clicked '+a+'...'+b);
     });
 
+
+    console.log('button event handler');
+    $('button').on('click',function(event,aaa) {
+        console.log('--- button event:',event,aaa);
+    });
+
 /*
     var sentences = AKT.kbs[kbId].sentences;
     for (var i=0; i<sentences.length; i++) {
