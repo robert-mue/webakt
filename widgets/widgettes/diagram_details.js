@@ -50,6 +50,7 @@ AKT.widgets.diagram_details.setup = function (widget) {
     var kb = AKT.KBs[kbId];
 
     var diagram = new Diagram('new','systo');
+
     widget.diagram = diagram;
  
     // Listbox with plain list of topics.

@@ -70,7 +70,7 @@ class Hierarchy {
     }
 
 
-    addNode = function (parentId, nodeId) {
+    addNode (parentId, nodeId) {
         if (!this._tree_down[parentId]) {
             this._tree_down[parentId] = [];
         }
@@ -98,7 +98,7 @@ class Hierarchy {
 
 // TODO: This code is still needed!   It handles legacy KBs, in AKT5's old format
 // for repesenting hierarchies.   See constructor.
-    cleanLinks = function (specLinks) {
+    cleanLinks (specLinks) {
         var links = [];
         for (var i=0; i<specLinks.length; i++) {
             var specLink = specLinks[i];
@@ -116,7 +116,7 @@ class Hierarchy {
     // a native one for this Class.   See the same method in Statement.js.
     // So, in principle every reference to Collection._PropertyId should be changed to
     // Collection.getPropertyValue(PropertyId).
-    getPropertyValue = function (propertyId) {
+    getPropertyValue (propertyId) {
         if (this['_'+propertyId]) {
             return this['_'+propertyId];
 
@@ -131,7 +131,7 @@ class Hierarchy {
 // corresonding sections of a kb.
 
 
-    makeTree = function (typeId,hierarchyId,links) {
+    makeTree (typeId,hierarchyId,links) {
         //console.log('makeTree: ',typeId,hierarchyId,links);
         var treeDown = {};
         //treeDown[hierarchyId] = [];
@@ -170,7 +170,7 @@ class Hierarchy {
 
 
 
-    makeUlTree = function () {
+    makeUlTree () {
         var hierarchyId = this._id;
         var treeDown = this._tree_down;
         console.log('-- ',hierarchyId, treeDown);
@@ -198,7 +198,7 @@ class Hierarchy {
     };
 
 
-    makeTreetableDiv = function (widget) {
+    makeTreetableDiv (widget) {
         console.log('Hierarchy.makeTreetableDiv()');
         var hierarchyId = this._id;
         console.log(this._id);
@@ -235,7 +235,7 @@ class Hierarchy {
 
     // Built using the treetable jQuery plugin
     // https://www.jqueryscript.net/demo/jQuery-Plugin-For-Displaying-A-Tree-Of-Data-In-A-Table-treetable/
-    makeTreetable = function (widget) {
+    makeTreetable (widget) {
         var hierarchyId = this._id;
         var type = this._type;
         var kb = this._kb;
@@ -366,7 +366,7 @@ class Hierarchy {
     }
 
 
-    buildTableRow = function (parentId,nodeId,level,isEmptyBranch,hierType,propertyIds) {
+    buildTableRow (parentId,nodeId,level,isEmptyBranch,hierType,propertyIds) {
         var kb = this._kb;
         var kbId = AKT.state.current_kb;
         var kb = AKT.KBs[kbId];
@@ -441,7 +441,7 @@ class Hierarchy {
 
 
 /*
-    makeTree = function (treeType) {
+    makeTree (treeType) {
         var treeDown = {};
         var treeUp = {};
         var item = 'object';
@@ -459,7 +459,7 @@ class Hierarchy {
     }
 */
 
-    findChildren = function (node) {
+    findChildren (node) {
         var treeDown = this._tree_down;
         var children = treeDown[node];
     /*
@@ -493,7 +493,7 @@ class Hierarchy {
     // - selected
     // - last_added... so that it can be highlghted to bring it to the user's attention.
     // - recently_added... so that the user knows which have been added "recently".
-    getCurrentState = function (tableTreetable) {
+    getCurrentState (tableTreetable) {
         // Don't re-initialise state.last_added and state.recently_added.
         var state = this._state;
         state.expanded = {};
@@ -511,7 +511,7 @@ class Hierarchy {
 
 
 
-    getAllDescendants = function (node) {
+    getAllDescendants (node) {
         var treeDown = this._tree_down;
         var descendants = getAll(treeDown, node, []);
         return descendants;
@@ -529,7 +529,7 @@ class Hierarchy {
     }
 
 
-    getAllAncestors = function (node) {
+    getAllAncestors (node) {
         var treeUp = this._tree_up;
         var ancestors = getAll(treeUp, node, []);
         return ancestors;
@@ -544,7 +544,7 @@ class Hierarchy {
         }
     }
 	
-	createBranch = function () {
+	createBranch () {
 
 	}
 

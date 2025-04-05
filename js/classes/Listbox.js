@@ -464,10 +464,10 @@ class Listbox {
 
     }
 
-    addColumn = function () {
+    addColumn () {
     }
 
-    findCheckedIds = function () {
+    findCheckedIds () {
         var itemKeys = [];
         var checkedInputs = $(this.divElement).find('input:checked');
         for (var i=0; i<checkedInputs.length; i++) {
@@ -478,7 +478,7 @@ class Listbox {
         return itemKeys;
     }
 
-    deleteCheckedIds = function () {
+    deleteCheckedIds () {
         console.log(this.args);
         var kb = this.args.kb;
         var containerObject = this.args.container_object;
@@ -494,33 +494,33 @@ class Listbox {
     }
 
 
-    selectAll = function () {
+    selectAll () {
             $(this.divElement).find('input[type=checkbox]').prop('checked',true);
     }
 
 
-    deselectAll = function () {
+    deselectAll () {
             $(this.divElement).find('input[type=checkbox]').prop('checked',false);
     }
 
 
-    invertChecked = function () {
+    invertChecked () {
        $(this.divElement).find('input[type=checkbox]').attr('data-checked',false);
        $(this.divElement).find('input[type=checkbox]:checked').attr('data-checked',true).prop('checked',false);
        $(this.divElement).find('input[type=checkbox][data-checked=false]').prop('checked',true);
     }
 
 
-    removeColumn = function () {
+    removeColumn () {
     }
 
-    addRow = function () {
+    addRow () {
     }
 
-    removeRow = function () {
+    removeRow () {
     }
 
-    refresh = function () {
+    refresh () {
     }
 
 

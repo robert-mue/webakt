@@ -88,7 +88,7 @@ class Topic {
     // a native one for this Class.   See the same method in Statement.js.
     // So, in principle every reference to Collection._PropertyId should be changed to
     // Collection.getPropertyValue(PropertyId).
-    getPropertyValue = function (propertyId) {
+    getPropertyValue (propertyId) {
         if (this['_'+propertyId]) {
             return this['_'+propertyId];
 
@@ -99,8 +99,8 @@ class Topic {
 
 
     // Derived from Statement:generateJsonFromFormal()
-    generateJavascriptFromJson= function () {
-        const infixOperator = {
+    generateJavascriptFromJson () {
+         const infixOperator = {
             and:'&&',
             or:'||'};
 
@@ -126,7 +126,7 @@ class Topic {
 
 
 
-    generateJavascriptFromSearchExpression = function() {
+    generateJavascriptFromSearchExpression () {
 
         var kbId = AKT.state.current_kb;
         var kb = AKT.kbs[kbId];
@@ -165,7 +165,7 @@ class Topic {
     }
 
 
-    passFilters = function (filters) {
+    passFilters (filters) {
         var kb = AKT.KBs[AKT.state.current_kb];   // TODO: fix!
 
         if (filters.hasOwnProperty('hierarchyId')) {
@@ -178,7 +178,7 @@ class Topic {
         return true;
     }
 
-    inHierarchy = function (hierarchyId) {
+    inHierarchy (hierarchyId) {
         var kb = AKT.KBs[AKT.state.current_kb];   // TODO: fix!
         var hierarchy = kb._topicHierarchies[hierarchyId];
         if (hierarchy.getAllDescendants(hierarchy._id).includes(this._id)) {

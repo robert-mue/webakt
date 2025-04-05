@@ -16,7 +16,7 @@ class Action {
     }
 
 
-    makeActionSpec = function () {
+    makeActionSpec () {
         var actionSpec = {
             element_id: this._element_id,
             selector: this._selector,
@@ -31,7 +31,7 @@ class Action {
     }
 
 
-    triggerEvent = function (actions) {
+    triggerEvent (actions) {
         var eventType = this._type;
 
         //var iStep = AKT.state.stepCounter;

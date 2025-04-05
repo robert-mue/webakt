@@ -5,7 +5,7 @@ class ActionList {
     }
 
 
-    add = function (action) {
+    add (action) {
         if (!AKT.state.event_recording) return;
         if (AKT.state.playing_events) return;
 
@@ -22,19 +22,19 @@ class ActionList {
     }
 
 
-    open = function () {
+    open () {
         var id = prompt('Recording_name:','');
         this.play(id);
     }
 
 
-    save = function () {
+    save () {
         var id = prompt('Recording name:','');
         localStorage.setItem('webakt_actions_'+id,JSON.stringify(this._actions));
     }
 
 
-    saveActionListToLocalStorage = function (key) {
+    saveActionListToLocalStorage (key) {
         var actionListSpec = [];
         for (var i=0; i<this._actions.length; i++) {
             var action = this._actions[i];
@@ -44,14 +44,14 @@ class ActionList {
     }
 
 
-    stop = function () {
+    stop () {
         AKT.state.event_recording = false;
     }
 
 
 
 
-    stepThroughRecording = function (id) {
+    stepThroughRecording (id) {
 
         if (!AKT.state.startedStepping) {
             AKT.state.event_recording = false;
@@ -76,7 +76,7 @@ class ActionList {
         }
     }
 
-    play = function (id) {
+    play (id) {
         AKT.state.event_recording = false;
         AKT.state.playing_events = true;
         if (!id) {
@@ -90,7 +90,7 @@ class ActionList {
     }
 
 
-    oneStep = function (actions) {
+    oneStep (actions) {
         console.log('\n==== ',actions);
         $('button').css('background','#d0d0d0');
         var istep = AKT.state.stepCounter;
@@ -106,7 +106,7 @@ class ActionList {
     }
 
 
-    getActionListFromLocalStorage = function (key) {
+    getActionListFromLocalStorage (key) {
         var actionList = [];
         var actionListSpec = JSON.parse(localStorage.getItem(key));
         for (var i=0;i<actionListSpec.length;i++) {

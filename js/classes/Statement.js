@@ -81,7 +81,7 @@ class Statement {
     }
 
 
-    generateId = function (kb) {
+    generateId (kb) {
         var id = 's'+kb(findLargestIndex);
     }
 
@@ -177,7 +177,7 @@ class Statement {
 
     // METHODS
 
-    isConditional = function () {
+    isConditional () {
         var json = this._json;
         if (json[0] === 'if') {
             return true;
@@ -188,7 +188,7 @@ class Statement {
 
 
     // TODO: Add check that the source actually exists in the list of sources....
-    addSource = function(sourceId) {
+    addSource (sourceId) {
         this._sources.push(sourceId);
     }
 
@@ -198,7 +198,7 @@ class Statement {
     // could include e.g. checking that the first argument for att_value/3 is
     // a known object, a possible mis-spelling for a known object, or an unknown
     // word waiting for the user to enter it as a "formal term".
-    checkFormalSyntax = function(formal) {
+    checkFormalSyntax (formal) {
         var result = this.generateJsonFromFormal(formal);
         if (typeof result === 'object') {
             return 'OK';
@@ -210,7 +210,7 @@ class Statement {
 
     // Splits a formal or English version of the statement around' if ',
     // return a two-element array.
-    splitAtIf = function(statementString) {  // formal or English
+    splitAtIf (statementString) {  // formal or English
         statementString = statementString.replace(')if ',') if ');
         const parts = statementString.split(' if ');
         if (parts.length === 1){
@@ -220,7 +220,7 @@ class Statement {
     }
 
 
-    findFormalTermsXXX = function () {
+    findFormalTermsXXX () {
         var kb = AKT.KBs[AKT.state.current_kb];   // TODO: fix!
         var formalTermIds = this._json.flat(99);
         var formalTerms = {};
@@ -233,7 +233,7 @@ class Statement {
         return formalTerms;
     }
 
-    findSourcesFromIds = function(sourceIds) {
+    findSourcesFromIds (sourceIds) {
         //console.debug('---- ',sourceIds);
         return sourceIds;
 /*
@@ -247,7 +247,7 @@ class Statement {
 */
     }
 
-    generateEnglishHtml = function() {
+    generateEnglishHtml () {
         console.log('calling makeEnglish');
         return this.makeEnglish({colourise:true,title:true});
     }
@@ -264,7 +264,7 @@ class Statement {
     // Arguably, this could be done in generateFormal() itself, since it involves the same
     // walking-through the JSON, but it seems neater to do it separately.
     
-    classifyFormalTerms = function () {
+    classifyFormalTerms () {
         var terms = {};
         var result = walk(this._json);
         return terms;
@@ -345,7 +345,7 @@ class Statement {
 
 
 
-    findFormalTerms = function (term_type) {
+    findFormalTerms (term_type) {
         var kbId = AKT.state.current_kb;
         var kb = AKT.KBs[kbId];
 
@@ -375,7 +375,7 @@ class Statement {
 	// formal statement.   It's a bad idea to have two ways of
 	// doing the same job, since both need to be maintained, So
 	// the method here should be deprecated and retired.
-    generateJsonFromFormal = function (formal) {
+    generateJsonFromFormal (formal) {
 
         let formal1 = AKT.tidyFormal(formal);
         //console.debug('\n',formal1);
@@ -617,7 +617,7 @@ class Statement {
     // this inside a loop over all categories, but this requires a function for each
     // category, which is hardly much of a saving.   
 
-    passFilters1 = function (filters) {
+    passFilters1 (filters) {
         var kbId = AKT.state.current_kb;
         var kb = AKT.KBs[kbId];
 
@@ -765,7 +765,7 @@ class Statement {
 
 
 
-    findType = function () {
+    findType () {
         var k1 = this._json[0];
         var k2 = this._json[1][0];
         var k3 = (k1==='if') ? k2 : k1;
@@ -783,7 +783,7 @@ class Statement {
 
 
 /*
-    passFilters = function (filters) {
+    passFilters (filters) {
         //console.log('****',filters);
 
         //var ok = {all:true,conditional:true,non_conditional:true,att_value:true,causal:true,formal_term:true,source:true};
@@ -873,7 +873,7 @@ class Statement {
         return true;
     }
 */
-    hasSource = function (sourceId) {
+    hasSource (sourceId) {
         var sources = this._sources;
         for (var i=0; i<sources.length;i++) {
             if (sources[i] === sourceId) {
@@ -883,7 +883,7 @@ class Statement {
         return false;
     }
 
-    containsFormalTerm = function (term) {
+    containsFormalTerm (term) {
 		var json = this.makeJsonFromFormal(this._formal);
 		try {
 			var flat = json.flat(99);
@@ -910,7 +910,7 @@ class Statement {
     // this._node_names is a statement property just for causal statements.  It is a simple 
     // object which always has  2 properties: {start_name:xxx, end_name:yyy} (but just for
     // causal statements), and is created when the KB is loaded.
-    containsNodeName = function (nodeNames) {
+    containsNodeName (nodeNames) {
         console.log('***2',nodeNames);
         if (this._node_names) {
             if (nodeNames.start_name && this._node_names.start_name === nodeNames.start_name ||
@@ -924,7 +924,7 @@ class Statement {
 
     // Cosmetic function for includedInBooleanSearch(searchTerm)
 
-    includedInTopic = function (topicId) {
+    includedInTopic (topicId) {
         //console.log('== ',topicId);
         var kbId = AKT.state.current_kb;
         var kb = AKT.KBs[kbId];
@@ -939,7 +939,7 @@ class Statement {
     // search expression.   This search expression might either come from the user entering it
     // in the Boolean search tool; or be the expression used to define a particular topic.
 
-    includedInSearchExpressionJs = function (searchExpressionJs, options) {   // options are for including conditional part
+    includedInSearchExpressionJs (searchExpressionJs, options) {   // options are for including conditional part
         var target;
 
         var kbId = AKT.state.current_kb;
@@ -1011,7 +1011,7 @@ class Statement {
     // for handling filters.  There is quite a lot of duplicaction, with the use of the
     // prefix ebf_ for all functions/methods.
 
-    extendedBooleanSearch = function (searchExpression) {
+    extendedBooleanSearch (searchExpression) {
         console.log(this._id,searchExpression);
     }
 
@@ -1037,7 +1037,7 @@ class Statement {
 // Checking and converting the Statement
 
 
-    checkFormal = function (formal) {
+    checkFormal (formal) {
 
         var overallResult = {};
 
@@ -1072,7 +1072,7 @@ class Statement {
     // or
     // - null, if the statment is not a causal statement.
 
-    makeNodesAndArc = function () {
+    makeNodesAndArc () {
         var json = this._json;
         var nodeJsonPair = extractCauseAndEffectParts(json);
         if (nodeJsonPair) {
@@ -1082,6 +1082,13 @@ class Statement {
 
             var nodeCause = getNode(nodeJsonPair[0]);
             var nodeEffect = getNode(nodeJsonPair[1]);
+            var valueCause = nodeCause.value;
+            var valueEffect = nodeEffect.value;
+            //delete nodeCause.value;   // The value property is passed back from getNode() as a temporary measure,
+            //delete nodeEffect.value;  // so can (and should) be deleted once it's been remembered for a particular       
+                                      // statement (link).   Otherwise a particular node will retain the last
+                                      // value returned, which could be confusing.
+            
             if (nodeJsonPair[3]) {
                 var nodeCondition = getNode(nodeJsonPair[3]);
             } else {
@@ -1096,7 +1103,14 @@ class Statement {
                 start_node_id:nodeCause.id,
                 end_node_id:  nodeEffect.id,
                 type:         nodeJsonPair[2],
-                statements:   [this]
+                statement_id: this._id,   // I use the statement ID instead of object, since object has 
+                                // a strong whiff of circularity.   See "this._arc = arc;" below.
+                statements:   [this],   // March 2025. Left in to avoid breaking anything, but 
+                                // THIS SHOULD NOT BE AN ARRAY, since this arc is for ONE STATEMENT
+                                // ONLY.   I.e. it is NOT the same as the arc used in the diagram,
+                                // which can capture several statements between the same pair of nodes.
+                start_value:  valueCause,
+                end_value:    valueEffect
             }
             this._arc = arc;
 
@@ -1147,7 +1161,26 @@ class Statement {
                 this._ghostArcEffect = ghostArcEffect;
             }
 
-            return {start_node:nodeCause,end_node:nodeEffect,arc:arc};
+            if (nodeIf) {
+                var nodes_and_arcs = {
+                    start_node:      nodeCause,
+                    end_node:        nodeEffect,
+                    nodeIf:          nodeIf,
+                    nodeIfCausal:    nodeIfCausal,
+                    arc:             arc,
+                    arcCondition:    arcCondition,
+                    ghostArcCause:   ghostArcCause,
+                    ghostArcEffect:  ghostArcEffect
+                }
+            } else {
+                nodes_and_arcs = {
+                    start_node:      nodeCause,
+                    end_node:        nodeEffect,
+                    arc:             arc
+                }
+            }
+            //if (nodeIf) console.log('\n',this._id,this._formal,'\n',nodes_and_arcs);
+            return nodes_and_arcs;
         }
 
         function extractCauseAndEffectParts(json) {
@@ -1239,7 +1272,7 @@ class Statement {
     // a native one for this Class. Here, the statement type is computed.
     // So, in principle every reference to Collection._PropertyId should be changed to
     // Collection.getPropertyValue(PropertyId).
-    getPropertyValue = function (propertyId) {
+    getPropertyValue (propertyId) {
         if (propertyId==='type') {
             return this.findType();
 
@@ -1287,7 +1320,7 @@ class Statement {
 	// None of them set a statement property, simply returning the result for processing
 	// in whatever function calls them.
 	
-	makeJsonFromFormal = function (formal) {
+	makeJsonFromFormal (formal) {
 	    try {
 			var json = this.checkFormal(formal).peg.parseTree;
 			this._json = json;
@@ -1306,7 +1339,7 @@ class Statement {
 	//       according to their type (object, attribute, etc)
 	// - title:boolean - pops-up a label indicating the formal term type on mouse-over.
 	
-    makeFormal = function (options) {
+    makeFormal (options) {
         this.makeFormalFromJson(options);
     }
 
@@ -1408,11 +1441,11 @@ class Statement {
 
 
     // ............................ makeEnglish() / makeEnglishFromJson()
-    makeEnglish = function (options) {  // Legacy
+    makeEnglish (options) {  // Legacy
         this.makeEnglishFromJson(options);
     }
 
-    makeEnglishFromJson = function (options) {
+    makeEnglishFromJson (options) {
         if (options && options.colours) {
             var colours = options.colours;
         } else {
@@ -1531,7 +1564,7 @@ used for external storage of the KB.   This:
 1. Allows syntactically invalid statements to be stored; and
 2. Avoids DRY (Don't Repeat Yourself - i.e. duplication of the same information).
 */
-    makeSpec = function () {
+    makeSpec () {
         var statementSpec = {
             id: this._id,
             //json: this._json,   

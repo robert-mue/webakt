@@ -3,44 +3,44 @@ class Node {
     constructor(spec) {
     }
 
-    makeJsonFromFormal = function () {
+    makeJsonFromFormal () {
         return json;
     }
 
 
-    makeJsonFromTemplate = function {
+    makeJsonFromTemplate {
         return json;
     }
 
 
-    makeFormalFromJson = function () {
+    makeFormalFromJson () {
         return formal;
     }
 
 
-    makeIdFromJson = function () {
+    makeIdFromJson () {
         return id;
     }
 
 
-    makeLabelFromJson = function () {
+    makeLabelFromJson () {
         return label;
     }
 
 
-    findStatements = function () {
+    findStatements () {
         return statements;
     }
 
 
     // Find all arcs for which this node is the start node.
-    findArcsFrom = function () {
+    findArcsFrom () {
         return arcsFrom;  // An array of Arc objects
     }
 
 
     // Find all arcs for which this node is the end node.
-    findArcsTo = function () {
+    findArcsTo () {
         return arcsTo;  // An array of Arc objects
     }
 

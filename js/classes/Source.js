@@ -180,7 +180,7 @@ class Source {
 
     // This method allows for the property value to be computed rather than be a native
     // one for this Class.   See the same method in Statement.js
-    getPropertyValue = function (propertyId) {
+    getPropertyValue (propertyId) {
         if (this['_'+propertyId]) {
             return this['_'+propertyId];
 
@@ -190,7 +190,7 @@ class Source {
     }
 
 
-    makeSpec = function() {
+    makeSpec() {
         var sourceSpec = {
             id: this._id,
             type: this._type,

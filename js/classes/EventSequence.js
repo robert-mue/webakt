@@ -6,7 +6,7 @@ class EventSequence {
 
     // Runs through all the events, without using a timer to pause at each this.
     // Used for UI testing.
-    runThrough = function () {
+    runThrough () {
 
         // This is crucial.   Without it, calling an event will generate a new event event!
         AKT.state.playing_events = true;
@@ -32,7 +32,7 @@ class Event {
         this._value = spec.value
     }
 
-    doEvent = function () {
+    doEvent () {
         switch (this._type) {
             case 'click':
                 $(this.selector).trigger('click');

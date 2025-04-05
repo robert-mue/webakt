@@ -181,7 +181,7 @@ class Kb {
     // GET ITEMS FROM A COLLECTION, FILTERED
 
 
-    getCollection = function (collectionTypeId,filters) {
+    getCollection (collectionTypeId,filters) {
 
         // See js/collection_specs.js to see the function that's used to get all the items
         // for the named collection.   
@@ -194,31 +194,31 @@ class Kb {
 
 
     // For legacy reasons, to stop old code breaking.
-    findFormalTerms = function (filters) {
+    findFormalTerms (filters) {
         return this.getFormalTerms(filters);
     }
-    findStatements = function (filters) {
+    findStatements (filters) {
         return this.getStatements(filters);
     }
-    findSources = function (filters) {
+    findSources (filters) {
         return this.getSources(filters);
     }
-    findObjectHierarchiesTerms = function (filters) {
+    findObjectHierarchiesTerms (filters) {
         return this.getObjectHierarchiesTerms(filters);
     }
-    findTopicHierarchies = function (filters) {
+    findTopicHierarchies (filters) {
         return this.getTopicHierarchies(filters);
     }
-    findTopics = function (filters) {
+    findTopics (filters) {
         return this.getTopics(filters);
     }
-    findImages = function (filters) {
+    findImages (filters) {
         return this.getImages(filters);
     }
     // End of section to handle legacy function calls.
 
 
-    getDiagrams = function () {
+    getDiagrams () {
         if (this._diagrams) {
             return this._diagrams;
         } else {
@@ -227,7 +227,7 @@ class Kb {
     }
 
 
-    getDiagramNodes = function () {
+    getDiagramNodes () {
         if (this._diagram_nodes) {
             return this._diagram_nodes;
         } else {
@@ -237,7 +237,7 @@ class Kb {
     }
 
 
-    getArcs = function () {
+    getArcs () {
         if (this._diagram_arcs) {
             return this._diagram_arcs;
         } else {
@@ -246,7 +246,7 @@ class Kb {
     }
 
 
-    getDiagrams = function () {
+    getDiagrams () {
         if (this._diagrams) {
             return this._diagrams;
         } else {
@@ -255,7 +255,7 @@ class Kb {
     }
 
 
-    getFormalTerms = function (filters) {
+    getFormalTerms (filters) {
         console.log('\n####################################################')
         console.log('Kb.findFormalterms(filters)');
         console.log(filters);
@@ -294,7 +294,7 @@ class Kb {
     }
 
 
-    extractFormalTerms = function () {
+    extractFormalTerms () {
         var allFormalTerms = {};
         for (var statementId in this._statements) {
             var statement = this._statements[statementId];
@@ -311,7 +311,7 @@ class Kb {
 
     // Returns an ARRAY of the ID (key) of the words (formal terms) that satisfy the filters object.
     // E.g. filters = {term_type:'process'};
-    findWords = function (filters) {   
+    findWords (filters) {   
         var words = [];
         for (var formalTermId in this._formalTerms) {
             var formalTerm = this._formalTerms[formalTermId];
@@ -323,7 +323,7 @@ class Kb {
     }
 
 
-    getStatements = function (filters) {
+    getStatements (filters) {
         var okStatements = {};
         //console.log('>>>\n',filters,'\n',this._statements);
         //console.log(8607,filters);
@@ -359,12 +359,12 @@ class Kb {
     }
 
 
-    getObjectHierarchies = function () {
+    getObjectHierarchies () {
         return this._objectHierarchies;
     }
 
 
-    getSources = function (filter) {   // 'options' allows for selectors, like GoJS 
+    getSources (filter) {   // 'options' allows for selectors, like GoJS 
                                             // for Nodes in Diagram
         if (!filter) {
             return this._sources;
@@ -374,12 +374,12 @@ class Kb {
     }
 
 
-    getTopicHierarchies = function () {
+    getTopicHierarchies () {
         return this._topicHierarchies;
     }
 
 
-    getTopics = function () {
+    getTopics () {
         return this._topics;
     }
 
@@ -428,7 +428,7 @@ class Kb {
 
     // This is orphan code, but left in in case it's useful...
 /*
-    findHierarchies = function (type, links) {
+    findHierarchies (type, links) {
         var hierarchies = {};
         var hierarchyIds = []; 
 
@@ -463,7 +463,7 @@ class Kb {
 */
 
 
-    countStatements = function () {
+    countStatements () {
         var count = {
             att_value_unconditional:0,att_value_conditional:0,
             causes_unconditional:0,causes_conditional:0,
@@ -516,7 +516,7 @@ class Kb {
         return count;
     }        
 
-    findNodeNames = function () {
+    findNodeNames () {
         var okNodeNames = {};
         for (var statementId in this._statements) {
             var statement = this._statements[statementId];
@@ -530,7 +530,7 @@ class Kb {
     }
 
 
-    findTopics = function (filters) {
+    findTopics (filters) {
         var okTopics = {};
         for (var topicId in this._topics) {
             var topic = this._topics[topicId];
@@ -542,7 +542,7 @@ class Kb {
     }
 
 
-    findFormalTermsxxx = function (filters) {
+    findFormalTermsxxx (filters) {
         var okFormalTerms = {};
         for (var formalTermId in this._formalTerms) {
             var formalTerm = this._formalTerms[formalTermId];
@@ -562,7 +562,7 @@ class Kb {
     // objects could be anything, but is here because it is here in Class Kb because ot
     // is probably some collection of entities for this KB.
     // Currently only statements employ this type of key.
-    findLargestIndex = function (objects,prefix) {
+    findLargestIndex (objects,prefix) {
         var maxIndex = 0;
         for (var key in objects) {
             var index = parseInt(key.replace(prefix,''));
@@ -572,7 +572,7 @@ class Kb {
     }
 
 
-    checkStatements = function () {
+    checkStatements () {
         var kbId = this._id;
         AKT.state.statement_check = {ok:0,fail:0};
         $.each(this._statements, function(id,statement) {
@@ -590,7 +590,7 @@ class Kb {
     // In practice, the idea is that a knowledge elicitatpr would create a spreadsheet
     // with two table - one for the sentences, and one for the sources, cross-
     // referenced using the source number.
-    generateCsv = function () {
+    generateCsv () {
 
         // Build source lookup table
         // The idea is to give each source a simple number, this being easier to type
@@ -619,7 +619,7 @@ class Kb {
     }
 
     
-    buildKbFromCsv = function (statements,sources) {
+    buildKbFromCsv (statements,sources) {
         //console.log(statements,sources);
 
         // First, create the lookup of sourceId given source number.
@@ -672,7 +672,7 @@ class Kb {
 
     // Note that this method MUST come before loadKbFromFile, since otherwise
     // you get a "function not found" error!
-    makeHierarchies1 = function (type,links) {
+    makeHierarchies1 (type,links) {
         var hierarchyNames = []; 
         var rootIds = [];
 
@@ -709,13 +709,13 @@ class Kb {
 
 
 
-    makeHierarchies2 = function (hierarchiesFromFile) {
+    makeHierarchies2 (hierarchiesFromFile) {
         var hierarchies = hierarchiesFromFile;
         return hierarchies;
     }
 
 
-    makeUlTree = function (treeType) {
+    makeUlTree (treeType) {
         const tree = this.makeTree(treeType);
         var treeDown = tree[0]
         var ul = $('<ul class="myUL"></ul>');
@@ -766,7 +766,7 @@ class Kb {
     // Just decided to use 3rd argument of JSON.stringify, and just live with the
     // length output.  Not easy to get the strings handled as JSON.
 
-    generateJsonFromKb = function () {
+    generateJsonFromKb () {
 
         var kbSpec = {
             metadata:{}, 
@@ -915,7 +915,7 @@ class Kb {
         return kbSpec;
     }
 
-    generateJsonFromKbForSearch = function () {
+    generateJsonFromKbForSearch () {
 
         var searchArray = [];
 
@@ -1002,7 +1002,7 @@ class Kb {
                    
 
 
-    loadKbFromFile = function (file_kb) {
+    loadKbFromFile (file_kb) {
 		try {
 			var items = file_kb.metadata;
 			for (var itemId in items) {
@@ -1100,7 +1100,7 @@ Re-write, below, to simply ignore statements that cannot be handled.
 			var parseResult = statement.checkFormal(file_kb.statements[id].formal).peg;
 			if (parseResult.result === 'fail') {
 				nFail += 1;
-				console.log('\nFault in Kb.js\nParsing new statement failed\n', nFail,statement._id,statement._rawFormal,'\n:',parseResult.error);
+				console.log('\nFault in Kb.js\nParsing new statement failed (1)\n', nFail,statement._id,statement._rawFormal,'\n:',parseResult.error);
 			} else {
 			    this._statements[id] = statement;
                 if (statement) {
@@ -1125,7 +1125,7 @@ Re-write, below, to simply ignore statements that cannot be handled.
                     }
                 } else {
                     nFail += 1;
-                    console.log('\nFault in Kb.js\nnew Statement failed\n', nFail,id,file_kb.statements[id]);
+                    console.log('\nFault in Kb.js\nnew Statement failed (2)\n', nFail,id,file_kb.statements[id]);
                 }
             }
 		}
@@ -1234,7 +1234,7 @@ Re-write, below, to simply ignore statements that cannot be handled.
     // of diagrams associated with the KB, and the +1 being the (diagram-independent) graph
     // of all the causal relationships, constructed in this function.
     
-    convertCausalToSysto = function () {
+    convertCausalToSysto () {
         
         var nodes = {};
         var arcs = {};
@@ -1422,7 +1422,7 @@ Re-write, below, to simply ignore statements that cannot be handled.
     }
 
 
-    crosscheckFormalTerms = function () {
+    crosscheckFormalTerms () {
         console.log('starting...');
         var formalTermsFromKb = this._formalTerms;
         var formalTermsFromStatements = this.extractFormalTermsFromStatements();
@@ -1460,7 +1460,7 @@ Re-write, below, to simply ignore statements that cannot be handled.
     }
 
 
-    extractFormalTermsFromStatements = function () {
+    extractFormalTermsFromStatements () {
         var statements = this._statements;
         var allTerms = {};
         var countStarted = {};

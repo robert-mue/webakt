@@ -4,13 +4,13 @@ class Arc {
     }
 
 
-    makeIdFromNodes = function (fromNode,toNode) {
+    makeIdFromNodes (fromNode,toNode) {
         return node1 + '__' + node2;
     }
 
 
     // Find the statement (there should be only 1) for this arc.
-    findStatement = function () {
+    findStatement () {
         return statements;
     }
 

@@ -3,6 +3,7 @@ class Diagram {
     constructor(id,spec) {
         console.log(9120,spec);
         self = this;
+        //thisDiagram = this;
         if (id) {
             this._id = id;
         } else {
@@ -57,7 +58,9 @@ class Diagram {
     // offset: distance from line to control point
     // https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line - See section "Another formula"
 
-    calculateJlinkParams = function (jlink) {
+
+
+    calculateJlinkParams (jlink) {
         if (jlink.attributes.vertices) {
             var sourceId = jlink.get('source').id;
             var targetId = jlink.get('target').id;
@@ -101,7 +104,7 @@ class Diagram {
     }
 
 
-    calculateJlinkVertex = function (jlink) {
+    calculateJlinkVertex (jlink) {
         //console.log(jlink);
         var sourceId = jlink.get('source').id;
         var targetId = jlink.get('target').id;
@@ -128,7 +131,7 @@ class Diagram {
 
 
 
-    convertJointToSysto = function () {
+    convertJointToSysto () {
         var joint = this._joint;
 
         var subgraph = {};
@@ -217,7 +220,7 @@ class Diagram {
     // This is not really a conversion, since it is only used to get systoNode.centrex/centrey
     // values to populate the systoNode instance.
 
-    convertSpringyToSysto = function () {
+    convertSpringyToSysto () {
         var subgraph = this._subgraph;
         var springy = this._springy;
         for (var i=0; i<springy.node.length; i++) {
@@ -231,7 +234,7 @@ class Diagram {
     }
 
 
-    convertSystoToSpringy = function () {
+    convertSystoToSpringy () {
         var springy = {nodes:[],edges:[]};
         for (nodeId in this._subgraph.nodes) {
             springy.nodes.push(nodeId);
@@ -261,7 +264,7 @@ class Diagram {
     // The node properties id, label, x and y have the same meaning in both contexts.
 
 
-    convertSystoToJoint = function (subgraph) {
+    convertSystoToJoint (subgraph) {
         console.log('\n\n\n===============================\nconvertSystoToJoint(subgraph)\nSysto subgraph',subgraph);
         var jgraph = this.jgraph;
 
@@ -333,7 +336,7 @@ class Diagram {
     }
 
 
-    createJnode = function (node) {
+    createJnode (node) {
         console.log(6601,node);
         var jgraph = this.jgraph;
         var id = node.id;
@@ -495,6 +498,7 @@ class Diagram {
             // to create various forms of names/labels for a node from the 
             // nodes JSON attribute.
             jnode.makeNodeName = function (json) {
+                console.log(7610,json);
                 if (typeof json === 'string') {
                     var array = [json];
                 } else {
@@ -534,7 +538,7 @@ class Diagram {
     }
 
 
-    createJlink = function (arc) {
+    createJlink (arc) {
         console.log(5701,'createJlink',arc);
         var jgraph = this.jgraph;
 
@@ -603,6 +607,10 @@ class Diagram {
                     });
                     if (jlink) {
                         jlink.calculateParams = function () {
+                            console.log(iamavar);
+                            console.log(7630,self);
+                            console.log(this);
+                            console.log(7631,jlink);
                             return self.calculateJlinkParams(jlink);
                         }
                         jlink.calculateVertex = function () {
@@ -766,7 +774,7 @@ class Diagram {
 // =========================================================================
 
 
-    createSystoNode = function (nodeJson) {
+    createSystoNode (nodeJson) {
         var kbId = widget.options.kbId;
         var kb = AKT.KBs[kbId];
         var subgraph = kb._subgraph;
@@ -806,7 +814,7 @@ springyGraphJSON = {
   ]
 };
 */
-    graphLayoutSpringy = function () {
+    graphLayoutSpringy () {
         var self = this;
 
         var springyGraphJson = {nodes:[],edges:[]};
@@ -883,7 +891,7 @@ springyGraphJSON = {
 
 
 
-    makeSubgraph = function (topic,show) {
+    makeSubgraph (topic,show) {
         if (show) console.log('\n\ndiagram.makeSubgraph');
         // kb.getStatements(filtering by causal and searchExpression)
         
@@ -947,7 +955,7 @@ springyGraphJSON = {
     }
 
 
-    render = function(library) {
+    render(library) {
         var widget = AKT.state.current_widget;
 
         if (!library || library === 'jointjs') {
@@ -989,7 +997,7 @@ springyGraphJSON = {
     }
 
 
-    updateMidnodes = function (element) {
+    updateMidnodes (element) {
         var jgraph = this.jgraph;
         _.each(jgraph.getLinks(), function(jlink) {
             var sourceId = jlink.get('source').id;
@@ -1003,7 +1011,7 @@ springyGraphJSON = {
 
     // This method allows for the property value to be computed rather than be a native
     // one for this Class.   See the same method in Statement.js
-    getPropertyValue = function (propertyId) {
+    getPropertyValue (propertyId) {
         if (this['_'+propertyId]) {
             return this['_'+propertyId];
 

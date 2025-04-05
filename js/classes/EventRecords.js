@@ -4,7 +4,7 @@ class EventRecords {
         this.event_records = [];  
     }
 
-    add = function (eventRecord) {
+    add (eventRecord) {
         this.event_records.push(eventRecord);
     }
 }

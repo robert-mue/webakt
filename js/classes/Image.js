@@ -40,7 +40,7 @@ class Image {
     // a native one for this Class.   See the same method in Statement.js.
     // So, in principle every reference to Collection._PropertyId should be changed to
     // Collection.getPropertyValue(PropertyId).
-    getPropertyValue = function (propertyId) {
+    getPropertyValue (propertyId) {
         if (this['_'+propertyId]) {
             return this['_'+propertyId];
 

@@ -88,7 +88,7 @@ class FormalTerm {
     }
 
 
-    makeSpec = function () {
+    makeSpec () {
         var formalTermSpec = {
             id: this._id,
             term: this._term,
@@ -127,7 +127,7 @@ class FormalTerm {
     // a native one for this Class.   See the same method in Statement.js.
     // So, in principle every reference to Collection._PropertyId should be changed to
     // Collection.getPropertyValue(PropertyId).
-    getPropertyValue = function (propertyId) {
+    getPropertyValue (propertyId) {
         if (this['_'+propertyId]) {
             return this['_'+propertyId];
 
@@ -137,7 +137,7 @@ class FormalTerm {
     }
 
 /*
-    passFilters = function(filters) {
+    passFilters(filters) {
         
         if (filters && filters.term_type) {
             if (filters.term_type === 'all') {
@@ -189,7 +189,7 @@ class FormalTerm {
         not_used: true/false
     */
 /*
-    passFilters1xxx = function (filters) {
+    passFilters1xxx (filters) {
 
         var kbId = AKT.state.current_kb;
         var kb = AKT.KBs[kbId];
@@ -295,7 +295,7 @@ class FormalTerm {
     // this inside a loop over all categories, but this requires a function for each
     // category, which is hardly much of a saving.   
 
-    passFilters1 = function (filters) {
+    passFilters1 (filters) {
         var kbId = AKT.state.current_kb;
         var kb = AKT.KBs[kbId];
 
@@ -429,7 +429,7 @@ class FormalTerm {
         return result;
     }
 
-    is_used = function (kb) {
+    is_used (kb) {
         var formaltermId = this._id;
         var cached = kb._cache[formaltermId];
         if (cached) {
