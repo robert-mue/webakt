@@ -325,20 +325,20 @@ class Kb {
 
     getStatements (filters) {
         var okStatements = {};
-        //console.log('>>>\n',filters,'\n',this._statements);
-        //console.log(8607,filters);
+        console.log('>>>\n',filters,'\n',this._statements);
+        console.log(8607,filters);
         if (typeof filters === 'object') {
-            //console.log(8608);
+            console.log(8608);
             for (var statementId in this._statements) {
                 var statement = this._statements[statementId];
 		        try {
                     if (statement.passFilters1(filters)) {
-                        //console.log(statementId);
+                        console.log(8609,statementId);
                         okStatements[statementId] = statement;
                     }
                 }
                 catch(error) {
-			        //console.log('ERROR: Invalid statement, failed in Statement.passFilters()\n',statement);
+			        console.log('ERROR: Invalid statement, failed in Statement.passFilters()\n',statement);
                 }
             }
 
@@ -890,7 +890,7 @@ class Kb {
                 for (var arcId in arcs1) {
                     arcs2[arcId] = {
                         id:arcId,
-                        type:arcs1[arcId].type,
+                        akt_type:arcs1[arcId].akt_type,
                         start_node_id:arcs1[arcId].start_node_id,
                         end_node_id:arcs1[arcId].end_node_id
                     }
@@ -1188,7 +1188,7 @@ Re-write, below, to simply ignore statements that cannot be handled.
             }
         } else {
             for (var id in file_kb.diagrams) {
-                console.log(9301,file_kb.diagrams[id]);
+                //console.log(9301,file_kb.diagrams[id]);
                 var diagram = new Diagram(id,file_kb.diagrams[id]);
                 //diagram.convertSystoToJoint();
                 this._diagrams[id] = diagram;
@@ -1250,8 +1250,11 @@ Re-write, below, to simply ignore statements that cannot be handled.
         for (var statementId in statements) {
             // Put this as a method in Statement class.
             var statement = statements[statementId];
+            console.log('\n',3301,statement);
             var json = statement.json;
+            console.log(3302,json);
             var nodePair = extractCauseAndEffectParts(json);
+            console.log(nodePair);
             if (nodePair) {
                 var arc = {};
                 var nodeIdPair = [];

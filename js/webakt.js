@@ -1952,3 +1952,63 @@ AKT.slidersCss = function(widget) {
 };
 
 
+// AKT.makeID()
+// ============
+// This function constructs a string which is the ID for arcs and vertex nodes in a 
+// webAKT diagram.    The call to this function provides the 'structure' being built
+// and two or 3 arguments, as an array. 
+// See the switch case statements for the possible values for the structure, along
+// with comments explaining its role.
+// The reason for having this function (rather than simply constructing IDs in  the code)
+// is to ensure consistency in the grammatical structure of the IDs created, since nodes
+// and arcs can be added to a Systo 'subgraph' in more than one place (specifically,
+// from the JointJS graph using Diagram.convertJointToSysto() and when the user adds 
+// a single node or arc interactively.)
+
+AKT.makeId = function(structure,args) {
+
+    switch(structure) {
+
+        // A causal_arc is the normal arc type, representinga causes1way statement.
+        case 'causal_arc':
+            var fromId = args[0];
+            var toId = args[1];
+            return fromId+'_TO_'+toId;
+            break;
+
+        // A condition_arc is one between a node which specifies a condition for a causal
+        // relationship and a vertex node: that is, a node placed on the middle of the arc
+        // between the cause and effect nodes of a causal relationship.   
+        // The vertex node is normally not visible, so the diagram shows this arc pointing
+        // at the middle of the causal arc.   It's only when the users say they want to 
+        // add a condition arc that a small blob appears on each causal arc, to provide 
+        // an attachment point for the condition arc.
+        case 'condition_arc':
+            var conditionId = args[0]
+            var fromId = args[1];
+            var toId = args[2];
+            return conditionId+'_TO_VERTEX_'+fromId+'_TO_'+toId;
+            break;
+
+        // A ghost_arc is one between a node which specifies a condition for a causal
+        // relationship and either the cause or effect node for that relationship.
+        // (There are always two ghost arcs, one for each of the two nodes.)
+        // Its use is solely for guilding the graph-layout algorithm, to ensure that
+        // the condition node is placed close to the two nodes in the causal relationship.
+        case 'ghost_arc':
+            var fromId = args[0];
+            var toId = args[1];
+            return 'GHOST '+fromId+'_TO_'+toId;
+            break;
+
+        case 'vertex_node':
+            var fromId = args[0];
+            var toId = args[1];
+            return 'VERTEX_'+fromId+'_TO_'+toId;
+            break;
+
+        default:
+            return 'ERROR in AKT.makeId() in webakt.js: '+structure+' not recognised';
+    }
+}
+

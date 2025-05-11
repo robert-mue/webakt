@@ -16,7 +16,8 @@ AKT.widgets.diagram_details = {};
 
 
 AKT.widgets.diagram_details.setup = function (widget) {
-    console.log('Starting akt.diagram: setup()');
+    console.log('\n\nXXX Starting akt.diagram: setup()');
+    console.log('XXX widget.options: ',widget.options);
 
     AKT.state.current_widget = widget;
 
@@ -48,37 +49,49 @@ AKT.widgets.diagram_details.setup = function (widget) {
     var instance = "something_unique";  // .... the widget's UUID
     var kbId = widget.options.kbId;
     var kb = AKT.KBs[kbId];
-
-    var diagram = new Diagram('new','systo');
-
-    widget.diagram = diagram;
  
-    // Listbox with plain list of topics.
-    var hierarchyId_filter = 'all';
-    var topics = kb.findTopics({hierarchyId:hierarchyId_filter});
-    for (var topicId in topics) {
-        var topic = topics[topicId];
-        var subgraph = diagram.makeSubgraph(topic,false);
-        var nNodes = Object.keys(subgraph.nodes).length; 
-        var nArcs = Object.keys(subgraph.arcs).length;  
 
-        var nConditional = 0;
-        for (var iArc in subgraph.arcs) {
-            var arc = subgraph.arcs[iArc];
-            if (arc.type === 'condition') {
-                nConditional += 1;               
-            }
-        }
-        topic._info = topicId+': '+nNodes+'/'+nArcs+' ('+nConditional+')';
-    } 
- 
-    AKT.loadSelectOptions(widget.element, 'listbox_topics', topics, ['_id','_info'],{title:'_search_term'});
-    // End of topics listbox
+
+    // We either create an empty jgraph (Joint graph) here if mode='new', or 
+    // we create the jgraph in diagram.convertSystoToJoint(), and populate it
+    // with nodes and arcs from the Systo subgraph.
+
+    // Reminder: we refer to "subgraph", not "graph", since it is a graph formed
+    // by a subset of all the causal statements in the KB.
+
+    // Note that "item" is the generic term (across all collections) for one 
+    // instance of a collection.    We could also used item_id and look up the
+    // instance, should we decide that is a better way of doing things.
+
+    // From now on in this widget, we should just be working with the (Joint) jgraph,
+    // not the (Systo) subgraph, until we invoke Springy for performing graph-layout,
+    // or perform an Update of the KB, which stores just the Systo graph in the diagram
+    // object.
+    var mode = widget.options.mode;
+    if (mode === 'new') {
+        var diagram = new Diagram('new','systo');
+        widget.diagram = diagram;
+
+    } else if (mode === 'view') {
+        diagram = widget.options.item;
+        widget.diagram = diagram;
+        var subgraph = diagram._subgraph;
+        //var jgraph = diagram.convertSystoToJoint(subgraph);
+
+    } else if (mode === 'edit') {  // NOTE that we do not currently clone the diagram!
+                // So any operations here modify the KB's diagram instance!
+        diagram = widget.options.item;
+        widget.diagram = diagram;
+        var subgraph = diagram._subgraph;
+        //var jgraph = diagram.convertSystoToJoint(subgraph);
+    }
 
     var jgraph = new joint.dia.Graph;
     widget.jgraph = jgraph;
-    diagram.jgraph = jgraph;   // TODO: Change all graph to jgraph
+    diagram._jgraph = jgraph;
     AKT.state.current_graph = jgraph;
+    
+
     // Change width and height here to create a bigger canvas, and cause the panel itself to size accordingly.
     //var paper = new joint.dia.Paper({ el: $(widget.element).find('.div_paper'), width: 1100, height: 600, gridSize: 1, model: graph, linkPinning:false });
     var paper = new joint.dia.Paper({
@@ -88,8 +101,35 @@ AKT.widgets.diagram_details.setup = function (widget) {
         gridSize: 1, 
         model: jgraph, 
         linkPinning:false });
+
     paper.scale(1);
     widget.scale = 1;
+
+    // Listbox with plain list of topics.
+    if (mode === 'new' || mode ==='edit') {
+        var hierarchyId_filter = 'all';
+        var topics = kb.findTopics({hierarchyId:hierarchyId_filter});
+        for (var topicId in topics) {
+            var topic = topics[topicId];
+            var subgraph = diagram.makeSubgraph(topic,false);
+            var nNodes = Object.keys(subgraph.nodes).length; 
+            var nArcs = Object.keys(subgraph.arcs).length;  
+
+            var nConditional = 0;
+            for (var iArc in subgraph.arcs) {
+                var arc = subgraph.arcs[iArc];
+                if (arc.akt_type === 'condition') {
+                    nConditional += 1;               
+                }
+            }
+            topic._info = topicId+': '+nNodes+'/'+nArcs+' ('+nConditional+')';
+        } 
+    }
+
+
+    AKT.loadSelectOptions(widget.element, 'listbox_topics', topics, ['_id','_info'],{title:'_search_term'});
+    // End of topics listbox
+
 
 
     $(widget.element).on( "resizexxx", function(event, ui) {
@@ -133,10 +173,11 @@ AKT.widgets.diagram_details.setup = function (widget) {
     jlinkInfobox.status = 'no_name';
     jlinkInfobox.addTo(jgraph);
     widget.jlinkInfobox = jlinkInfobox;
-
+    
+    console.log(jgraph);
 
     var m = {};
-    AKT.state.mytype = 'pointer';
+    AKT.state.aktType = 'pointer';
     var count = {object:0, attribute:0, process:0, action:0, causes1way:0, causes2way:0, link:0};
     var nodeReady = false;
     var flowPad = null;
@@ -232,11 +273,11 @@ AKT.widgets.diagram_details.setup = function (widget) {
     // Store datalist option values in arrays, one for each syntactic element
     var syntacticElementTypes = ['actions', 'attributes','objects', 'parts', 'processes', 'values'];
     AKT.state.memory = {};
-    $.each(syntacticElementTypes, function(i, type) {
-        AKT.state.memory[type] = [];
-        var list = $('#'+type).find('option');
+    $.each(syntacticElementTypes, function(i, aktType) {
+        AKT.state.memory[aktType] = [];
+        var list = $('#'+aktType).find('option');
         $.each(list, function(j,item) {
-            AKT.state.memory[type].push(item.value);
+            AKT.state.memory[aktType].push(item.value);
         });
     });
 
@@ -291,7 +332,29 @@ AKT.widgets.diagram_details.setup = function (widget) {
         var kbId = widget.options.kbId;
         var kb = AKT.KBs[kbId];
 
-        $(widget.element).find('.div_meta').css({display:'block'});
+        if (widget.diagram._subgraph) {
+            widget.diagram.printSubgraph('From Update',widget.diagram._subgraph);
+        }
+
+        var mode = widget.options.mode;
+        console.log(8401,mode);
+        if (mode === 'new') {
+            $(widget.element).find('.div_meta').css({display:'block'});
+        } else if (mode === 'view') {
+            alert('You cannot sace changes to the diagram in View mode.');
+        } else if (mode === 'edit') {
+            console.log(8402,jgraph);
+            widget.diagram._joint = jgraph;   // Hopefully, redundant, if the function-like approach works.
+            widget.diagram._jgraph = jgraph;   // Ditto.  Duplicate properties are retained during the refactoring process!
+            widget.diagram._subgraph = widget.diagram.convertJointToSysto(jgraph);
+            console.log(8403,widget.diagram._subgraph);
+            var id = widget.diagram._id;
+            console.log(8404,widget.diagram);
+            kb._diagrams[id] = widget.diagram;
+            AKT.saveKbInLocalStorage(kbId)
+            $('#message').text('The Diagram list has been updated');
+            AKT.trigger('item_changed_event',{kb:kb,item_type:'diagram',item:widget.diagram});
+       }
         
     });
 
@@ -302,6 +365,17 @@ AKT.widgets.diagram_details.setup = function (widget) {
         var title = $(widget.element).find('.div_title').text();
         var memo = $(widget.element).find('.div_memo').text();
 
+        // April 2025 Major refactoring to get rid of jointObject and diagram._joint 
+        // (same thing), since that was just a reconfiguration of information in jgraph.
+        // It was confusing to have a 4th way of representing a graph (after Systo, Joint
+        // and Springy).
+        // So, the following code has now been subsumed into Diagram.js: convertJointToSysto(jgraph).
+        // We still create a jointObject there (now called joint), but that is now purely a local thing,
+        // rather than something that is passed around.
+        // Note: the jgraph is now passed as an argument, to make the code more function-like, 
+        // replacing the previous structure of having a _joint property for the Diagram class.
+        // The following commented-out code is left in to shw what used to happen.
+/*
         var jointObject = {nodes:[],links:[]};
         _.each(jgraph.getElements(), function(el) {
             jointObject.nodes.push(el.attributes);
@@ -309,6 +383,7 @@ AKT.widgets.diagram_details.setup = function (widget) {
         _.each(jgraph.getLinks(), function(el) {
             jointObject.links.push(el.attributes);
         });
+*/
 
         //var diagram = new Diagram(id,{id:id, title:title, memo:memo, language:'joint', joint:jointObject});
         //if (!kb._diagrams) {
@@ -317,9 +392,11 @@ AKT.widgets.diagram_details.setup = function (widget) {
 
         console.log(5051,'\n----------');
         console.log(widget.diagram);
-        console.log(jointObject);
-        widget.diagram._joint = jointObject;
-        widget.diagram.convertJointToSysto();
+        console.log(jgraph);
+        widget.diagram._joint = jgraph;   // Hopefully, redundant, if the function-like approach works.
+        widget.diagram._jgraph = jgraph;   // Ditto.  Duplicate properties are retained during the refactoring process!
+        widget.diagram._subgraph = widget.diagram.convertJointToSysto(jgraph);
+        widget.diagram.printSubgraph('Printing from diagram_details:button_meta_ok',widget.diagram._subgraph);
         widget.diagram._id = id;
         widget.diagram._title = title;
         widget.diagram._memo = memo;
@@ -422,16 +499,26 @@ what I'll do.
             var n = kb.findLargestIndex(kb._statements,'s')+1;
             var id = 's'+n;
             console.log(6007,id);
-            var statement = new Statement({id:id,json:json});
+            var statement = new Statement({id:id,json:json,type:'causal'});
             console.log(6008,statement);
             var formal = statement.makeFormalFromJson();
             console.log(6009,formal);
             var english = statement.makeEnglishFromJson();
+            statement.makeNodesAndArc();
             statement._formal = formal;
             console.log(i,n,id);
             console.log(json);
             console.log(formal);
             kb._statements[id] = statement;
+
+            var formalTerms = statement.classifyFormalTerms();
+            for (var id in formalTerms) {
+                var formalTerm = new FormalTerm({id:id,type:formalTerms[id][0],kb:kb,synonyms:[],description:''});
+                kb._formalTerms[id] = formalTerm;
+            }
+
+            AKT.trigger('new_item_created_event',{kb:kb,item_type:'statement',item:statement});
+            AKT.trigger('item_changed_event',{kb:kb,item_type:'statement',item:statement});
         }
         $(this).parent().parent().css({display:'none'});
     });
@@ -445,17 +532,17 @@ what I'll do.
     // Click an Add Node button
     $('.button_add_node').on('click', function(event,item) {
         var category = event.currentTarget.dataset.category;  // 'node' or 'link'
-        var type = event.currentTarget.dataset.type;
-        process_node_or_link_button(this, category, type);   // 'attribute', 'object', 'process' or 'action'
+        var aktType = event.currentTarget.dataset.akt_type;
+        process_node_or_link_button(this, category, aktType);   // 'attribute', 'object', 'process' or 'action'
     });
 
     // Click an Add Link button
     $('.button_add_link').on('click', function(event,item) {
         var category = event.currentTarget.dataset.category;  // 'node' or 'link'
-        var type = event.currentTarget.dataset.type;   // 'causes1way', 'causes2way' or 'link'
-        console.log('===',category,type);
+        var aktType = event.currentTarget.dataset.akt_type;   // 'causes1way', 'causes2way' or 'link'
+        console.log('===',category,aktType);
 
-        process_node_or_link_button(this, category, type);
+        process_node_or_link_button(this, category, aktType);
     });
 
 
@@ -472,7 +559,7 @@ what I'll do.
 
 
     $('.button_delete_node_or_link').on('click', function () {
-        var jgraph = diagram.jgraph;
+        var jgraph = diagram._jgraph;
         _.each(jgraph.getLinks(), function(jlink) {
             if (jlink.selected) {
                 jgraph.getCell(jlink.id).remove();
@@ -566,6 +653,7 @@ what I'll do.
 // =========================== LISTBOX HANDLERS  ==============================
 
     $(widget.element).find('.button_display').on('click', function() {
+        console.log('.button_display');
         event.stopPropagation();
         var kbId = widget.options.kbId;
         var kb = AKT.KBs[kbId];
@@ -647,7 +735,7 @@ what I'll do.
         var kb = AKT.KBs[kbId];
 
         var nodeTypes = {attribute:true, object:true, process:true, action:true};
-        var nodeType = AKT.state.mytype;
+        var nodeType = AKT.state.aktType;
         console.log(':::',nodeType,x,y);
 
         $('.diagram_button_left').css({border:'solid 1px #808080', background:'#f0f0f0'});
@@ -668,7 +756,7 @@ what I'll do.
             }
         });
 
-        AKT.state.mytype = 'pointer';
+        AKT.state.aktType = 'pointer';
     });
 
 
@@ -810,7 +898,10 @@ what I'll do.
     paper.on('link:pointerup', function(linkView) {
         console.log('\nEVENT link:pointerup in diagram.js');
         console.log('linkView.model:',linkView.model);
-        console.log('mytype:',AKT.state.mytype);
+        console.log('aktType:',AKT.state.aktType);
+
+        var diagram = widget.diagram;
+        console.log('diagram:',diagram);
 
         var jlink = linkView.model;
 
@@ -822,8 +913,8 @@ what I'll do.
 
         // ... and this is for the first time, when a new link has just been dragged.
         } else {   // The jlink doesn't already have an 'along' property.
-            var type = AKT.state.mytype;  // From the jlink type button the user has clicked.
-            console.log(type);
+            var aktType = AKT.state.aktType;  // From the jlink type button the user has clicked.
+            console.log(aktType);
 
             try {
                 var along = 0.5;
@@ -834,21 +925,20 @@ what I'll do.
                 var targetId = linkView.model.attributes.target.id;
        
                 var arc = {
-                    id: sourceId+'__'+targetId,
+                    id: AKT.makeId('causal_arc',[sourceId,targetId]),
                     start_node: {id:sourceId},
                     end_node: {id:targetId},
                     start_node_id: sourceId,
                     end_node_id: targetId,
                     along: along,
                     offset: offset,
-                    type: type
+                    akt_type: aktType
                 };
-                diagram.createJlink(arc);
-                diagram._subgraph.arcs[arc.id] = arc;
-                console.log('diagram after createJlink(arc)',diagram);
+                var jlink = diagram.createJlink(arc);
+                jlink.addTo(diagram._jgraph);
 
             } catch (error) {
-                console.error(error);
+                console.log(error);
             }
         }
     });
@@ -895,7 +985,7 @@ what I'll do.
                     stroke:'#dd0000',
                     strokeWidth:2,
                     targetMarker: {
-                        'fill': '#dd0000',
+                        'fill': 'green',
                         'stroke': 'none',
                         'type': 'path',
                         'd': 'M 12 -6 0 0 12 6 Z'
@@ -910,7 +1000,7 @@ what I'll do.
                     stroke:'#0000dd',
                     strokeWidth:3,
                     targetMarker: {
-                        'fill': '#0000dd',
+                        'fill': 'black',
                         'stroke': 'none',
                         'type': 'path',
                         'd': 'M 12 -6 0 0 12 6 Z'
@@ -926,7 +1016,11 @@ what I'll do.
         console.log('diagram.js: paper.on("link:pointerdblclick"');
 
         var jlink = linkView.model;
-        if (jlink.attributes.type === 'condition') {
+        console.log(3101,jlink);
+
+        console.log('\n\n#####\n#####\n#####\n',jlink,'\n\n');
+
+        if (jlink.attributes.akt_type === 'condition') {
             return;
         }
 
@@ -937,9 +1031,12 @@ what I'll do.
             }
         });
         var sourceId = linkView.model.attributes.source.id;
+       console.log(7600,sourceId,jgraph);
+
         var jnodeSource = jgraph.getCell(sourceId);
         console.log('jnodeSource:',jnodeSource);
         AKT.state.currentSourceNode = jnodeSource;
+        console.log(3102,jnodeSource);
         jnodeSource.attr({
             body:{
                 stroke:'blue',
@@ -956,8 +1053,8 @@ what I'll do.
                 strokeWidth:1
             }
         });
-
-        console.log(7601,sourceId,targetId);
+         console.log(7601,sourceId,targetId);
+        console.log(7602,jnodeSource,jnodeTarget);
 
         var kbId = AKT.state.current_kb;
 
@@ -1006,10 +1103,10 @@ what I'll do.
 
     // --------------------------------------------------------------------------------
 
-    function process_node_or_link_button(button, group, type) {
-        if (AKT.state.mytype === type) {
+    function process_node_or_link_button(button, group, aktType) {
+        if (AKT.state.aktType === aktType) {
             $('.diagram_button_left').css({border:'solid 1px #808080', background:'#f0f0f0'});
-            AKT.state.mytype = 'pointer';
+            AKT.state.aktType = 'pointer';
             if (group === 'link') {
                 _.each(jgraph.getElements(), function(el) {
                     el.removeAttr('body/magnet').removeAttr('text/pointer-events');
@@ -1018,8 +1115,8 @@ what I'll do.
         } else {
             $('.diagram_button_left').css({border:'solid 1px #808080', background:'#f0f0f0'});
             $(button).css({border:'solid 1px #808080', background:'#88ff88'});
-            AKT.state.mytype = type;
-            console.log('====',group,type);
+            AKT.state.aktType = aktType;
+            console.log('====',group,aktType);
             if (group === 'link') {
                 _.each(jgraph.getElements(), function(el) {
                     el.attr('body/magnet', true).attr('text/pointer-events', 'none');
@@ -1029,9 +1126,9 @@ what I'll do.
     }
 
 
-    function makeId(mytype) {
-        count[mytype] += 1;
-        return mytype+count[mytype];
+    function makeId(aktType) {
+        count[aktType] += 1;
+        return aktType+count[aktType];
     }
 
 
@@ -1127,15 +1224,21 @@ AKT.widgets.diagram_details.display = function (widget) {
             var diagram = AKT.state.current_diagram;  // The object, not the ID
             diagram.render('jointjs');
         }
+
     } else if (mode === 'view') {
         var diagram = widget.options.item;
         var diagramId = widget.options.item_id;
-        diagram.jgraph = widget.jgraph;
+        var subgraph = diagram._subgraph;
+        diagram.convertSystoToJoint(subgraph, widget.jgraph);  // 15 April 2025 New version
+        diagram._jgraph = widget.jgraph;
         diagram.render('jointjs');
+
     } else if (mode === 'edit') {
         var diagram = widget.options.item;
         var diagramId = widget.options.item_id;
-        diagram.jgraph = widget.jgraph;
+        var subgraph = diagram._subgraph;
+        diagram.convertSystoToJoint(subgraph, widget.jgraph);  // 15 April 2025 New version
+        diagram._jgraph = widget.jgraph;
         diagram.render('jointjs');
     }
 };
@@ -1180,6 +1283,12 @@ AKT.widgets.diagram_details.html = `
             <input type="button" style="float:left;margin-left:10px;" class="button_display" value="Display">
         </div>
 
+        <button class="button_topic_details" title="This opens up the standard topic_details panel for the selected topic.">Topic details</button>
+        <button class="button_topic_display" title="This generates a layout for the selected topic, and displays it.">Display topic</button>
+        <button class="button_diagram_redisplay" title="This generates a new layout for the whole diagram, and re-displays it.">Re-display diagram</button>
+        <button class="button_update" title="This adds the diagram to the current knowledge base, or modifies it if it exists alread.">Update</button>
+
+        <!-- Pension off the following 3 lines -->
         <input type="button" class="button_update" style="float:left;margin-left:10px;" value="Update">
         <input type="button" class="button_load" style="float:left;margin-left:10px;" id="'+instance+'_load diagram_load" value="Load">
         <input type="button" onclick="layout();" style="float:left;margin-left:3%;" id="'+instance+'_menu" value="Menu">
@@ -1193,18 +1302,18 @@ AKT.widgets.diagram_details.html = `
         <div class="left_div w3-col w3-left w3-container div_editting" style="margin-top:0px; padding:5px; width:110px;">
             <fieldset style="position:static;">
                 <legend>Add node</legend>
-                <input type="button" class="button_add_node button_add_attribute diagram_button_left node_attribute" data-category="node" data-type="attribute" value="Attribute"><br>
-                <input type="button" class="button_add_node button_add_object diagram_button_left node_object" data-category="node" data-type="object" value="Object"><br>
-                <input type="button" class="button_add_node button_add_process diagram_button_left node_process" data-category="node" data-type="process"  value="Process"><br>
-                <input type="button" class="button_add_node button_add_action diagram_button_left node_action" data-category="node" data-type="action" value="Action"><br>
+                <input type="button" class="button_add_node button_add_attribute diagram_button_left node_attribute" data-category="node" data-akt_type="attribute" value="Attribute"><br>
+                <input type="button" class="button_add_node button_add_object diagram_button_left node_object" data-category="node" data-akt_type="object" value="Object"><br>
+                <input type="button" class="button_add_node button_add_process diagram_button_left node_process" data-category="node" data-akt_type="process"  value="Process"><br>
+                <input type="button" class="button_add_node button_add_action diagram_button_left node_action" data-category="node" data-akt_type="action" value="Action"><br>
              </fieldset>
 
             <fieldset style="position:static;">
                 <legend>Add link</legend>
-                <input type="button" class="button_add_link button_add_causes1way diagram_button_left link_causes1way" data-category="link" data-type="causes1way" value="Causes1way" style="width:60px;"><br>
-                <input type="button" class="button_add_link button_add_causes2way diagram_button_left link_causes2way" data-category="link" data-type="causes2way" value="Causes2way" style="width:60px;"><br>
-                <input type="button" class="button_add_link button_add_link diagram_button_left link_link" data-category="link" data-type="link" value="Link" style="width:60px;"><br>
-                <input type="button" class="button_add_link button_add_link diagram_button_left link_condition" data-category="link" data-type="condition" value="Condition" style="width:60px;"><br>
+                <input type="button" class="button_add_link button_add_causes1way diagram_button_left link_causes1way" data-category="link" data-akt_type="causes1way" value="Causes1way" style="width:60px;"><br>
+                <input type="button" class="button_add_link button_add_causes2way diagram_button_left link_causes2way" data-category="link" data-akt_type="causes2way" value="Causes2way" style="width:60px;"><br>
+                <input type="button" class="button_add_link button_add_link diagram_button_left link_link" data-category="link" data-akt_type="link" value="Link" style="width:60px;"><br>
+                <input type="button" class="button_add_link button_add_link diagram_button_left link_condition" data-category="link" data-akt_type="condition" value="Condition" style="width:60px;"><br>
              </fieldset>
 
             <fieldset style="position:static;">

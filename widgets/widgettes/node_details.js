@@ -19,13 +19,26 @@ AKT.widgets.node_details = {};
 
 AKT.widgets.node_details.setup = function (widget) {
 
+    var thisNode = {};
+
+    // THIS IS PURELY TO SIMPLIFY TESTING OF CREATING A DIAGRAM WITH TWO NODES!
+    // DELETE IN RELEASE VERSION!
+    if (!AKT.state.node_switch) AKT.state.node_switch = 1;
+    if (AKT.state.node_switch === 1) {
+        $(widget.element).find('.div_formal').text('attribute(aaa,bbb)');
+        thisNode.id = 'aaa_bbb';
+        AKT.state.node_switch = 2;
+    } else {
+        $(widget.element).find('.div_formal').text('attribute(ccc,ddd)');
+        thisNode.id = 'ccc_ddd';
+        AKT.state.node_switch = 1;
+    }
+
     if (widget.options.mode === 'existing_node') {
         $(widget.element).find('.div_formal_label').css({display:'none'});
         $(widget.element).find('.div_wordlist').css({display:'none'});
         $(widget.element).find('.div_template_section').css({display:'none'});
     }
-
-    var thisNode = {};
 
     console.log(1501,widget.options);
 
@@ -51,7 +64,7 @@ AKT.widgets.node_details.setup = function (widget) {
                 '<input type="button" value="X" class="dialog_close_button"/>'+
             '</div>');
         $(widget.element).append(widgetTitlebar);
-        $('.dialog_close_button').on('click', function () {
+        $('.dialog_close_buttonxxx').on('click', function () {
             var id = $(this).parent().parent()[0].id;
             $('#'+id).css({display:"none"});
         });
@@ -115,6 +128,7 @@ AKT.widgets.node_details.setup = function (widget) {
 */
         //var id = $(this).parent().parent()[0].id;
         //$('#'+id).css({display:"none"});
+
 
     // This is not the same as the OK button..  
     // Rather, this converts the template contents into a formal node
@@ -270,7 +284,7 @@ AKT.widgets.node_details.setup = function (widget) {
         //console.log(2010,formal,s,json,id);
         var node = {
             id: id,
-            type: widget.options.node_type,    // TODO: Should be widget.options.node_type,
+            akt_type: widget.options.node_type,    
             label: id,
             centrex: widget.options.x,
             centrey: widget.options.y,
@@ -280,11 +294,15 @@ AKT.widgets.node_details.setup = function (widget) {
         }
         console.log(1701,' Systo node 1:',node);
     
+/* April 2025.   Strategy is not to modify subgraph (i.e. the Systo format) until
+   the user clicks the Update button.
+   But we still create a (Systo) node, since that's how we pass the reqired details to 
+   diagram.createJnode(), below.
         if (!diagram._subgraph) {
             diagram._subgraph = {nodes:{},arcs:{}};
         }
         diagram._subgraph.nodes[id] = node;
-
+*/
         //var x = widget.options.x;
         //var y = widget.options.y;
         //var aktType = widget.options.node_type;
@@ -297,7 +315,15 @@ AKT.widgets.node_details.setup = function (widget) {
 
         //var node = {id:id,type:widget.options.node_type,label:id,centrex:x,centrey:y,json:json};
         console.log(1702,'Systo node 2',node);
-        diagram.createJnode(node);
+        console.log(1703,diagram);
+        var jnode = diagram.createJnode(node);
+        console.log(1704,jnode);
+        jnode.addTo(diagram._jgraph);
+
+        diagram._jgraph.getElements().forEach(function(element) {
+            //element.render();
+            console.log(5400,element);
+        });
 
         var label = id.replace(/_/g, ' ');
         var labelWrapped = AKT.mywrap(label,15).wrappedString;
@@ -305,8 +331,8 @@ AKT.widgets.node_details.setup = function (widget) {
 
         //saveDiagramToLocalStorage(jgraph, 'current');
         $('.diagram_button_left').css({border:'solid 1px #808080', background:'#f0f0f0'});
-        AKT.state.mytype = 'pointer';
-        _.each(diagram.jgraph.getElements(), function(el) {
+        AKT.state.aktType = 'pointer';
+        _.each(diagram._jgraph.getElements(), function(el) {
             el.removeAttr('body/magnet').removeAttr('text/pointer-events');
         });
 

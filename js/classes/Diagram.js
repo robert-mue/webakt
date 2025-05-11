@@ -1,7 +1,8 @@
+
 class Diagram {
     
     constructor(id,spec) {
-        console.log(9120,spec);
+        //console.log(9120,spec);
         self = this;
         //thisDiagram = this;
         if (id) {
@@ -64,8 +65,8 @@ class Diagram {
         if (jlink.attributes.vertices) {
             var sourceId = jlink.get('source').id;
             var targetId = jlink.get('target').id;
-            var source = this.jgraph.getCell(sourceId);
-            var target = this.jgraph.getCell(targetId);
+            var source = this._jgraph.getCell(sourceId);
+            var target = this._jgraph.getCell(targetId);
 
             var sx = source.attributes.position.x + 25;
             var sy = source.attributes.position.y + 15;
@@ -108,8 +109,8 @@ class Diagram {
         //console.log(jlink);
         var sourceId = jlink.get('source').id;
         var targetId = jlink.get('target').id;
-        var source = this.jgraph.getCell(sourceId);
-        var target = this.jgraph.getCell(targetId);
+        var source = this._jgraph.getCell(sourceId);
+        var target = this._jgraph.getCell(targetId);
     
         var sx = source.attributes.position.x + 25;
         var sy = source.attributes.position.y + 15;
@@ -131,10 +132,15 @@ class Diagram {
 
 
 
-    convertJointToSysto () {
-        var joint = this._joint;
+    convertJointToSysto (jgraph) {
+        // April 2025 Major revamp, to make it more obvious about what is going on.
 
-        var subgraph = {};
+        console.log(1234,jgraph.getElements());
+        console.log(1234,jgraph.getLinks());
+
+        var subgraph = {};    // Reminder: "subgraph" is my term for a Systo-syntax graph which 
+            // is a subset of the whole KB's graph of causal statements.  It is called subgraph
+            // precisely because it is a subset.  
         subgraph.meta = {
             id: this._id,
             name: 'no_name',
@@ -145,69 +151,77 @@ class Diagram {
         };
 
         subgraph.nodes = {};
-        console.log(4500,joint.nodes);
-        $.each(joint.nodes, function(i,jointNode) {
-            console.log(4501,jointNode);
-            if (jointNode.id.includes('-')) {
+        var elements = jgraph.getElements();   // "elements" is JointJS's term for nodes plus other
+            // things which I ignore.
+        for (var i=0; i<elements.length; i++) {
+            var element = elements[i];
+            console.log('\n\n6401 *****************\n',element);
+            if (element.id.includes('-')) {
                 // Ignore if it's not a regular node.
                 // Nov 2024. This is a terrible hack.    I'm not sure why these nodes are in the joint
                 // version.  Using the Domini topic as an example, there is one node ID with a long
                 // hyphen-separated hex string.
                 //console.log(4501,'NO',jointNode);
-            } else if (jointNode.id.includes('vertex')) {
-                var systoNodeId = jointNode.id.replace(/\n/g,"_").replace(/__/g,"_");
-                var systoNode = {
-                    type: 'vertex',
-                    //label: jointNode.attrs.label.text,
+            } else if (element.id.includes('VERTEX')) {
+                console.log(6402,' VERTEX');
+                var systoNodeId = element.id.replace(/\n/g,"_").replace(/__/g,"_");  // April 2025 The 2nd operation
+                    // should be redundant, since __ should not occur.
+                var systoNode = {    // Properties akt_type and json not relevant for a vertex node.
+                    akt_type: 'vertex',
                     id: systoNodeId,
                     label: systoNodeId,
-                    centrex: jointNode.position.x,
-                    centrey: jointNode.position.y
+                    centrex: element.attributes.position.x,
+                    centrey: element.attributes.position.y
                 }
                 subgraph.nodes[systoNodeId] = systoNode;
-                console.log(4502,systoNode);
             } else {
-                //console.log(4502,'YES',jointNode);
-                //var systoNodeId = jointNode.attrs.label.text.replace(/\n/g,"_").replace(/__/g,"_");
-                var systoNodeId = jointNode.id.replace(/\n/g,"_").replace(/__/g,"_");
+                var systoNodeId = element.id.replace(/\n/g,"_").replace(/__/g,"_");
                 var systoNode = {
                     type: 'object',
-                    //label: jointNode.attrs.label.text,
+                    akt_type: element.akt_type,
                     id: systoNodeId,
                     label: systoNodeId,
-                    centrex: jointNode.position.x,
-                    centrey: jointNode.position.y
+                    centrex: element.attributes.position.x,
+                    centrey: element.attributes.position.y,
+                    json:    element.json
                 };
                 subgraph.nodes[systoNodeId] = systoNode;
             }
-        });
+        };
 
+        // Now handle all the JointJS links (Systo arcs)
         subgraph.arcs = {};
-        $.each(joint.links, function(i,jointLink) {
-            var startNodeId = getNodeIdFromJointNodeId(joint.nodes,jointLink.source.id);
-            var endNodeId = getNodeIdFromJointNodeId(joint.nodes,jointLink.target.id);
-            console.log(8881,startNodeId,endNodeId);
-            var systoArc = {
-                type: jointLink.mytype,
-                start_node_id: startNodeId.replace(/\n/g,"_").replace(/__/g,"_"),
-                end_node_id: endNodeId.replace(/\n/g,"_").replace(/__/g,"_")
-            };
-            var temp = startNodeId + '_TO_' + endNodeId;
-            var systoArcId = temp.replace(/\n/g,"_").replace(/__/g,"_");
-            systoArc.id = systoArcId;
-            subgraph.arcs[systoArcId] = systoArc;
-        });
+        var links = jgraph.getLinks();
+        console.log(1600,jgraph);
+        console.log(1601,links);
+        for (var i=0; i<links.length; i++) {
+            var link = links[i];
+            if (link.arc) {
+                var startNodeId = link.arc.start_node_id;
+                var endNodeId = link.arc.end_node_id;
+                var systoArc = {
+                    akt_type: link.arc.akt_type,
+                    start_node_id: startNodeId.replace(/\n/g,"_").replace(/__/g,"_"),
+                    end_node_id: endNodeId.replace(/\n/g,"_").replace(/__/g,"_")
+                };
+                var temp = startNodeId + '_TO_' + endNodeId;
+                var systoArcId = temp.replace(/\n/g,"_").replace(/__/g,"_");
+                systoArc.id = systoArcId;
+                subgraph.arcs[systoArcId] = systoArc;
+            }
+        };
 
         this._subgraph = subgraph;
         console.log(4503,this._subgraph);
+        return subgraph;
 
-        function getNodeIdFromJointNodeId(jointNodes,jointNodeId) {
-            for (var i=0; i<jointNodes.length; i++) {
-                var jointNode = jointNodes[i];
-                if (jointNode.id === jointNodeId) {
-                    console.log(8882,jointNodeId,jointNode);
+        function getNodeIdFromJointNodeId(jnodes,jnodeId) {
+            for (var i=0; i<jnodes.length; i++) {
+                var jnode = jnodes[i];
+                if (jnode.id === jnodeId) {
+                    console.log(8882,jnodeId,jnode);
                     //var result = jointNode.attrs.label.text;
-                    var result = jointNode.id;
+                    var result = jnode.id;
                     return result;
                 }
             }
@@ -263,10 +277,17 @@ class Diagram {
     // In Joint, it is a type of shape.
     // The node properties id, label, x and y have the same meaning in both contexts.
 
+    // 15th April 2025 Keeping the same name, but changing the way it works.   Previously,
+    // it did as the name suggests: convert a Systo graph ("subgraph" in webAKT) to a Joint 
+    // graph ("jgraph").   Now, it tkes in a jgraph, and ADDS the nodes and arcs it gets
+    // from the Systo graph.    
 
-    convertSystoToJoint (subgraph) {
+    convertSystoToJoint (subgraph, jgraph) {
         console.log('\n\n\n===============================\nconvertSystoToJoint(subgraph)\nSysto subgraph',subgraph);
-        var jgraph = this.jgraph;
+        //var jgraph = this._jgraph;
+        //var jgraph = new joint.dia.Graph;
+        //this._jgraph = jgraph;
+        console.log(5300,subgraph,jgraph);
 
         for (var nodeId in subgraph.nodes) {
             var node = subgraph.nodes[nodeId];
@@ -276,13 +297,15 @@ class Diagram {
                 var jnode = this.createJnode(node);
                 if (jnode) {   // In case something goes wrong...
                     jnode.addTo(jgraph);
+                    console.log('\n5301\n',node,'\n',jnode);
                 }
             }
         }
+        console.log(jgraph);
 
         for (var arcId in subgraph.arcs) {
             var arc = subgraph.arcs[arcId];
-            if (arc.type !== 'condition'){
+            if (arc.akt_type !== 'condition'){
                 console.log('\n8101 non-condition arc:',arc);
                 if (arc) {
                     //var n = arc.statements.length;
@@ -297,7 +320,7 @@ class Diagram {
 
         for (var arcId in subgraph.arcs) {
             var arc = subgraph.arcs[arcId];
-            if (arc.type === 'condition'){
+            if (arc.akt_type === 'condition'){
                 console.log('\n8102 condition arc:',arc);
                 if (arc) {
                     var jlink = this.createJlink(arc);
@@ -308,6 +331,12 @@ class Diagram {
                 }
             }
         }
+
+
+
+        console.log(5305,jgraph);
+        return jgraph;  // Probably unnecessary, since it's an object, and passed 
+                // in as an argument.
 /*
         for (var arcId in subgraph.arcs) {
             var arc = subgraph.arcs[arcId];
@@ -337,15 +366,20 @@ class Diagram {
 
 
     createJnode (node) {
-        console.log(6601,node);
-        var jgraph = this.jgraph;
+        console.log('\n\ncreateJnode\n',6601,node);
+        var jgraph = this._jgraph;
+        console.log(6602,jgraph);
         var id = node.id;
-        var aktType = node.type;
+        if (node.akt_type) {
+            var aktType = node.akt_type;
+        } else {
+            aktType = 'vertex';
+        }
         var label = node.label;
         var x = node.centrex;
         var y = node.centrey;
         var json = node.json;
-        console.log(9999,json);
+        console.log(6603,json);
 
         var label = id.replace(/_/g, ' ');
         var labelWrapped = AKT.mywrap(label,15).wrappedString;
@@ -370,9 +404,11 @@ class Diagram {
             });
             jnode.akt_type = 'attribute';
             jnode.status = 'no_name';
-            jnode.addTo(jgraph);
-            jnode.on('change:position', function(element, position) {
-                self.updateMidnodes(element);
+            jnode.addTo(jgraph);  // I wanted to do in calling function (node_details:ok button), but 
+                    // got Joint error.
+            jnode.on('change:position', function(thisNode, position) {
+                console.log(9899,thisNode);
+                updateMidnodes(thisNode,jgraph);
             });
             jnode.attr('body/magnet', true).attr('text/pointer-events', 'none');
 
@@ -398,7 +434,7 @@ class Diagram {
             jnode.status = 'no_name';
             jnode.addTo(jgraph);
             jnode.on('change:position', function(element, position) {
-                self.updateMidnodes(element);
+                updateMidnodes(element,jgraph);
             });
             jnode.attr('body/magnet', true).attr('text/pointer-events', 'none');
 
@@ -420,7 +456,7 @@ class Diagram {
             jnode.status = 'no_name';
             jnode.addTo(jgraph);
             jnode.on('change:position', function(element, position) {
-                self.updateMidnodes(element);
+                updateMidnodes(element,jgraph);
             });
             jnode.attr('body/magnet', true).attr('text/pointer-events', 'none');
 
@@ -442,7 +478,7 @@ class Diagram {
             jnode.status = 'no_name';
             jnode.addTo(jgraph);
             jnode.on('change:position', function(element, position) {
-                self.updateMidnodes(element);
+                updateMidnodes(element,jgraph);
             });
             jnode.attr('body/magnet', true).attr('text/pointer-events', 'none');
 
@@ -453,19 +489,19 @@ class Diagram {
             jnode.position(x-3, y-3);
             jnode.resize(7, 7);
             jnode.attr({
-                body: {stroke: 'blue', strokeWidth: 1, fill:'blue'}
+                body: {stroke: 'blue', strokeWidth: 1, fill:'yellow'}
             });
             jnode.akt_type = 'vertex';
             jnode.status = 'no_name';
             jnode.addTo(jgraph);
             //jnode.on('change:position', function(element, position) {
-            //    self.updateMidnodes(element);
+            //    self.updateMidnodes(element,jgraph);
             //});
             jnode.attr('body/magnet', true).attr('text/pointer-events', 'none');
         }
 
         $('.diagram_button_left').css({border:'solid 1px #808080', background:'#f0f0f0'});
-        AKT.state.mytype = 'pointer';
+        AKT.state.aktType = 'pointer';
 
         // This is the formal Prolog-style syntax for the node, basically
         // AKT's formal grammar for att_value statements or the components
@@ -535,16 +571,31 @@ class Diagram {
                 'id = ',id,'     aktType = ',aktType);
             return null;
         }
+
+
+        function updateMidnodes (element,jgraph) {
+            console.log(9901,element);
+            _.each(jgraph.getLinks(), function(jlink) {
+                var sourceId = jlink.get('source').id;
+                var targetId = jlink.get('target').id;
+                if (element.id === sourceId || element.id === targetId) {
+                    //var params = self.calculateJlinkVertex(jlink);
+                    console.log(9902,jlink);
+                    var params = jlink.calculateVertex();
+                }
+            });
+        }
+
     }
 
 
     createJlink (arc) {
         console.log(5701,'createJlink',arc);
-        var jgraph = this.jgraph;
+        var jgraph = this._jgraph;
+        var self = this;
 
         //try {
-            var type = arc.type;   // TODO: fix this temporary hack.
-            //aktType = 'causes1way';
+            var aktType = arc.akt_type;
             var id = arc.id;
             var sourceId = arc.start_node_id;
 
@@ -561,7 +612,7 @@ class Diagram {
             var source = jgraph.getCell(sourceId);
             var target = jgraph.getCell(targetId);
             if (source && target) {
-                console.log(arc);
+                console.log(arc,source,target);
                 if (arc.along) {
                     var along = arc.along;
                 } else {
@@ -583,7 +634,10 @@ class Diagram {
 */
                 var col = '#dd0000';
 
-                if (type === 'causes1way') {
+                console.log(5702,aktType);
+
+                if (aktType === 'causes1way') {
+                    console.log(5703);
                     var jlink = new joint.shapes.standard.Link({
                         akt_id: id,
                         id: id,
@@ -591,7 +645,7 @@ class Diagram {
                         target: target,
                         smooth: true,
                         z: -1,
-                        type:'causes1way',
+                        akt_type:'causes1way',
                         attrs: {
                             line: {
                                 stroke: col,
@@ -607,7 +661,6 @@ class Diagram {
                     });
                     if (jlink) {
                         jlink.calculateParams = function () {
-                            console.log(iamavar);
                             console.log(7630,self);
                             console.log(this);
                             console.log(7631,jlink);
@@ -621,23 +674,26 @@ class Diagram {
                         jlink.arc = arc;
                         jlink.addTo(jgraph);
                         jlink.set('akt_id',id);
-                        jlink.set('mytype',type);
+                        jlink.set('akt_type','causes1way');
+                        //jlink.set('akt_type',type);
                         //jlink.set('vertices', [this.calculateJlinkVertex(jlink)]);
                         var vertex = jlink.calculateVertex();
                         jlink.set('vertices', [jlink.calculateVertex()]);
 
-                        var jnodeVertex = new joint.shapes.examples.CustomRectangle({id:'vertex_'+jlink.id});
+                        var vertexNodeId = AKT.makeId('vertex_node',[sourceId,targetId]);
+                        //var jnodeVertex = new joint.shapes.examples.CustomRectangle({id:'VERTEX_'+jlink.id});
+                        var jnodeVertex = new joint.shapes.examples.CustomRectangle({id:vertexNodeId});
                         jnodeVertex.position(vertex.x-3, vertex.y-3);
                         jnodeVertex.resize(7,7);
                         jnodeVertex.attr({
-                            body: {fill: '#dd0000',stroke:'#dd0000',strokeWidth:1}
+                            body: {fill: '#dd0000',stroke:'black',strokeWidth:1}
                         });
                         jnodeVertex.attr('./display','none');
                         jnodeVertex.addTo(jgraph);
                         jlink.jnode_vertex = jnodeVertex;
                     }
 
-                } else if (type === 'causes2way') {
+                } else if (aktType === 'causes2way') {
                     var jlink = new joint.shapes.standard.Link({
                         akt_id: id,
                         id: id,
@@ -676,11 +732,11 @@ class Diagram {
                         jlink.offset = offset;
                         jlink.addTo(jgraph);
                         jlink.set('akt_id',aktId);
-                        jlink.set('mytype',aktType);
+                        jlink.set('aktType','causes2way');
                         jlink.set('vertices', [this.calculateJlinkVertex(jlink)]);
                     }
 
-                } else if (type === 'link') {
+                } else if (aktType === 'link') {
                     var along = 0.5;
                     var jlink = new joint.shapes.standard.Link({
                         id: [sourceId,targetId].sort().join(),
@@ -689,7 +745,7 @@ class Diagram {
                         along: along,
                         smooth: true,
                         z: -1,
-                        type: 'link',
+                        akt_type: 'link',
                         attrs: {
                             line:{stroke:'blue'},
                             '.marker-target': { d: 'M 12 0 L 0 6 L 12 12 z'},
@@ -706,12 +762,12 @@ class Diagram {
                     });
                     jlink.addTo(jgraph);
                     jlink.set('akt_id',id);
-                    jlink.set('mytype',type);
+                    jlink.set('akt_type','link');
                     jlink.set('vertices', [this.calculateCurveVertexPosition(source, target, along, offset)]);
 
                
-                } else if (type === 'condition') {
-                    console.log(8710,type,id,source,link);
+                } else if (aktType === 'condition') {
+                    console.log(8710,aktType,id,source,link);
                     var jlink = new joint.shapes.standard.Link({
                         akt_id: id,
                         id: id,
@@ -719,7 +775,7 @@ class Diagram {
                         target: target,
                         smooth: true,
                         z: -1,
-                        type:'condition',
+                        akt_type:'condition',
                         attrs: {
                             line: {
                                 stroke: '#dd00dd',
@@ -742,17 +798,20 @@ class Diagram {
                         }
                         jlink.along = along;
                         jlink.offset = offset;
+                        jlink.arc = arc;
                         jlink.addTo(jgraph);
                         jlink.set('akt_id',id);
-                        jlink.set('mytype',type);
+                        jlink.set('akt_type','condition');
                         //jlink.set('vertices', [this.calculateJlinkVertex(jlink)]);
                         var vertex = jlink.calculateVertex();
                         jlink.set('vertices', [jlink.calculateVertex()]);
                     }
                 }
+            } else {
+                console.log('\n\nERROR: could not create source or target node.\n\n');
             }
             $('.diagram_button_left').css({border:'solid 1px #808080', background:'#f0f0f0'});
-            AKT.state.mytype = 'pointer';
+            AKT.state.aktType = 'pointer';
             _.each(jgraph.getElements(), function(el) {
                 el.removeAttr('body/magnet').removeAttr('text/pointer-events');
             });
@@ -792,6 +851,7 @@ class Diagram {
         nodes[nodeId] = {
             id:nodeId,
             type:'object',
+            akt_type: 'attribute',   // !!! ALLOW FOR THE OTHER TYPES !!!
             label:nodeId,
             json:node,
             x:500*Math.random(),y:500*Math.random(),
@@ -827,7 +887,7 @@ springyGraphJSON = {
         }
         var springyGraph = new Springy.Graph();
         springyGraph.loadJSON(springyGraphJson);
-        //console.log('903 Initial springyGraph:',springyGraph);
+        console.log('903 Initial springyGraph:',springyGraph);
         var layout = new Springy.Layout.ForceDirected(
           springyGraph,
           50.0, // Spring stiffness
@@ -846,6 +906,7 @@ springyGraphJSON = {
             node.p = p;
           },
           function done() {
+            console.log(904,'Springy.done');
             var subgraph = self._subgraph;
             var xmin = 0;
             var xmax = 0;
@@ -905,6 +966,8 @@ springyGraphJSON = {
         var filters = {type:{causal:true},topic:{[topic._id]:true}};
         var statements = kb.getStatements(filters);
 
+        console.log(5801,statements);
+
         for (var statementId in statements) {
             var statement = statements[statementId];
             var arc = statement._arc;
@@ -955,7 +1018,16 @@ springyGraphJSON = {
     }
 
 
-    render(library) {
+    render(library,jgraph) {
+        console.log(4400,library,jgraph);
+        console.log(this._subgraph);
+        this.printSubgraph('Printing from Diagram:render()',this._subgraph);
+
+        //var kbId = AKT.state.current_kb;
+        //var kb = AKT.KBs[kbId];
+        //var id = 'dd101';
+        //var testSubgraph = this.makeStringifiableSubgraph(this._subgraph);
+        //kb._diagrams[id] = testSubgraph;
         var widget = AKT.state.current_widget;
 
         if (!library || library === 'jointjs') {
@@ -963,7 +1035,9 @@ springyGraphJSON = {
 
             jgraph.clear();
             widget.jlinkInfobox.addTo(jgraph);
-            var jointObject = this.convertSystoToJoint(this._subgraph);
+            var jointObject = this.convertSystoToJoint(this._subgraph,jgraph);
+            //var jointObject = this.convertSystoToJoint(testSubgraph,jgraph);
+            console.log(4401,jointObject);
             return;
 /*
             var jnodes = jointObject.nodes;
@@ -992,22 +1066,10 @@ springyGraphJSON = {
             }
 */
 
-            console.log(JSON.stringify(jgraph.toJSON(),null,4));
+            console.log(4402,JSON.stringify(jgraph.toJSON(),null,4));
         } // End of: if (library==='jointjs')...
     }
 
-
-    updateMidnodes (element) {
-        var jgraph = this.jgraph;
-        _.each(jgraph.getLinks(), function(jlink) {
-            var sourceId = jlink.get('source').id;
-            var targetId = jlink.get('target').id;
-            if (element.id === sourceId || element.id === targetId) {
-                //var params = self.calculateJlinkVertex(jlink);
-                var params = jlink.calculateVertex();
-            }
-        });
-    }
 
     // This method allows for the property value to be computed rather than be a native
     // one for this Class.   See the same method in Statement.js
@@ -1018,6 +1080,54 @@ springyGraphJSON = {
         } else {
             return null;
         }
+    }
+
+    
+    // This method makes a simplified version of the subgraph by removing all objects
+    // (leaving just their instance IDs), ready for stringifying and saving in Local Storage
+    // or file.   Apart from making the subgraph more compact, this removes the risk of 
+    // JSON.stringify() failing because of circular references.
+    // We use the JSON.parse(JSON.stringify()) pattern to isolate the resulting object
+    // from the original subgraph, and to guarantee that it is stringifiable.
+
+    makeStringifiableSubgraph (subgraph) {
+
+        if (subgraph.meta) {
+            var meta1 = JSON.parse(JSON.stringify(subgraph.meta));
+        } else {
+            meta1 = {};
+        }
+
+        var nodes1 = JSON.parse(JSON.stringify(subgraph.nodes));
+
+        var arcs = subgraph.arcs;
+        var arcs1 = {};
+        for (var arcId in arcs) {
+            var arc = arcs[arcId];
+            var arc1 = {
+                akt_type:     arc.akt_type,
+                end_node_id:  arc.end_node_id,
+                end_value:    arc.end_value,
+                id:           arc.id,
+                start_node_id:arc.start_node_id,
+                start_value:  arc.start_value,
+                statement_id: arc.statement_id
+            }
+            arcs1[arcId] = arc1;
+        }
+        var arcs2 = JSON.parse(JSON.stringify(arcs1));
+        
+        return {meta:meta1, nodes:nodes1, arcs:arcs2};
+    }
+
+
+    printSubgraph (label,subgraph) {
+        var subgraph1 = this.makeStringifiableSubgraph(subgraph);  // subgraph1 is also an object, 
+            // but is isolated from the original subgraph so can be modified without affecting
+            // the original version.
+        console.log('\n\nOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO\n',label,'\n');
+        console.log(JSON.stringify(subgraph1,null,4));
+        console.log('\noooooooooooooooooooooooooooooooooooooo');
     }
 
 

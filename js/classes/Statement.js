@@ -1095,14 +1095,16 @@ class Statement {
                 nodeCondition = null;
             }
 
-            var arcId = nodeCause.id+'__'+nodeEffect.id;
+            //** var arcId = nodeCause.id+'__'+nodeEffect.id;
+            // See AKT.makeId() in webakt.js
+            var arcId = AKT.makeId('causal_arc',[nodeCause.id,nodeEffect.id]);
             var arc = {
                 id:           arcId,
                 start_node:   nodeCause,
                 end_node:     nodeEffect,
                 start_node_id:nodeCause.id,
                 end_node_id:  nodeEffect.id,
-                type:         nodeJsonPair[2],
+                akt_type:     nodeJsonPair[2],
                 statement_id: this._id,   // I use the statement ID instead of object, since object has 
                                 // a strong whiff of circularity.   See "this._arc = arc;" below.
                 statements:   [this],   // March 2025. Left in to avoid breaking anything, but 
@@ -1116,10 +1118,11 @@ class Statement {
 
             if (nodeJsonPair[3]) {  // It's a simple conditional causal statement!
                 var nodeIf = getNode(nodeJsonPair[3]);  // This is node for condition term.
-                var nodeIfCausal = getNode(['vertex',arc.id]); // This is ghost node for end of condition arc.
+                var nodeIfCausal = getNode(['VERTEX',arc.id]); // This is the vertex node at the end of the condition arc.
 
                 // Real arc from node_if to node_if_causal (the node attached to the causal arc)
-                var arcId = nodeIf.id+'---'+nodeIfCausal.id;
+                //var arcId = nodeIf.id+'---'+nodeIfCausal.id;
+                var arcId = AKT.makeId('conditional_arc',[nodeIf.id,nodeIfCausal.id]);
                 var arcCondition = {
                     id:            arcId,
                     start_node:    nodeIf,
@@ -1127,13 +1130,13 @@ class Statement {
                     start_node_id: nodeIf.id,
                     end_node_id:   nodeIfCausal.id,
                     end_arc:       arc,
-                    type:          'condition',
+                    akt_type:      'condition',
                     statements:    [this]
                 }
                 this._arcCondition = arcCondition;
 
                 // Ghost arc from node_if_causal to node_cause: purely for springy graph layout
-                var arcId = nodeIfCausal.id+'---'+nodeCause.id;
+                var arcId = AKT.makeId('ghost_arc',[nodeIfCausal.id,nodeCause.id]);
                 var ghostArcCause = {
                     id:            arcId,
                     //start_node: nodeIfCausal,
@@ -1141,13 +1144,13 @@ class Statement {
                     end_node:      nodeCause,
                     start_node_id: nodeIf.id,
                     end_node_id:   nodeCause.id,
-                    type:          'ghost',
+                    akt_type:          'ghost',
                     statements:    [this]
                 }
                 this._ghostArcCause = ghostArcCause;
 
                 // Ghost arc from node_if_causal to node_effect: purely for springy graph layout
-                var arcId = nodeIfCausal.id+'---'+nodeEffect.id;
+                arcId = AKT.makeId('ghost_arc',[nodeIfCausal.id,nodeEffect.id]);
                 var ghostArcEffect = {
                     id:            arcId,
                     //start_node: nodeIfCausal,
@@ -1155,7 +1158,7 @@ class Statement {
                     end_node:      nodeEffect,
                     start_node_id: nodeIf.id,
                     end_node_id:   nodeEffect.id,
-                    type:          'ghost',
+                    akt_type:          'ghost',
                     statements:    [this]
                 }
                 this._ghostArcEffect = ghostArcEffect;
@@ -1216,7 +1219,7 @@ class Statement {
             var nodeJson = JSON.parse(JSON.stringify(nodeJsonIn));
 
             if (typeof nodeJson === 'string') {
-                return {id:nodeJson,label:nodeJson,json:[nodeJson],type:'attribute'};
+                return {id:nodeJson,label:nodeJson,json:[nodeJson],akt_type:'attribute'};
 
             } else if (nodeJson[0]==='not') {
                 nodeJson = nodeJson[1];   // *** TODO *** Fix this hack - the causal link
@@ -1245,7 +1248,7 @@ class Statement {
                     id:    nodeId,
                     label: nodeId,
                     json:  truncated,
-                    type:  nodeJson[0]==='attribute' ? 'attribute' : nodeJson[0],
+                    akt_type:  nodeJson[0]==='attribute' ? 'attribute' : nodeJson[0],
                     value: value    // NOTE: The same node can appear several times, but the value
                                     // can change, depending on the statement.   Therefore, the value
                                     // is passed back purely for the current causal statement, and should
@@ -1259,7 +1262,7 @@ class Statement {
                     id:    nodeId,
                     label: nodeId,
                     json:  nodeJson,
-                    type:  'attribute',
+                    akt_type:  'attribute',
                     value: value     // See note above.
                 };  
                 return node;
