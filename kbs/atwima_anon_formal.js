@@ -6788,7 +6788,7 @@ AKT.kbs.atwima =
         "Fallows_and_soil_types": {
             "id": "Fallows_and_soil_types",
             "name": "Fallows_and_soil_types",
-            "search_term": "and(or(afonywie,or(soil,or(asase_enyine,or(asase_kokoo,or(asase_shesheeshe,or(asase_tuntum,ateche)))))),fallow)",
+            "search_term": "(afonywie or soil or asase_enyine or asase_kokoo or asase_shesheeshe or asase_tuntum or ateche) and fallow",
             "nested_list": [
                 "and",
                 [
@@ -6823,7 +6823,7 @@ AKT.kbs.atwima =
         "Fallows_on_black_soil": {
             "id": "Fallows_on_black_soil",
             "name": "Fallows_on_black_soil",
-            "search_term": "and(or(asase_tuntum,black_layer),fallow)",
+            "search_term": "(asase_tuntum or black_layer) and fallow",
             "nested_list": [
                 "and",
                 [
@@ -6882,7 +6882,7 @@ AKT.kbs.atwima =
         "Fertility_of_black_soil": {
             "id": "Fertility_of_black_soil",
             "name": "Fertility_of_black_soil",
-            "search_term": "and(or(fertility,or(enyunu,or(fertility,or(cocoa_suitability,or(fertility_loss,or(moisture,or(shesheeshe,or(temperature,or(texture,water_holding_capacity))))))))),or(asase_tuntum,black_layer))",
+            "search_term": "(fertility or enyunu or fertility or cocoa_suitability or fertility_loss or moisture or shesheeshe or temperature or texture water_holding_capacity) and (asase_tuntum or black_layer)",
             "nested_list": [
                 "and",
                 [
@@ -6933,7 +6933,8 @@ AKT.kbs.atwima =
         "Fertility_of_clay": {
             "id": "Fertility_of_clay",
             "name": "Fertility_of_clay",
-            "search_term": "and(or(fertility,or(enyunu,or(fertility,or(cocoa_suitability,or(fertility_loss,or(moisture,or(shesheeshe,or(temperature,or(texture,water_holding_capacity))))))))),ateche)",
+            "search_term": "(fertility or enyunu or fertility or cocoa_suitability or fertility_loss or moisture or shesheeshe or temperature or texture or water_holding_capacity) and ateche",
+
             "nested_list": [
                 "and",
                 [
@@ -6980,7 +6981,7 @@ AKT.kbs.atwima =
         "Fertility_of_red_soil": {
             "id": "Fertility_of_red_soil",
             "name": "Fertility_of_red_soil",
-            "search_term": "and(or(fertility,or(enyunu,or(fertility,or(cocoa_suitability,or(fertility_loss,or(moisture,or(shesheeshe,or(temperature,or(texture,water_holding_capacity))))))))),asase_kokoo)",
+            "search_term": "(fertility or enyunu or fertility or cocoa_suitability or fertility_loss or moisture or shesheeshe or temperature or texture or water_holding_capacity) and asase_kokoo",
             "nested_list": [
                 "and",
                 [
@@ -7027,7 +7028,7 @@ AKT.kbs.atwima =
         "Fertility_of_sandy_soil": {
             "id": "Fertility_of_sandy_soil",
             "name": "Fertility_of_sandy_soil",
-            "search_term": "and(or(fertility,or(enyunu,or(fertility,or(cocoa_suitability,or(fertility_loss,or(moisture,or(shesheeshe,or(temperature,or(texture,water_holding_capacity))))))))),afonywie)",
+            "search_term": "(fertility or enyunu or fertility or cocoa_suitability or fertility_loss or moisture or shesheeshe or temperature or texture or water_holding_capacity) and afonywie",
             "nested_list": [
                 "and",
                 [
@@ -7285,7 +7286,7 @@ AKT.kbs.atwima =
         "Soil_fertility": {
             "id": "Soil_fertility",
             "name": "Soil_fertility",
-            "search_term": "and(soil,or(fertility,or(fertility,nutrients)))",
+            "search_term": "soil and (fertility or fertility or nutrients)",
             "nested_list": [
                 "and",
                 "soil",
@@ -7361,7 +7362,7 @@ AKT.kbs.atwima =
         "Soil_properties": {
             "id": "Soil_properties",
             "name": "Soil_properties",
-            "search_term": "and(soil,or(moisture,or(rainfall,or(rain,or(water,or(temperature,or(shesheeshe,or(enyunu,or(water_holding_capacity,or(abuo,or(texture,or(etwre,or(boulder,or(loosening,or(shaking,or(fertility,or(fertility,or(nutrients,decomposition))))))))))))))))))",
+            "search_term": "soil and (moisture or rainfall or rain or water or temperature or shesheeshe or enyunu or water_holding_capacity or abuo or texture or etwre or boulder or loosening or shaking or fertility or fertility or nutrients or decomposition)",
             "nested_list": [
                 "and",
                 "soil",
@@ -7471,7 +7472,7 @@ AKT.kbs.atwima =
         "Soil_types": {
             "id": "Soil_types",
             "name": "Soil_types",
-            "search_term": "or(afonywie,or(asase_kokoo,or(asase_tuntum,or(ateche,black_layer))))",
+            "search_term": "afonywie or asase_kokoo or asase_tuntum or ateche black_layer",
             "nested_list": [
                 "or",
                 "afonywie",
@@ -7494,7 +7495,7 @@ AKT.kbs.atwima =
         "Soils": {
             "id": "Soils",
             "name": "Soils",
-            "search_term": "or(soil,or(asase_kokoo,or(asase_enyine,or(asase_shesheeshe,or(asase_tuntum,or(ateche,or(afonywie,or(soil,black_layer))))))))",
+            "search_term": "soil or asase_kokoo or asase_enyine or asase_shesheeshe or asase_tuntum or ateche or afonywie or soil black_layer",
             "nested_list": [
                 "or",
                 "soil",

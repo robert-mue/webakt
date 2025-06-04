@@ -69,6 +69,7 @@ AKT.widgets.diagram_details.setup = function (widget) {
     // object.
     var mode = widget.options.mode;
     if (mode === 'new') {
+        console.log('9100 New');
         var diagram = new Diagram('new','systo');
         widget.diagram = diagram;
 
@@ -107,10 +108,55 @@ AKT.widgets.diagram_details.setup = function (widget) {
 
     // Listbox with plain list of topics.
     if (mode === 'new' || mode ==='edit') {
+        //console.log(9121);
         var hierarchyId_filter = 'all';
+
+        var statements = kb._statements;
+        var statementsArray = [];
+        for (var statementId in statements) {
+            var statement = statements[statementId];
+            var formalTerms = statement.getFormalTerms();
+            statement._terms = formalTerms;
+            statementsArray.push(statement);
+        }
+        console.log(91211,statements);
+
         var topics = kb.findTopics({hierarchyId:hierarchyId_filter});
         for (var topicId in topics) {
+            //console.log(9122,topicId);
             var topic = topics[topicId];
+            console.log('\nTOPIC:',topicId,topic._search_term);
+
+            var formalTerms = topic.getFormalTerms();
+            //console.log('@@@ 9123',formalTerms);
+            // We don't need both ways of storing the topic's formal terms!   
+            // topic._formal_terms is obviously better.
+            kb._lookup.formal_terms_for_topic[topicId] = formalTerms;
+            topic._formal_terms = formalTerms;
+
+            var topicStatements = statementsArray.filter(check);
+            function check (statement) {
+                if (statement._formal.search('causes') !== -1) {  // Cheeky hack for causes1way or causes2way.
+                        // Note that this finds the number of causal *statements* for a topic, *not* the 
+                        // number of diagram arcs, for a particular topic.   It is therefore just an 
+                        // approximateindex of how many arcs will be displayed.
+                        // Need to check for "if" when conditional att_value() statements can also be
+                        // be included in diagram.
+                    for (var term in topic._formal_terms) {
+                        if (statement._terms[term]) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            console.log(9125,topicId,topicStatements.length);
+            if (topic._search_term.search(' and ') !== -1) {
+                console.log(topic._search_term.search(' and '));
+                topic._info = topicId+': ---';
+            } else {
+                topic._info = topicId+': '+topicStatements.length;
+            }
+/*
             var subgraph = diagram.makeSubgraph(topic,false);
             var nNodes = Object.keys(subgraph.nodes).length; 
             var nArcs = Object.keys(subgraph.arcs).length;  
@@ -123,7 +169,9 @@ AKT.widgets.diagram_details.setup = function (widget) {
                 }
             }
             topic._info = topicId+': '+nNodes+'/'+nArcs+' ('+nConditional+')';
+*/
         } 
+        console.log();
     }
 
 
@@ -464,6 +512,111 @@ what I'll do.
         console.log('\nEVENT Clicked on link_causes1way_dialog_ok in diagram_details.js');
         var kbId = AKT.state.current_kb;
         var kb = AKT.KBs[kbId];
+
+        var sourceJson = JSON.parse(JSON.stringify(AKT.state.currentSourceNode.json));    // There has to be a better way.   Maybe
+        var targetJson = JSON.parse(JSON.stringify(AKT.state.currentTargetNode.json));    // use a data-attribute, or a text field?
+        console.log(6661,sourceJson,targetJson);
+
+        var rows = $(widget.element).find('.table_values').find('tr');
+        console.log(rows);
+
+        var values = {};   // Convenience storage of attribute values from table,
+                           // one entry for each statement.
+        for (var i=1;i<rows.length;i++) {   // Ignore the first (header) row in the table.
+            var row = rows[i];
+            var statementId = $(row).find('td:eq(1)').text();  // This selects the second <td>
+            values[statementId] = {
+                status: $(row).data('status'),    // 'existing_statement' or 'new_statement'
+                cause:  $(row).find('td[data-role="cause"]').text(),
+                effect: $(row).find('td[data-role="effect"]').text()
+            };
+            if (values[statementId].cause === '') delete values[statementId].cause;
+            if (values[statementId].effect === '') delete values[statementId].effect;
+
+            console.log(i,'existing',$(rows[i]).find('[data-status="existing_statement"][data-role="cause"]').text(),'===>',$(rows[i]).find('[data-status="existing_statement"][data-role="effect"]').text());
+        }
+        console.log('@@@',values);
+
+        // Now modify values in existing statement, create a new statement, or delete a statement,
+        // depending on the value of the 'status' property.
+        for (var statementId in values) {
+            console.log('@',statementId,values[statementId]);
+            if (values[statementId].status === 'existing_statement') {
+                var statement = kb._statements[statementId];
+                console.log('@@',statement);
+                if (values[statementId].cause) {
+                    console.log('@cause');
+                    statement.resetValue('cause',values[statementId].cause);
+                }
+                if (values[statementId].effect) {
+                    console.log('@effect');
+                    statement.resetValue('effect',values[statementId].effect);
+                }
+
+            } else if (values[statementId].status = 'new_statement') {
+                var sourceValue = values[statementId].cause;
+                var targetValue = values[statementId].effect;
+
+                var sourceJson = JSON.parse(JSON.stringify(AKT.state.currentSourceNode.json));    // There has to be a better way.   Maybe
+                var targetJson = JSON.parse(JSON.stringify(AKT.state.currentTargetNode.json));    // use a data-attribute, or a text field?
+                console.log(6001,AKT.state);
+                console.log(6002,JSON.stringify(sourceJson));
+                console.log(6003,JSON.stringify(targetJson));
+                // TODO: att_value must be treated separately for each of source and target nodes, since 
+                // object/process/action don't have a value!
+                if (sourceJson[0] === 'attribute') {
+                    sourceJson[0] = 'att_value';
+                    //sourceJson.pop();
+                }
+                if (targetJson[0] === 'attribute') {
+                    targetJson[0] = 'att_value';
+                    //targetJson.pop();
+                }
+                if (sourceValue) {
+                    //sourceJson.push(sourceValue);
+                    sourceJson[3] = sourceValue;
+                }
+                if (targetValue) {
+                    //targetJson.push(targetValue);
+                    targetJson[3] = targetValue;
+                }
+                console.log(6004,JSON.stringify(sourceJson));
+                console.log(6005,JSON.stringify(targetJson));
+                var json = ['causes1way',sourceJson, targetJson];
+                console.log(6006,JSON.stringify(json));
+                var n = kb.findLargestIndex(kb._statements,'s')+1;
+                var id = 's'+n;
+                console.log(6007,id);
+                var statement = new Statement({id:id,json:json,type:'causal'});
+                console.log(6008,statement);
+                var formal = statement.makeFormalFromJson();
+                console.log(6009,formal);
+                var english = statement.makeEnglishFromJson();
+                statement.makeNodesAndArc();
+                statement._formal = formal;
+                console.log(i,n,id);
+                console.log(json);
+                console.log(formal);
+                kb._statements[id] = statement;
+
+                var formalTerms = statement.classifyFormalTerms();
+                for (var id in formalTerms) {
+                    var formalTerm = new FormalTerm({id:id,type:formalTerms[id][0],kb:kb,synonyms:[],description:''});
+                    kb._formalTerms[id] = formalTerm;
+                }
+
+                AKT.trigger('new_item_created_event',{kb:kb,item_type:'statement',item:statement});
+                AKT.trigger('item_changed_event',{kb:kb,item_type:'statement',item:statement});
+
+            } else if (values[statementId].status = 'delete_statement') {
+            }
+        }
+
+
+        for (var i=0;i<rows.length;i++) {
+            console.log(i,'new',$(rows[i]).find('[data-status="new_statement"]').text());
+        }
+/*
         for (var i=1; i<=3; i++) {
             console.log('\n**',i);
             var sourceValue = $(this).parent().parent().find('.cause_value_'+i+' input').val();
@@ -520,12 +673,41 @@ what I'll do.
             AKT.trigger('new_item_created_event',{kb:kb,item_type:'statement',item:statement});
             AKT.trigger('item_changed_event',{kb:kb,item_type:'statement',item:statement});
         }
+*/
         $(this).parent().parent().css({display:'none'});
     });
 
 
     $(widget.element).find('.link_causes1way_dialog_cancel').on('click', function() {
         $(this).parent().parent().css({display:'none'});
+    });
+
+
+    // Add another, blank, row in the attribute-values table.
+    $(widget.element).find('.link_causes1way_dialog_add').on('click', function() {
+        var jnodes = AKT.state.current_jnodes;
+        var jnodeSource = jnodes.source;
+        var jnodeTarget = jnodes.target;
+
+        var dialog = $(widget.element).find('.link_causes1way_dialog');
+
+        widget.tentativeNewStatementCounter += 1;
+        var tentativeStatementId = 's'+(kb.findLargestIndex(kb._statements,'s')+widget.tentativeNewStatementCounter);
+
+        var tr = $('<tr data-status="new_statement"></tr>');
+
+        $(tr).append('<td><input type="checkbox"></input></td>');
+
+        $(tr).append('<td class="new_attribute_value">'+tentativeStatementId+'</td>');
+
+        if (jnodeSource.json[0] === 'attribute'){
+            $(tr).append('<td  data-status="new_statement" data-role="cause" data-statement_id="'+tentativeStatementId+'" contenteditable style="border:solid 1px black;padding:5px;"></td>');
+        }
+
+        if (jnodeTarget.json[0] === 'attribute'){
+             $(tr).append('<td data-status="new_statement" data-role="effect" data-statement_id="'+tentativeStatementId+'" contenteditable style="border:solid 1px black;padding:5px;"></td>');
+        }
+        $(dialog).find('.table_values').append(tr);
     });
 
 
@@ -1015,8 +1197,13 @@ what I'll do.
     paper.on('link:pointerdblclick', function(linkView) {
         console.log('diagram.js: paper.on("link:pointerdblclick"');
 
+        widget.tentativeNewStatementCounter = 0;
+
         var jlink = linkView.model;
         console.log(3101,jlink);
+
+        var arc = jlink.arc;
+        AKT.state.current_arc = arc;
 
         console.log('\n\n#####\n#####\n#####\n',jlink,'\n\n');
 
@@ -1031,7 +1218,7 @@ what I'll do.
             }
         });
         var sourceId = linkView.model.attributes.source.id;
-       console.log(7600,sourceId,jgraph);
+        console.log(7600,sourceId,jgraph);
 
         var jnodeSource = jgraph.getCell(sourceId);
         console.log('jnodeSource:',jnodeSource);
@@ -1053,24 +1240,58 @@ what I'll do.
                 strokeWidth:1
             }
         });
-         console.log(7601,sourceId,targetId);
+        console.log(7601,sourceId,targetId);
         console.log(7602,jnodeSource,jnodeTarget);
+        AKT.state.current_jnodes = {source:jnodeSource,target:jnodeTarget};
 
         var kbId = AKT.state.current_kb;
+
+        //console.log(7603,arc.statements);
+        //for (var i=0; i<arc.statements.length; i++) {
+        //    var statement = arc.statements[i];
+        //    console.log(7604,statement._id);
+        //}
 
         var dialog = $(widget.element).find('.link_causes1way_dialog');
         dialog.find('.span_source').text(jnodeSource.makeNodeName(jnodeSource.json)+': '+jnodeSource.makeNodeFormal(jnodeSource.json));
         dialog.find('.span_target').text(jnodeTarget.makeNodeName(jnodeTarget.json)+': '+jnodeTarget.makeNodeFormal(jnodeTarget.json));
+        $(dialog).find('.table_values').empty();
 
-        if (jnodeSource.json[0] === 'attribute'){
-            dialog.find('.table_attribute_cause_values').css({display:'block'});
-        } else {
-            dialog.find('.table_attribute_cause_values').css({display:'none'});
-        }
-        if (jnodeTarget.json[0] === 'attribute'){
-            dialog.find('.table_attribute_effect_values').css({display:'block'});
-        } else {
-            dialog.find('.table_attribute_effect_values').css({display:'none'});
+        // Only build up a table of values if at least one of cause or effect has attribute values.
+        if (jnodeSource.json[0] === 'attribute' || jnodeTarget.json[0] === 'attribute'){
+            //var tr = $(dialog).find('.table_values').append('<tr></tr>');
+            var tr = $('<tr></tr>');
+            $(tr).append('<td></td>');
+
+            $(tr).append('<td style="padding-right:10px;">Statement ID</td>');
+            if (jnodeSource.json[0] === 'attribute'){
+                $(tr).append('<td style="padding-right:10px;">Cause attribute value</td>');
+            }
+            if (jnodeTarget.json[0] === 'attribute'){
+                $(tr).append('<td>Effect attribute value</td>');
+            }
+            $(dialog).find('.table_values').append(tr);
+
+            if (arc.statements) {
+                for (var i=0; i<arc.statements.length; i++) {
+                    var tr = $('<tr data-status="existing_statement"></tr>');
+
+                    $(tr).append('<td><input type="checkbox"></input></td>');
+                    var statement = arc.statements[i];
+                    console.log(7604,statement._id);
+
+                    $(tr).append('<td class="'+statement._id+'">'+statement._id+'</td>');
+
+                    if (jnodeSource.json[0] === 'attribute'){
+                        $(tr).append('<td contenteditable style="border:solid 1px black;padding:5px;" data-role="cause">'+statement._arc.start_value+'</td>');
+                    }
+
+                    if (jnodeTarget.json[0] === 'attribute'){
+                         $(tr).append('<td contenteditable style="border:solid 1px black;padding:5px;" data-role="effect">'+statement._arc.end_value+'</td>');
+                   }
+                   $(dialog).find('.table_values').append(tr);
+                }
+            }
         }
 
         dialog.css({display:'block'});
@@ -1392,7 +1613,8 @@ AKT.widgets.diagram_details.html = `
             <div><span>Effect:</span><span class="span_target"></span></span></div>
 
             <div>
-                <table class="table_attribute_cause_values" style="float:left;">
+                <table class="table_values" style="border-spacing:10px 0px;margin-top:10px;"></table>
+                <!--table class="table_attribute_cause_values" style="float:left;">
                     <tr>
                         <th>Cause attribute's value</td>
                     </tr>
@@ -1419,10 +1641,14 @@ AKT.widgets.diagram_details.html = `
                     <tr>
                         <td class="effect_value_3"><input type="text" style="background:white;"></input></td>
                     </tr>
-                </table>
+                </table --->
                 <div style="clear:both;"></div>
             </div>
 
+            <input type="button" class="link_causes1way_dialog_add" style="float:left;margin-left:10px;" value="Add">
+            <input type="button" class="link_causes1way_dialog_view" style="float:left;margin-left:50px;" value="View">
+            <input type="button" class="link_causes1way_dialog_edit" style="float:left;margin-left:10px;" value="Edit">
+            <input type="button" class="link_causes1way_dialog_delete" style="float:left;margin-left:10px;" value="Delete">
             <input type="button" class="link_causes1way_dialog_ok" style="float:right;" value="OK">
             <input type="button" class="link_causes1way_dialog_cancel" style="float:right;" value="Cancel">
         </div>

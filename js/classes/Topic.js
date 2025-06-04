@@ -99,7 +99,9 @@ class Topic {
 
 
     // Derived from Statement:generateJsonFromFormal()
+
     generateJavascriptFromJson () {
+        //console.log(1511,'generateJavascriptFromJson\n',this._json);
          const infixOperator = {
             and:'&&',
             or:'||'};
@@ -128,6 +130,8 @@ class Topic {
 
     generateJavascriptFromSearchExpression () {
 
+        //console.log(1501,'generateJavascriptFromSearchExpression()\n',this._search_term);
+
         var kbId = AKT.state.current_kb;
         var kb = AKT.kbs[kbId];
 
@@ -146,6 +150,7 @@ class Topic {
         var search1 = searchd.split(" ");                       // Tokenise using space as the separator
         //console.log(searchExpression,searcha,searchb,searchc,searchd,search1);
         search2 = '';
+
         for (var i=0; i<search1.length; i++) {
             var symbol = search1[i];
             if (symbol === ' ' || symbol === '') {
@@ -158,10 +163,43 @@ class Topic {
                 search2 += ' || ';
             } else {
                 search2 += 'contains("'+symbol+'")';
+             }
+        }
+        //console.log(1502,'search2',search2);
+        //console.log(formalTerms);
+        return search2;
+    }
+
+
+
+    getFormalTerms () {
+
+        if (this._search_term === '') {
+            var search2 = '';
+            return search2;
+        }
+
+        var searchExpression = this._search_term;
+
+        //searchExpression = "trees and ( soil or water )";
+        var searcha = searchExpression.replace(/\(/g, ' ( ');   // To easily tokenise "("
+        var searchb = searcha.replace(/\)/g, ' ) ');            // To easily tokenise ")"
+        var searchc = searchb.replace(/  /g, ' ');              // Get rid of extraneous spaces
+        var searchd = searchc.replace(/  /g, ' ');              // ... and again!
+        var search1 = searchd.split(" ");                       // Tokenise using space as the separator
+
+        // formalTerms is an object (hash, dict...) rather than an array to speed lookup of its elements.
+        var formalTerms = {};
+        for (var i=0; i<search1.length; i++) {
+            var symbol = search1[i];
+            // Use a regular expression!!
+            if (symbol === ' ' || symbol === '' || symbol === '(' || symbol === ')' || symbol === 'and' || symbol === 'or') {
+                continue;
+            } else {
+                 formalTerms[symbol] = true;
             }
         }
-        console.log(search2);
-        return search2;
+        return formalTerms;
     }
 
 

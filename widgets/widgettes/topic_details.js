@@ -286,7 +286,7 @@ AKT.widgets.topic_details.html = `
 
     <button class="button_statements" style="width:80px;height:25px;" title="Show all statements for this topic.">Statements</button>
     <button class="button_in_hierarchy" style="width:80px;height:25px;" title="Show this topic in the topic hierarchies.">In hierarchy</button>
-    <button class="button_update" style="width:80px;height:25px;" title="Update the KB">Update KB</button>
+    <button class="button_update" style="width:80px;height:25px;" title="Update the KB">Update</button>
     <button class="button_diagram" style="display:none;width:140px;height:35px;" title="Generate and display the causal diagram for all causal statements for this topic.">Diagram</button>
 
 </div>     <!-- End of content div -->

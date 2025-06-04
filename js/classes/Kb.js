@@ -29,6 +29,9 @@ class Kb {
 		this._topics = {};
 		this._topicHierarchies = {};
         this._keys = {};   // Synonym keys
+        this._lookup = {    // container for various efficiency lookups
+            formal_terms_for_topic:{}
+        };  
 
 		this.diagrams = {};
 		this.formalTerms = {};
@@ -325,15 +328,15 @@ class Kb {
 
     getStatements (filters) {
         var okStatements = {};
-        console.log('>>>\n',filters,'\n',this._statements);
-        console.log(8607,filters);
+        //console.log('>>>\n',filters,'\n',this._statements);
+        //console.log(8607,filters);
         if (typeof filters === 'object') {
-            console.log(8608);
+            //console.log(8608);
             for (var statementId in this._statements) {
                 var statement = this._statements[statementId];
 		        try {
                     if (statement.passFilters1(filters)) {
-                        console.log(8609,statementId);
+                        //console.log(8609,statementId);
                         okStatements[statementId] = statement;
                     }
                 }
@@ -559,7 +562,7 @@ class Kb {
     // and finds the largest integer part of that key.   So if the list of objects is
     // this._statements, the key has the form snnn, and the prefix part is 's',
     // it finds the largest value for the nnn part.
-    // objects could be anything, but is here because it is here in Class Kb because ot
+    // 'objects' could be anything, but is here because it is here in Class Kb because it
     // is probably some collection of entities for this KB.
     // Currently only statements employ this type of key.
     findLargestIndex (objects,prefix) {

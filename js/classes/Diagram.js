@@ -2,7 +2,7 @@
 class Diagram {
     
     constructor(id,spec) {
-        //console.log(9120,spec);
+        console.log(9120,spec);
         self = this;
         //thisDiagram = this;
         if (id) {
@@ -311,7 +311,7 @@ class Diagram {
                     //var n = arc.statements.length;
                     var jlink = this.createJlink(arc);
                     if (jlink) {   // In case something has gone wrong...
-                        console.log(81011,jlink);
+                        //console.log(81011,jlink);
                         jlink.addTo(jgraph);
                     }
                 }
@@ -366,9 +366,9 @@ class Diagram {
 
 
     createJnode (node) {
-        console.log('\n\ncreateJnode\n',6601,node);
+        //console.log('\n\ncreateJnode\n',6601,node);
         var jgraph = this._jgraph;
-        console.log(6602,jgraph);
+        //console.log(6602,jgraph);
         var id = node.id;
         if (node.akt_type) {
             var aktType = node.akt_type;
@@ -379,7 +379,7 @@ class Diagram {
         var x = node.centrex;
         var y = node.centrey;
         var json = node.json;
-        console.log(6603,json);
+        //console.log(6603,json);
 
         var label = id.replace(/_/g, ' ');
         var labelWrapped = AKT.mywrap(label,15).wrappedString;
@@ -731,7 +731,7 @@ class Diagram {
                         jlink.along = along;
                         jlink.offset = offset;
                         jlink.addTo(jgraph);
-                        jlink.set('akt_id',aktId);
+                        jlink.set('akt_id',id);
                         jlink.set('aktType','causes2way');
                         jlink.set('vertices', [this.calculateJlinkVertex(jlink)]);
                     }
@@ -966,7 +966,8 @@ springyGraphJSON = {
         var filters = {type:{causal:true},topic:{[topic._id]:true}};
         var statements = kb.getStatements(filters);
 
-        console.log(5801,statements);
+        
+        console.log(9301,Object.keys(statements).length);
 
         for (var statementId in statements) {
             var statement = statements[statementId];

@@ -187,6 +187,45 @@ class Statement {
     }
 
 
+    // May 2025: Need to extend this to allow for an att_value value in 
+    // a conditional part of the statement.     
+    // Also, need to generate a change event, so that any display of the
+    // statement is also updated (unless this is handled by the calling code).
+    resetValue(mode,value) {
+        console.log(5501,mode,value,this);
+        var json = this._json;
+        if (json[0] === 'causes1way') {
+            if (mode === 'cause') {
+                if (json[1][0] === 'att_value') {
+                    json[1][3] = value;
+                }
+            } else if (mode === 'effect') {
+                if (json[2][0] === 'att_value') {
+                    json[2][3] = value;
+                }
+            }
+        } else if (json[0] === 'if') {
+            if (json[0][0] === 'causes1way') {
+                if (mode === 'cause') {
+                    if (json[0][1][0] === 'att_value') {
+                        json[0][1][3] = value;
+                    }
+                } else if (mode === 'effect') {
+                    if (json[0][2][0] === 'att_value') {
+                        json[0][2][3] = value;
+                    }
+                }
+            }
+        } else {
+            console.log('Statement.js: resetValue(mode,value).\n'+
+                'Trying to reset an att_value value in an inappropriate statement.\n'+
+                'statement ID: '+this._id+'\n'+
+                'statement JSON: '+this._json);
+        }
+    }
+            
+            
+
     // TODO: Add check that the source actually exists in the list of sources....
     addSource (sourceId) {
         this._sources.push(sourceId);
@@ -342,6 +381,18 @@ class Statement {
 
 
 
+    getFormalTerms () {
+        var ignoreList = {att_value:true,object:true,process:true,action:true,
+            if:true,causes1way:true,causes2way:true,not:true,and:true,or:true};
+        var formalTerms = {};
+        var terms = this._json.flat(99);
+        for (var i=0; i<terms.length; i++) {
+            var term = terms[i];
+            if (ignoreList[term]) continue;
+            formalTerms[term] = true;
+        }
+        return formalTerms;
+    }
 
 
 
