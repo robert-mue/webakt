@@ -74,48 +74,6 @@ AKT.widgets.boolean_search.setup = function (widget) {
         $(widgetContent).find('.textarea_search_box').val('');
     });
 
-    $(widgetContent).find('.button_searchXXX').on('click', function () {
-        event.stopPropagation();
-        var kbId = widget.options.kbId;
-        var kb = AKT.kbs[kbId];
-
-
-        var searchExpression = $(widgetContent).find('.textarea_search_box').val();
-        var searchExpressionJs = AKT.convertSearchExpressionToJavascript(searchExpression);
-
-        var eventShiftKey = event ? event.shiftKey : null;
-        var panel = new Panel('dialog_Generic', 
-            eventShiftKey, 
-            {left:'650px',top:'20px',width:'580px',height:'550px'},
-            {widget_name:'statements', kbId:kbId, filters:{search_expression_js:searchExpressionJs}});
-
-/*  This is the code used for the topic_details.js Statements button.   Note that it is in terms of the
-    TOPIC, not the SEARCH EXPRESSION.   We either have to create a dummy topic behind the scenes, or
-    make a new filter which works directly with the Boolean expression.
-        var panel = AKT.panelise({
-            widget_name:'collection',
-            position:{left:'20px',top:'20px'},
-            size:{width:'550px',height:'540px'},
-            shift_key: eventShiftKey,
-            options:{kbId:AKT.state.current_kb,item_type:'statement',filters:{topic:{[topic._id]:true}}}
-        });
-*/
-    });
-
-    $(widgetContent).find('.button_mysearch').on('click', function () {
-        var kbId = widget.options.kbId;
-        var kb = AKT.kbs[kbId];
-
-        // The user has to type in pure JavaScript!
-        var searchExpressionJs = $(widgetContent).find('.textarea_search_box').val();
-
-        var eventShiftKey = event ? event.shiftKey : null;
-        var panel = new Panel('dialog_Generic', 
-            eventShiftKey, 
-            {left:'650px',top:'20px',width:'580px',height:'550px'},
-            {widget_name:'statements', kbId:kbId, extended_boolean_search:searchExpressionJs});
-    });
-
 
     $(widget.element).find('.button_create_topic').on('click', function (event) {    // The New button
         console.debug('BUTTON: Clicked on boolean_search create_topic button');
@@ -131,6 +89,42 @@ AKT.widgets.boolean_search.setup = function (widget) {
             size:{width:'580px',height:'450px'},
             shift_key: event.shiftKey,
             options:{kbId:kbId, mode:'new', search_expression:searchExpression}
+        });
+    });
+
+
+    // Derived with modification from topic_details.js, Update and Statements button handlers.
+    //
+    // Since AKT.panelise() needs a topic ID rather than a topic object, we need to insert
+    // the new topic into the KB, with the working ID of 'boolean_search'.   This means that
+    // we must delete this topic each time we do a search, to avoid reatin lots with the 
+    // same name.  Messy, but it does mean that we use the standard filtering mechanism for
+    //generating the list of statements.
+    $(widgetContent).find('.button_search').on('click', function () {
+        event.stopPropagation();
+        var kbId = widget.options.kbId;
+        var kb = AKT.KBs[kbId];
+
+        var id = 'boolean_search';
+        if (kb._topics[id]) {
+            delete kb._topics[id];
+        }
+        var searchExpression = $(widget.element).find('.textarea_search_box').val();
+        //var description = $(widget.element).find('.div_description').text();
+        var objects = 'object';
+        var topic = new Topic({id:id,description:'null',search_expression:searchExpression,objects:objects});
+        widget.topic = topic;
+        console.log(kb,id,topic);
+        kb._topics[id] = topic;
+        //AKT.trigger('new_topic_created_event',{kb:kb,topic:topic});
+        var eventShiftKey = event ? event.shiftKey : null;
+
+        var panel = AKT.panelise({
+            widget_name:'collection',
+            position:{left:'20px',top:'20px'},
+            size:{width:'550px',height:'540px'},
+            shift_key: eventShiftKey,
+            options:{kbId:AKT.state.current_kb,item_type:'statement',filters:{topic:{[topic._id]:true}}}
         });
     });
 
@@ -226,8 +220,8 @@ AKT.widgets.boolean_search.html = `
     </fieldset>
 
     <button class="button_create_topic" style="float:right;width:80px;height:30px;margin:10px;">Create topic</button>
-    <button class="button_search" style="display:none;float:right;width:70px;height:30px;margin:10px;">Search</button>
-    <button class="button_mysearch" style="display:none; float:right;width:70px;height:30px;margin:10px;">MySearch</button>
+    <button class="button_search" style="float:right;width:70px;height:30px;margin:10px;">Search</button>
+    <button class="button_mysearch" style="float:right;width:70px;height:30px;margin:10px;">MySearch</button>
 
 <div style="clear:both"></div>
 </div>

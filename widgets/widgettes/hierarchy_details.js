@@ -307,7 +307,7 @@ AKT.widgets.hierarchy_details.setup = function (widget) {
 	// This is detected by the on('item_selected_event', ...) event handler,
 	// which updates the hierarchy, then in turn triggers a custom event,
 	// the 'kb_changed_event' event.   This is detected by the 
-	// on('kb_changed_event', ...) event handler, which the processes it
+	// on('kb_changed_event', ...) event handler, which then processes it,
 	// re-displaying the hierarchy treetable.
 
 	// 22 March 2023. Technique I am now using is to set an AKT.state boolean
@@ -318,18 +318,43 @@ AKT.widgets.hierarchy_details.setup = function (widget) {
 	// to ensure that only the active panel can respond to the event.
 	// The test below checks for both of these.
 	
+    // Note that there is a confusing duplicate meaning here for the word 'item'.
+    // In widget.options, it refers to one hierarchy (i.e. one item from the
+    // object or topic hierarchy collection).   
+    // In args, it refers to one formal term or one topic, i.e. selected from
+    // the collection of formal terms or topics.   
+    // Both uses of item are correct - an instance f a collection - it's just that      
+    // here we are deaing wth two different collections.
+    // I try to copy 'item' into a suitably-named variable to reduce the confusion.
+
 	$(document).on('item_selected_event', function(event,args) {
-        console.log(9001,args);
-        console.log(9002,AKT.state.listening_for_formal_term, AKT.state.active_panel_id, widget.element[0].id);
+        var kbId = AKT.state.current_kb;
+        var kb = AKT.KBs[kbId];
 	    if (AKT.state.listening_for_formal_term &&
 				AKT.state.active_panel_id === widget.element[0].id) {
+            console.log(9001,args);
+            console.log(9002,AKT.state.listening_for_formal_term, AKT.state.active_panel_id, widget.element[0].id);
 			console.log(9003,'listener:item_selected_event:',args,widget.element[0].id);
+            console.log(9004,widget.options);
+            if (widget.options.item) {
+                var hierarchy = widget.options.item;
+            } else {
+                hierarchy = AKT.state.current_hierarchy;
+            }
+            var hierarchyType = hierarchy._type;   // 'object' or 'topic'
+            var hierarchyId = hierarchy._id;
 
-			if (widget.options.hierarchy) {
-				var hierarchy = widget.options.hierarchy;
-			} else {
-				hierarchy = AKT.state.current_hierarchy;
-			}
+            if (hierarchyType === 'object') {
+                var formalTerm = kb._formalTerms[args.item_id];
+                if (formalTerm._type !== 'object') {
+                    alert('Please select a formal term of type Object for the object hierarchy.');
+                    return;
+                }
+            } else if (hierarchyType === 'topic') {
+            } else {
+                alert('CODING ERROR in hierarchy_details.js\nNot your fault.\nUnrecognised hierarchy type:',hierarchyType);
+            }
+
             self.hierarchy = hierarchy;
 			var trSelected = $(widget.element).find('.div_hierarchies').find('tr.selected');
 			var parentId = $(trSelected).data('tt-id');
@@ -344,7 +369,11 @@ AKT.widgets.hierarchy_details.setup = function (widget) {
 				instance:hierarchy,
 				change:{type:'node_added',parentId:parentId,nodeId:newNodeId}
 			});
-		}
+		} else {
+            // Do nothing: This widget instance is not the one waiting for a node-selection 
+            // event (i.e. a click in the formal_term_collection or the topic_collection
+            // listox).
+        }
     });
 
 
@@ -392,9 +421,9 @@ AKT.widgets.hierarchy_details.display = function (widget) {
 
     var hierarchyType = widget.options.item_type;
     var hierarchyId = widget.options.item_id;
-    console.log(hierarchyType);
-    console.log(hierarchyId);
-    console.log(AKT.collection_specs);
+    console.log('/',3301,hierarchyType);
+    console.log(3302,hierarchyId);
+    console.log(3303,AKT.collection_specs);
     var hierarchy = kb['_'+AKT.collection_specs[hierarchyType].plural][hierarchyId];
     if (!hierarchy) return;
     self.hierarchy = hierarchy;
@@ -406,6 +435,8 @@ AKT.widgets.hierarchy_details.display = function (widget) {
 
     $(widget.element).find('.div_hierarchies').append(divTreetable);
     //$(divTreetable).append(tableTreetable);
+    console.log(3304,widget.options);
+    console.log(3305,itemId);
     if (itemId) {
         try {
             $(tableTreetable).treetable('reveal', itemId);

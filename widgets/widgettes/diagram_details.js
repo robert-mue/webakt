@@ -196,7 +196,7 @@ AKT.widgets.diagram_details.setup = function (widget) {
     var jlinkInfobox = new joint.shapes.standard.Rectangle();   
     //var jlinkInfobox = joint.shapes.basic.TextBlock();
     jlinkInfobox.position(300,300);  //This is set according to current mouse position.
-    jlinkInfobox.resize(300, 90);
+    jlinkInfobox.resize(300, 60);
     jlinkInfobox.attr({
         body: {
             stroke: 'black', 
@@ -892,6 +892,11 @@ what I'll do.
         var scale = widget.scale;
         console.log('scale:',scale);
         widget.dragStartPosition = { x: x * scale, y: y * scale};    
+ 
+        jlinkInfobox.attr({
+            body:{display:'none'},
+            label:{display:'none'}
+        });
     });
 
 
@@ -1127,7 +1132,8 @@ what I'll do.
 
 
     paper.on('link:mouseover', function(linkView, event) {
-        if ($(widget.element).find('.checkbox_arc_info').is(':checked')) {
+        //if ($(widget.element).find('.checkbox_arc_info').is(':checked')) {
+        if (true) {
             var jlink = linkView.model;
             //console.log(jlink);
             //console.log(jlink.arc.statements);

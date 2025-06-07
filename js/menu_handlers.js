@@ -768,7 +768,7 @@ AKT.menuHandler.menu_tools_loadtool = function() {
     var eventShiftKey = event ? event.shiftKey : null;
 
     // Pre-filled to simpify testing.
-    var url = prompt('Tool URL:','file:///home/robert/Projects/webakt/dev/tools/statements_summary.js');
+    var url = prompt('Tool URL:','tools/statements_summary.js');
     loadTool(url);
 };
 
@@ -797,7 +797,7 @@ AKT.menuHandler.menu_tools_loadtoolbox = function() {
     var eventShiftKey = event ? event.shiftKey : null;
 
     // Pre-filled to simplify testing.
-    var url = prompt('Toolbox URL:','file:///home/robert/Projects/webakt/dev/tools/rm1.js');
+    var url = prompt('Toolbox URL:','tools/rm1.js');
     loadToolbox(url);
 
     function loadToolbox(url) {
