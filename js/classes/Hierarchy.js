@@ -324,8 +324,8 @@ class Hierarchy {
             $(table).find('tr[data-tt-id=' + id + ']').addClass("recently_added");
         }
 
-        $(table).find('.recently_added').css({color:'blue'});
-        $(table).find('.last_added').css({background:'yellow'});
+        //$(table).find('.recently_added').css({color:'blue'});
+        //$(table).find('.last_added').css({background:'yellow'});
 
 		console.log(1999,table);
         return table;

@@ -441,7 +441,8 @@ AKT.widgets.hierarchy_details.display = function (widget) {
         try {
             $(tableTreetable).treetable('reveal', itemId);
             var node = $(tableTreetable).treetable('node', itemId);
-            $(node.row).css('background','yellow');
+            //$(node.row).css('background','yellow');
+            $(node.row).css('background','orange');
         }
         catch(err) {
             console.log(err);
@@ -472,11 +473,13 @@ AKT.widgets.hierarchy_details.display = function (widget) {
 		var key = $(this).attr('data-tt-id');
 		console.log('key:',key);
 		if (!value || key === value) {
-			$(tableElement).find('tr:even').css({background:'white'});
-			$(tableElement).find('tr:odd').css({background:'#e8e8e8'});
+			//$(tableElement).find('tr:even').css({background:'white'});
+			//$(tableElement).find('tr:odd').css({background:'#e8e8e8'});
+			$(tableElement).find('tr').css({background:'white'});
 			$(divElement).find('.tr_listbox').removeAttr('data-selected');
 			$(divElement).find('.tr_listbox').removeClass('selected');
 			$(this).css({background:'yellow'});
+			//$(this).css({background:'pink'});
 			$(this).attr('data-selected','yes');
 			$(this).addClass('selected');
 			//AKT.trigger('item_selected_event',{item_type:args.item_type,item_id:key});

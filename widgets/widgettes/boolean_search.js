@@ -221,7 +221,6 @@ AKT.widgets.boolean_search.html = `
 
     <button class="button_create_topic" style="float:right;width:80px;height:30px;margin:10px;">Create topic</button>
     <button class="button_search" style="float:right;width:70px;height:30px;margin:10px;">Search</button>
-    <button class="button_mysearch" style="float:right;width:70px;height:30px;margin:10px;">MySearch</button>
 
 <div style="clear:both"></div>
 </div>

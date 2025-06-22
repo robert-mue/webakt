@@ -15,7 +15,7 @@ AKT.widgets.formal_term_details.setup = function (widget) {
 
     // Thanks to https://webdesign.tutsplus.com/how-to-build-a-simple-carousel-with-vanilla-javascript--cms-41734t 
 
-
+    console.log('window',AKT.state.window);
 
     var kbId = widget.options.kbId;
     var kb = AKT.KBs[kbId];
@@ -646,6 +646,7 @@ AKT.widgets.formal_term_details.html = `
         </div>
 
         <button class="button_update" style="float:right;width:60px;height:25px;margin-left:10px;" title="Updates this entry in the knowledge base.">Update</button>
+        <a class="button_help" href="help.html#ref_formal_term_details" target="_blank" style="float:right;width:60px;height:25px;margin-left:10px;" title="Help on this widget">Help</a>
 
     </div>
     

@@ -46,7 +46,7 @@ AKT.widgets.collection.setup = function (widget) {
         AKT.state.current_kb, 
         'kbId',
         'kb');
-    $(divWidgetSettings).append(selectElement);
+    //$(divWidgetSettings).append(selectElement);
 
     $(divWidgetSettings).append(`
         <div style="float:left; margin-left:20px;">
@@ -54,6 +54,8 @@ AKT.widgets.collection.setup = function (widget) {
             <button class="button_show_hide" style="float:left;padding-left:3px;padding-right:3px;margin-left:5px;">Show</button>
             <button class="button_apply" style="float:left;padding-left:3px;padding-right:3px;margin-left:5px;">Apply</button>
             <button class="button_ignore" style="float:left;padding-left:3px;padding-right:3px;margin-left:5px;">Ignore</button>
+            <div style="float:left;margin-left:20px;">n=</div>
+            <div class="div_n" style="float:left;height:20px;width:30px;"></div>
         </div>
     `);
     $(divWidgetSettings).append('<div style="clear:both;"></div>');
@@ -703,6 +705,7 @@ AKT.widgets.collection.display = function (widget) {
     }    
 */    
     var nItems = Object.keys(items).length;
+    $(widget.element).find('.div_n').text(nItems);
 
     if (itemType === 'statement') {
         var statements = kb._statements;

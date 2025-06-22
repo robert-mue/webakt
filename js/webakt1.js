@@ -36,6 +36,16 @@ $(document).ready(function() {
     var termx = new Termx({term_id:'a1'});
     termx.addTerm('b1');
 
+            var URL = 'help.html';
+            //var URL = 'help.html#ref_'+subname;
+            //var URL = 'help.html ref_'+'formal_term_details';
+            //$(this).append('<a href="'+URL+'" class="popup">+</a>');
+            var name = '_blank';
+            var specs = 'location=yes,height=570,width=520,scrollbars=yes,status=yes';
+            //window.open(URL, name, specs);
+            //window.open('https://www.bbc.co.uk', name, specs);
+            console.log('AKT.state:',AKT.state);
+
     // Dialog windows
     $( "#dialog1" ).dialog({
         autoOpen:  false,

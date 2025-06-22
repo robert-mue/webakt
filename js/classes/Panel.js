@@ -274,10 +274,40 @@ class Panel {
             $(this).css({display:'none'});
         });
 
+/* window.open - specs
+fullscreen=yes|no|1|0	Whether or not to display the browser in full-screen mode. Default is no. A window in full-screen mode must also be in theater mode. IE only
+height=pixels	The height of the window. Min. value is 100
+left=pixels	The left position of the window. Negative values not allowed
+location=yes|no|1|0	Whether or not to display the address field. Opera only
+menubar=yes|no|1|0	Whether or not to display the menu bar
+resizable=yes|no|1|0	Whether or not the window is resizable. IE only
+scrollbars=yes|no|1|0	Whether or not to display scroll bars. IE, Firefox & Opera only
+status=yes|no|1|0	Whether or not to add a status bar
+titlebar=yes|no|1|0	Whether or not to display the title bar. Ignored unless the calling application is an HTML Application or a trusted dialog box
+toolbar=yes|no|1|0	Whether or not to display the browser toolbar. IE and Firefox only
+top=pixels	The top position of the window. Negative values not allowed
+width=pixels	The width of the window. Min. value is 100
+*/
+
         $('#'+panelId).find('.dialog_help_button').on('click', function () {
+            console.log(AKT.state.ref);
             var helpname = helpName(subname);
-            $('#div_help').html($('#ref_'+helpname).html());
-            $('#div_help').css({display:'block'});
+            var elementId = '#ref_'+helpname;
+            var URL = 'help.html#ref_'+subname;
+            var URL = 'https://www.bbc.co.uk';
+            //var URL = 'help.html ref_'+'formal_term_details';
+            //$(this).append('<a href="'+URL+'" class="popup">+</a>');
+            var name = '_blank';
+            var specs = 'location=yes,height=570,width=520,scrollbars=yes,status=yes';
+            var ref = window.open(URL, name, specs);
+            ref.addEventListener('load',function() {
+                //console.log(ref);
+                console.log(ref.document.getElementById('ref_formal_term_details').innerHTML);
+            });
+            AKT.state.ref = ref;
+            //var ref1 = $(ref).find('div').text();
+            //console.log(ref1);
+            return;
 
             function helpName(subName) {
                 var helpNameLookup = {
