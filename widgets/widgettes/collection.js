@@ -198,9 +198,11 @@ AKT.widgets.collection.setup = function (widget) {
     // ===================================================================================
     // Buttons to invoke operations on the Listbox (New/view/Edit/Delete/SelectAll/Invert)
 
-    $(widget.element).find('.button_new').on('click', function (event) {   // New button
+    $(widget.element).find('[local_id="button_new"]').on('click', function (event) {   // New button
         console.log('\n*** Click event on New button');
-        event.stopPropagation();
+        if (AKT.state.action_mode !== 'recording') {
+            event.stopPropagation();
+        }
 
         if (itemType === 'topicxxx') {
             //      Mechanism for creating a new topic is currently (Nov 2024) via the 
@@ -209,20 +211,6 @@ AKT.widgets.collection.setup = function (widget) {
             //      However (March 2025) it is still allowed, so that it can be the top node in a topic hierarchy.
             alert('You currently cannot create a new Topic this way.\nPlease got to the Boolean Search command in the KB menu.');
         } else {
-/*
-            var action = new Action({
-                element_id: widget.element[0].id,
-                selector:   '.button_new',
-                type:       'click',
-                file:       'collection.js',
-                function:   "$(widget.element).find('.button_new').on('click', function (event) {}",
-                message:    'Clicked on New button in a collection panel.',
-                before:      'About to click on New button.',
-                after:       'Just clicked on New button.',
-               prompt:     'prompt'
-            });
-            AKT.action_list.add(action);
-*/
             openDetailsPanel(widget,'new');
         }
     });
@@ -230,42 +218,18 @@ AKT.widgets.collection.setup = function (widget) {
 
     $(widget.element).find('.button_view').on('click', function (event) {   // View button
         console.log('\n*** Click event on View button');
-        event.stopPropagation();
-/*
-        var action = new Action({
-            element_id: widget.element[0].id,
-            selector:   '.button_view',
-            type:       'click',
-            file:       'collection.js',
-            function:   "$(widget.element).find('.button_view').on('click', function (event) {}",
-            message:    'Clicked on View button in a collection panel.',
-            before:     'About to click on View button.',
-            after:      'Just clicked on View button.',
-            prompt:     'prompt'
-        });
-        AKT.action_list.add(action);
-*/
+        if (AKT.state.action_mode !== 'recording') {
+            event.stopPropagation();
+        }
         openDetailsPanel(widget,'view');
     });
 
 
     $(widget.element).find('.button_edit').on('click', function (event) {   // Edit button
         console.log('\n*** Click event on Edit button');
-        event.stopPropagation();
-/*
-        var action = new Action({
-            element_id: widget.element[0].id,
-            selector:   '.button_edit',
-            type:       'click',
-            file:       'collection.js',
-            function:   "$(widget.element).find('.button_edit').on('click', function (event) {}",
-            message:    'Clicked on Edit button in a collection panel.',
-            before:     'About to click on Edit button.',
-            after:      'Just clicked on Edit button.',
-            prompt:     'prompt'
-        });
-        AKT.action_list.add(action);
-*/
+        if (AKT.state.action_mode !== 'recording') {
+            event.stopPropagation();
+        }
         openDetailsPanel(widget,'edit');
     });
 
@@ -334,22 +298,11 @@ AKT.widgets.collection.setup = function (widget) {
 
     function openDetailsPanel(widget,mode)  {
 
+        console.log(8401,'collection.js:openDetailsPanel()',mode,widget);
+
         var itemType = widget.options.item_type;
 
         var selector = '.button_'+mode;
-        var action = new Action({
-            element_id: widget.element[0].id,
-            selector:   '.button_'+mode,
-            type:       'click',
-            file:       'collection.js',
-            function:   "$(widget.element).find('.button_"+mode+").on('click', function (event) {}",
-            message:    'Clicked on '+mode+' button in a collection panel.',
-            before:     'About to click on '+mode+' button.',
-            after:      'Just clicked on mode button.',
-            prompt:     'prompt'
-        });
-        AKT.action_list.add(action);
-
         var kbId = kb._id;
 
         if (mode==='view' || mode==='edit') {
@@ -757,13 +710,13 @@ AKT.widgets.collection.html = `
     <div class="div_filters" style="display:none;"></div>
 
     <div class="w3-col w3-right w3-container" style="width:75px;margin:15px;">
-        <button class="button_new" style="width:70px;height:27px;">New</button><br/>
-        <button class="button_view" style="width:70px;height:27px;">View</button><br/>
-        <button class="button_edit" style="width:70px;height:27px;">Edit</button><br/>
-        <button class="button_delete" style="width:70px;height:27px;">Delete</button>
-        <button class="button_select_all" style="width:70px;height:27px;">Select all</button>
-        <button class="button_deselect_all" style="width:70px;height:27px;">Deselect all</button>
-        <button class="button_invert" style="width:70px;height:27px;">Invert</button>
+        <button class="button_new" local_id="button_new" style="width:70px;height:27px;">New</button><br/>
+        <button class="button_view" local_id="button_view" style="width:70px;height:27px;">View</button><br/>
+        <button class="button_edit" local_id="button_edit" style="width:70px;height:27px;">Edit</button><br/>
+        <button class="button_delete" local_id="button_delete" style="width:70px;height:27px;">Delete</button>
+        <button class="button_select_all" local_id="button_select_all" style="width:70px;height:27px;">Select all</button>
+        <button class="button_deselect_all" local_id="button_deselect_all" style="width:70px;height:27px;">Deselect all</button>
+        <button class="button_invert" local_id="button_invert" style="width:70px;height:27px;">Invert</button>
     </div>
 
     <div class="w3-rest w3-container div_widget_listbox_container"></div>

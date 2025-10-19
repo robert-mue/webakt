@@ -6,6 +6,14 @@ AKT.widgets.statement_details.setup = function (widget) {
     console.log('\n*** [statement_details.js] AKT.widgets.statement_details.setup(): options=',widget.options);
     var self = this;
 
+
+
+    //$(widget.element).on('clickxxxxx','buttonxxxx', function(event) {
+    //    event.stopPropagation();
+    //    console.log('---',event);
+    //});
+
+
     AKT.state.current_widget = widget;
     widget.counter = 0;
 
@@ -67,7 +75,7 @@ AKT.widgets.statement_details.setup = function (widget) {
     // Nov 2024.  I have removed this, since only relevant for New statement, which will
     // not have, and should not have, its formal terms extracted and added to the 
     // formal_terms collection.  HTML <button> element has been commented out.
-    $(widget.element).find('.button_colourxxx').on('click',function() {
+    $(widget.element).find('[local_id="button_colour"]').on('click',function(event) {
         console.log('\n*** [statement_details.js] Click event on "Colour" button');
         var statement = widget.options.item;
         if ($(this).text() === 'Colour') {
@@ -108,9 +116,19 @@ AKT.widgets.statement_details.setup = function (widget) {
         }
     });
 
-    $(widget.element).find('.button_check').on('click', function() {
+    $(widget.element).find('[local_id="button_check"]').on('click', function(event) {
+        console.log('\n [statement_details.js] Click event on "Check" button');
+        if (AKT.state.action_mode !== 'recording') {
+            event.stopPropagation();
+        }
+    });
+
+
+    $(widget.element).find('.button_checkxxxxxxxxxxxxxxxxxxxxxxxxxxxxx').on('click', function(event) {
         console.log('\n*** [statement_details.js] Click event on "Check" button');
-        event.stopPropagation();
+        if (AKT.state.action_mode !== 'recording') {
+            event.stopPropagation();
+        }
         var kbId = widget.options.kbId;
         var kb = AKT.KBs[kbId];
 
@@ -137,12 +155,14 @@ AKT.widgets.statement_details.setup = function (widget) {
         }
     });
 
-    $(widget.element).find('.button_colour').css({display:'block'});
+    $(widget.element).find('.button_colour').css({display:'block'});  // ????? Why is this here?
 
 
-    $(widget.element).find('.button_template').on('click', function() {
+    $(widget.element).find('[local_id="button_template"]').on('click', function(event) {
         console.log('\n*** [statement_details.js] Click event on "Template" button');
-        event.stopPropagation();
+        if (AKT.state.action_mode !== 'recording') {
+            event.stopPropagation();
+        }
         var kbId = widget.options.kbId;
         var kb = AKT.kbs[kbId];
 
@@ -158,10 +178,10 @@ AKT.widgets.statement_details.setup = function (widget) {
             widget_name:'statement_template',
             position:{left:'20px',top:'20px'},
             size:{width:'410px',height:'375px'},
-            shift_key: event.shiftKey,
+            //shift_key: event.shiftKey,
             options:{kbId:kbId, opened_by_widgie:widget}
         });
-
+/*  Aug 2025 This should now be redundant.
         var action = new Action({
             element_id: widget.element[0].id,
             selector:   '.button_template',
@@ -174,14 +194,16 @@ AKT.widgets.statement_details.setup = function (widget) {
             prompt:     'prompt'
         });
         AKT.action_list.add(action);
-
+*/
     });
 
 
     // Formal terms button
-    $(widget.element).find('.button_formal_terms').on('click', function() {
+    $(widget.element).find('[local_id="button_formal_terms"]').on('click', function(event) {
         console.log('\n*** [statement_details.js] Click event on "Formal terms" button');
-        event.stopPropagation();
+        if (AKT.state.action_mode !== 'recording') {
+            event.stopPropagation();
+        }
         var kbId = widget.options.kbId;
         var kb = AKT.kbs[kbId];
 
@@ -197,9 +219,11 @@ AKT.widgets.statement_details.setup = function (widget) {
     });
 
 
-    $(widget.element).find('.button_source_details').on('click', function (event) {   // Source details button
+    $(widget.element).find('[local_id="button_formal_terms"]').on('click', function (event) {   // Source details button
         console.log('\n*** [statement_details.js] Click event on "Source details" button');
-        event.stopPropagation();
+        if (AKT.state.action_mode !== 'recording') {
+            event.stopPropagation();
+        }
 
         var kbId = widget.options.kbId;
         var kb = AKT.KBs[kbId];
@@ -219,9 +243,11 @@ AKT.widgets.statement_details.setup = function (widget) {
     });
 
 
-    $(widget.element).find('.button_add_source').on('click', function (event) {   // add_source button
+    $(widget.element).find('[local_id="button_add_source"]').on('click', function (event) {   // add_source button
         console.log('\n*** [statement_details.js] Click event on "Add source" button');
-        event.stopPropagation();
+        if (AKT.state.action_mode !== 'recording') {
+            event.stopPropagation();
+        }
 
         var kbId = widget.options.kbId;
         var kb = AKT.KBs[kbId];
@@ -250,9 +276,11 @@ AKT.widgets.statement_details.setup = function (widget) {
     });
 
 
-    $(widget.element).find('.button_remove_source').on('click', function (event) {  
+    $(widget.element).find('[local_id="button_remove_source"]').on('click', function (event) {  
         console.log('\n*** [statement_details.js] Click event on Remove source button');
-        event.stopPropagation();
+        if (AKT.state.action_mode !== 'recording') {
+            event.stopPropagation();
+        }
 
         var kbId = widget.options.kbId;
         var kb = AKT.KBs[kbId];
@@ -281,8 +309,10 @@ AKT.widgets.statement_details.setup = function (widget) {
 
 
     // Example used in AKT Manual, Chapter 14, Creating a simple knowledge base
-    $(widget.element).find('.button_tut2_single').on('click', function() {
-        event.stopPropagation();
+    $(widget.element).find('[local_id="button_wizard1"]').on('click', function(event) {
+        if (AKT.state.action_mode !== 'recording') {
+            event.stopPropagation();
+        }
         console.log('\n*** [statement_details.js] Click event on "Tut2 1" button');
 		var kbId = 'atwima';
         var kb = AKT.KBs[kbId];  // 
@@ -312,8 +342,10 @@ AKT.widgets.statement_details.setup = function (widget) {
 
 
     // Example used in AKT Manual, Chapter 14, Creating a simple knowledge base
-    $(widget.element).find('.button_tut2_all').on('click', function() {
-        event.stopPropagation();
+    $(widget.element).find('[local_id="button_wizard2"]').on('click', function(event) {
+        if (AKT.state.action_mode !== 'recording') {
+            event.stopPropagation();
+        }
         console.log('\n*** [statement_details.js] Click event on "Tut2 all" button');
 		var kbId = AKT.state.current_kb;
         var kb = AKT.KBs[kbId];
@@ -344,9 +376,11 @@ AKT.widgets.statement_details.setup = function (widget) {
 
     // ============================================================================ update
     // This should only be callable if mode = new or edit.
-    $(widget.element).find('.button_update').on('click', function() {
+    $(widget.element).find('[local_id="button_update"]').on('click', function(event) {
         console.log('\n*** [statement_details.js] Click event on "Update" button');
-        event.stopPropagation();
+        if (AKT.state.action_mode !== 'recording') {
+            event.stopPropagation();
+        }
 		var kbId = AKT.state.current_kb;
         var kb = AKT.KBs[kbId];
 
@@ -359,17 +393,16 @@ AKT.widgets.statement_details.setup = function (widget) {
             statement = widget.temp_statement;
         }
 
-        // This regex strips out any HTML markup in the displayed formal statement.
-        const regex = /<\/?\w[^>]*>/g;
-        var formalHtml = $(widget.element).find('.div_formal').text();
-        var formal = formalHtml.replace(regex, '');
+        var formal = $(widget.element).find('.textarea_formal').val();
         statement._formal = formal;
         // Note that we re-generate the JSON here from the formal statement, even if
         // the user used the statement_template.js widget to create the statement - 
         // that passes back (in the 'statement_template_ok_event' event) the json
         // created from the template.
         statement._json = statement.makeJsonFromFormal(formal);
+        console.log(77703,statement._json);
         statement._english = statement.makeEnglishFromJson();
+        console.log(77704,statement._english);
         $(widget.element).find('.div_english').text(statement._english);
 
         // formalTerms has structure {a:['object'],b:['attribute'],c:['value']} for statement att_value(a,b,c)
@@ -397,35 +430,41 @@ AKT.widgets.statement_details.setup = function (widget) {
         } else if (widget.options.mode==='edit') {
             AKT.trigger('item_changed_event',{kb:kb,item_type:'statement',item:statement});
         }
-
+/*  Aug 2025 Now redundant
         console.log(widget.element);
         var action = new Action({
             element_id: widget.element[0].id,
             selector:   '.button_update',
             type:       'click',
             file:       'statement_details.js',
-            function:   "$(widget.element).find('.button_update').on('click', function() {});",
+            function:   "$(widget.element).find('.button_update').on('click', function(event) {});",
             message:    'Clicked on the Update button',
             prompt:     'prompt'
         });
         AKT.action_list.add(action);
-
+*/
 
         $('#message').text('The Statements list has been updated');
 	});
 
 
     // ----------------------------------------------------------------------- INPUT EVENTS
-    $(widget.element).find('.div_formal').on('input', function (event) {
-        console.log('\n*** [statement_details.js] Keyboard event');
+    $(widget.element).find('[local_id="textarea_formal"]').on('keyup', function (event) {
+        console.log('\n*** [statement_details.js] Input keyboard event');
         var kbId = widget.options.kbId;
         var kb = AKT.KBs[kbId];
 
-        const divFormal = $(widget.element).find('.div_formal');
+        //console.log(this);
+        //console.log($(this));
+        //console.log($(this).val());
 
-        const regex = /<\/?\w[^>]*>/g;
-        var formalHtml = $(divFormal).html();
-        var formal = formalHtml.replace(regex, '');
+        //const textareaFormal = $(widget.element).find('.div_formal');
+
+        //const regex = /<\/?\w[^>]*>/g;
+        //var formalHtml = $(divFormal).val();
+        //var formal = formalHtml.replace(regex, '');
+
+        var formal = $(this).val();
 
         try {
             var result = parser.parse(formal);
@@ -481,13 +520,9 @@ AKT.widgets.statement_details.setup = function (widget) {
         var kbId = widget.options.kbId;
         var kb = AKT.KBs[kbId];
 
-        $(widget.element).find('.div_formal').text(args.formal);
+        $(widget.element).find('.textarea_formal').val(args.formal);
 
-        const divFormal = $(widget.element).find('.div_formal');
-
-        const regex = /<\/?\w[^>]*>/g;
-        var formalHtml = $(divFormal).html();
-        var formal = formalHtml.replace(regex, '');
+        var formal = $(widget.element).find('.textarea_formal').val();
         var tempStatement = new Statement({kb:kb,formal:formal});
 
         try {
@@ -526,21 +561,21 @@ AKT.widgets.statement_details.display = function (widget) {
 
         if (widget.options.mode === 'view' || widget.options.mode === 'edit') {   // Starting display colourises formal and English.
             // TODO: Next 6 lines of code should go into statement methods.
-            var formalHtml = statement.makeFormalFromJson({colourise:true,title:true});
+            var formal = statement.makeFormalFromJson({colourise:false,title:false});  // This *did* have HTML markup, but now just plain text.
             var englishHtml = statement.makeEnglishFromJson({colourise:true,title:true});
 
-            formalHtml = formalHtml.replace('if','<b>if</b><br/>');
+            //formalHtml = formalHtml.replace('if','<b>if</b><br/>');
             englishHtml = englishHtml.replace('if','<b>if</b><br/>');
 
             // Add line-wrapping break-points (the HTML <wbr> tag) after commas in the formal version.
-            let regex = /,/g;
-            formalHtml = formalHtml.replace(regex,',<wbr>');
+            //let regex = /,/g;
+            //formalHtml = formalHtml.replace(regex,',<wbr>');
 
             // Now insert the various bits into their respective HTML elements.
             $(widget.element).find('.div_kb_id').text(kbId);    
             $(widget.element).find('.div_statement_id').text(statement._id); 
 
-            $(widget.element).find('.div_formal').html(formalHtml);  
+            $(widget.element).find('.textarea_formal').val(formal);  
             $(widget.element).find('.div_english').html(englishHtml);  
 
             // Note that the css has to be applied *after* the element has been 
@@ -567,7 +602,9 @@ AKT.widgets.statement_details.display = function (widget) {
                well as getting up a formal_term_details panel!
             $(widget.element).find('.formal_term').on('click', function (event) {    // The Details button
                 console.debug('BUTTON: Clicked on a formal term in the statement.');
-                event.stopPropagation();
+                if (AKT.state.action_mode !== 'recording') {
+                    event.stopPropagation();
+                }
 
                 var formalTermId = $(this).text();
                 console.log($(this),formalTermId);
@@ -647,22 +684,22 @@ AKT.widgets.statement_details.html = `
         <fieldset>
             <legend>Formal Language</legend>
             <div class="div_keywords" style="display:none;">
-                <button>att_value</button>
-                <button>action</button>
-                <button>part</button>
-                <button>process</button>
-                <button>causes1way</button>
-                <button>causes2way</button>
+                <button local_id="button_att_value">att_value</button>
+                <button local_id="button_action">action</button>
+                <button local_id="button_part">part</button>
+                <button local_id="button_process">process</button>
+                <button local_id="button_causes1way">causes1way</button>
+                <button local_id="button_causes2way">causes2way</button>
             </div>
             <div class="div_quickies" style="display:none;">
-                <button>att_value(a,b,c)</button><br/>
-                <button>att_value(a,b,c) causes1way att_value(d,e,f)</button><br/>
-                <button>att_value(a,b,c) if att_value(x,y,z)</button><br/>
-                <button>att_value(a,b,c) causes1way att_value(d,e,f) if att_value(x,y,z)</button>
+                <button local_id="button_quickie1">att_value(a,b,c)</button><br/>
+                <button local_id="button_quickie2">att_value(a,b,c) causes1way att_value(d,e,f)</button><br/>
+                <button local_id="button_quickie3">att_value(a,b,c) if att_value(x,y,z)</button><br/>
+                <button local_id="button_quickie4">att_value(a,b,c) causes1way att_value(d,e,f) if att_value(x,y,z)</button>
             </div>
 
             <div style="padding:1px;">
-                <div class="div_formal modal" contenteditable style="float:left;overflow-y:auto;line-height:1;word-wrap:break-word;white-space:normal;font-size:13px;width:410px;height:50px;border:solid 1px #a0a0a0;background:white;"></div>
+                <textarea class="textarea_formal modal" local_id="textarea_formal" style="float:left;overflow-y:auto;line-height:1;word-wrap:break-word;white-space:normal;font-size:13px;width:410px;height:50px;border:solid 1px #a0a0a0;background:white;"></textarea>
                 <div class="div_formal_flag" style="float:left;width:10px;height:35px;background:white;"></div>
                 <div style="clear:both;"></div>
             </div>
@@ -680,11 +717,11 @@ AKT.widgets.statement_details.html = `
         <fieldset>
             <legend>Source(s)</legend>
             <div style="float:left;">Source  /<br/>Derivation</div>
-            <select class="select_sources" size="5" style="float:left; clear:right;width:220px;background:white;">[]</select>
+            <select class="select_sources" local_id="select_sources" size="5" style="float:left; clear:right;width:220px;background:white;">[]</select>
             <div style="float:left;width:120px;">
-                <button class="button_source_details" style="width:100px;height:20px;margin-left:20px;margin-top:0px;">Source details</button>
-                <button class="button_add_source modal" style="width:100px;height:20px;margin-left:20px;margin-top:4px;">Add source</button>
-                <button class="button_remove_source modal" style="width:100px;height:20px;margin-left:20px;margin-top:4px;">Remove source</button>
+                <button class="button_source_details" local_id="button_source_details" style="width:100px;height:20px;margin-left:20px;margin-top:0px;">Source details</button>
+                <button class="button_add_source modal" local_id="button_add_source" style="width:100px;height:20px;margin-left:20px;margin-top:4px;">Add source</button>
+                <button class="button_remove_source modal" local_id="button_remove_source" style="width:100px;height:20px;margin-left:20px;margin-top:4px;">Remove source</button>
             </div>
         </fieldset>
 
@@ -692,24 +729,24 @@ AKT.widgets.statement_details.html = `
         <!-- Memo ------------------------------------------------------------->
         <fieldset>
             <legend>Memo</legend>
-            <div class="div_memo" contenteditable modal style="width:420px;00px;height:50px;background:white;border:solid 1px black;"></div>
+            <textarea class="textarea_memo" local_id="textarea_memo" style="width:420px;00px;height:50px;background:white;border:solid 1px black;"></textarea>
         </fieldset>
     </div>
 
     <!-- Buttons -------------------------------------------------------------->
     <div class="div_edit_buttons" style="float:left;width:100px;text-align:center;padding:10px;">
-        <!--button class="button_colour" style="display:block;width:70px;height:26px;margin:5px;">Colour</button><br/-->
-        <button class="button_check" style="width:70px;height:25px;margin:5px;">Check</button><br/>
-        <button class="button_template modal" style="width:70px;height:25px;margin:5px;">Template</button>
-        <!--button class="button_formal_terms" style="width:70px;height:40px;margin:5px;">Formal Terms</button><br/-->
+        <!--button class="button_colour" local_id="button_colour" style="display:block;width:70px;height:26px;margin:5px;">Colour</button><br/-->
+        <button class="button_check" local_id="button_check" style="width:70px;height:25px;margin:5px;">Check</button><br/>
+        <button class="button_template modal" local_id="button_template" style="width:70px;height:25px;margin:5px;">Template</button>
+        <!--button class="button_formal_terms" local_id="button_formal_terms" style="width:70px;height:40px;margin:5px;">Formal Terms</button><br/-->
         <fieldset>
             <legend>Wizard</legend>
-            <button class="button_tut2_single modal inwidget_recording" style="width:70px;height:25px;margin:0px;margin-top:0px;" title="Statements used in webAKT Tutorial 2.\nEach click loads 1 statement, and you must click\nthe Update button to add the statement to the KB.">Tut2 1</button><br/>
-            <button class="button_tut2_all modal inwidget_recording" style="width:70px;height:25px;margin:0px;"title="Statements used in webAKT Tutorial 2.\nCycles through all the statements, whic\nare automatically added to the KB.">Tut2 all</button><br/>
-            <button class="button_atwima_single modal inwidget_recording" style="width:70px;height:25px;margin:0px;">Atwima 1</button><br/>
-            <button class="button_atwima_all modal inwidget_recording" style="width:70px;height:25px;margin:0px;margin-bottom:0px;">Atwima all</button><br/>
+            <button class="button_tut2_single modal inwidget_recording" local_id="button_wizard1" style="width:70px;height:25px;margin:0px;margin-top:0px;" title="Statements used in webAKT Tutorial 2.\nEach click loads 1 statement, and you must click\nthe Update button to add the statement to the KB.">Tut2 1</button><br/>
+            <button class="button_tut2_all modal inwidget_recording" local_id="button_wizard2" style="width:70px;height:25px;margin:0px;"title="Statements used in webAKT Tutorial 2.\nCycles through all the statements, whic\nare automatically added to the KB.">Tut2 all</button><br/>
+            <button class="button_atwima_single modal inwidget_recording" local_id="button_wizard3" style="width:70px;height:25px;margin:0px;">Atwima 1</button><br/>
+            <button class="button_atwima_all modal inwidget_recording" local_id="button_wizard4" style="width:70px;height:25px;margin:0px;margin-bottom:0px;">Atwima all</button><br/>
         </fieldset>
-        <button class="button_update modal inwidget_recording" style="width:70px;height:25px;margin:5px;">Update</button><br/>
+        <button class="button_update modal inwidget_recording" local_id="button_update" style="width:70px;height:25px;margin:5px;">Update</button><br/>
     </div>
 
 </div>     <!-- End of content div -->
@@ -724,8 +761,10 @@ To avoid cluttering up main code block.
 
 
     /// ------------------------------------------------------------------- BUTTON CLICK EVENTS
-    $(widget.element).find('.button_translate').on('click', function() {
-        event.stopPropagation();
+    $(widget.element).find('.button_translate').on('click', function(event) {
+        if (AKT.state.action_mode !== 'recording') {
+            event.stopPropagation();
+        }
         var kbId = widget.options.kbId;
         var kb = AKT.kbs[kbId];
 
@@ -747,8 +786,10 @@ To avoid cluttering up main code block.
 
 
     // Magic button - generates a syntacticaly-correct statement!
-    $(widget.element).find('.button_magic').on('click', function() {
-        event.stopPropagation();
+    $(widget.element).find('.button_magic').on('click', function(event) {
+        if (AKT.state.action_mode !== 'recording') {
+            event.stopPropagation();
+        }
 
         var statementJson = AKT.makeStatement();
         var statement = new Statement({json:statementJson});
@@ -772,8 +813,10 @@ To avoid cluttering up main code block.
  
 
 
-    $(widget.element).find('.div_keywords > button').on('click', function() {
-        event.stopPropagation();
+    $(widget.element).find('.div_keywords > button').on('click', function(event) {
+        if (AKT.state.action_mode !== 'recording') {
+            event.stopPropagation();
+        }
         console.log($(this).text());
         var formalSoFar = $(widget.element).find('.div_formal_main').text();
         var formalPlus = formalSoFar + $(this).text();
@@ -781,8 +824,10 @@ To avoid cluttering up main code block.
     });
 
 
-    $(widget.element).find('.div_quickies > button').on('click', function() {
-        event.stopPropagation();
+    $(widget.element).find('.div_quickies > button').on('click', function(event) {
+        if (AKT.state.action_mode !== 'recording') {
+            event.stopPropagation();
+        }
         var formal = $(this).text();
         $(widget.element).find('.div_formal').text(formal);
         try {
@@ -795,8 +840,10 @@ To avoid cluttering up main code block.
     });
 
 
-    $(widget.element).find('.button_wizardxxx').on('click', function() {
-        event.stopPropagation();
+    $(widget.element).find('.button_wizardxxx').on('click', function(event) {
+        if (AKT.state.action_mode !== 'recording') {
+            event.stopPropagation();
+        }
         console.log('Clicked on Wizard button');
 
         var testStatements = [

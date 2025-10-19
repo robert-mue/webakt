@@ -125,7 +125,7 @@ AKT.widgets.summary.display = function (widget) {
     // event handler- as indeed is the case in menuHandlers.js, from which this code was lifted.
     // But some differ in their options.   Simples thing is to keep them separate.
 
-    $(widget.element).find('.div_view_metadata').on('click', function(event) {
+    $(widget.element).find('[local_id="div_view_metadata"]').on('click', function(event) {
         event.stopPropagation();
         var eventShiftKey = event ? event.shiftKey : null;
 
@@ -138,7 +138,7 @@ AKT.widgets.summary.display = function (widget) {
         });
     });
 
-    $(widget.element).find('.div_view_statements').on('click', function(event) {
+    $(widget.element).find('[local_id="div_view_statements"]').on('click', function(event) {
         event.stopPropagation();
         var eventShiftKey = event ? event.shiftKey : null;
 
@@ -151,7 +151,7 @@ AKT.widgets.summary.display = function (widget) {
         });
     });
 
-    $(widget.element).find('.div_view_sources').on('click', function(event) {
+    $(widget.element).find('[local_id="div_view_sources"]').on('click', function(event) {
         event.stopPropagation();
         var eventShiftKey = event ? event.shiftKey : null;
 
@@ -164,7 +164,7 @@ AKT.widgets.summary.display = function (widget) {
         });
     });
 
-    $(widget.element).find('.div_view_formal_terms').on('click', function(event) {
+    $(widget.element).find('[local_id="div_view_formal_terms"]').on('click', function(event) {
         event.stopPropagation();
         var eventShiftKey = event ? event.shiftKey : null;
 
@@ -177,7 +177,7 @@ AKT.widgets.summary.display = function (widget) {
         });
     });
 
-    $(widget.element).find('.div_view_object_hierarchies').on('click', function(event) {
+    $(widget.element).find('[local_id="div_view_object_hierarchies"]').on('click', function(event) {
         event.stopPropagation();
         var eventShiftKey = event ? event.shiftKey : null;
 
@@ -190,7 +190,7 @@ AKT.widgets.summary.display = function (widget) {
     });
     });
 
-    $(widget.element).find('.div_view_topics').on('click', function(event) {
+    $(widget.element).find('[local_id="div_view_topics"]').on('click', function(event) {
         event.stopPropagation();
         var eventShiftKey = event ? event.shiftKey : null;
 
@@ -203,7 +203,7 @@ AKT.widgets.summary.display = function (widget) {
         });
     });
 
-    $(widget.element).find('.div_view_topic_hierarchies').on('click', function(event) {
+    $(widget.element).find('[local_id="div_view_topic_hierarchies"]').on('click', function(event) {
         event.stopPropagation();
         var eventShiftKey = event ? event.shiftKey : null;
 
@@ -216,7 +216,7 @@ AKT.widgets.summary.display = function (widget) {
         });
     });
 
-    $(widget.element).find('.div_view_images').on('click', function(event) {
+    $(widget.element).find('[local_id="div_view_images"]').on('click', function(event) {
         event.stopPropagation();
         var eventShiftKey = event ? event.shiftKey : null;
 
@@ -239,7 +239,7 @@ AKT.widgets.summary.html = `
 
         <div class="metadata">
             <h2>Metadata</h2>
-            <div class="div_view div_view_metadata">View</div>
+            <div class="div_view div_view_metadata" local_id="div_view_metadata">View</div>
             <div style="clear:both"></div>
             <table style="max-width:350px;">
                 <tr>
@@ -255,7 +255,7 @@ AKT.widgets.summary.html = `
 
         <div class="statements">
             <h2>Statements</h2>
-            <div class="div_view div_view_statements">View</div>
+            <div class="div_view div_view_statements" local_id="div_view_statements">View</div>
             <div style="clear:both"></div>
             <table>
                 <tr>
@@ -292,13 +292,13 @@ AKT.widgets.summary.html = `
 
         <div class="sources">
             <h2>Sources</h2>
-            <div class="div_view div_view_sources">View</div>
+            <div class="div_view div_view_sources" local_id="div_view_sources">View</div>
             <div style="clear:both"></div>
         </div>
 
         <div class="formal_terms">
             <h2>Formal terms</h2>
-            <div class="div_view div_view_formal_terms">View</div>
+            <div class="div_view div_view_formal_terms" local_id="div_view_formal_terms">View</div>
             <div style="clear:both"></div>
             <table>
                 <tr>
@@ -334,7 +334,7 @@ AKT.widgets.summary.html = `
 
         <div class="object_hierarchies">
             <h2>Object hierarchies</h2>
-            <div class="div_view div_view_object_hierarchies">View</div>
+            <div class="div_view div_view_object_hierarchies" local_id="div_view_object_hierarchies">View</div>
             <div style="clear:both"></div>
             <table>
                 <tr>
@@ -346,7 +346,7 @@ AKT.widgets.summary.html = `
 
         <div class="topics">
             <h2>Topics</h2>
-            <div class="div_view div_view_topics">View</div>
+            <div class="div_view div_view_topics" local_id="div_view_topics">View</div>
             <div style="clear:both"></div>
             <table>
                 <tr>
@@ -358,7 +358,7 @@ AKT.widgets.summary.html = `
 
         <div class="topic_hierarchies">
             <h2>Topic hierarchies</h2>
-            <div class="div_view div_view_topic_hierarchies">View</div>
+            <div class="div_view div_view_topic_hierarchies" local_id="div_view_topic_hierarchies">View</div>
             <div style="clear:both"></div>
             <table>
                 <tr>
@@ -370,7 +370,7 @@ AKT.widgets.summary.html = `
 
         <div class="images">
             <h2>Images</h2>
-            <div class="div_view div_view_images">View</div>
+            <div class="div_view div_view_images" local_id="div_view_images">View</div>
             <div style="clear:both"></div>
             <table>
                 <tr>

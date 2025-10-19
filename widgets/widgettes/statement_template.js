@@ -462,6 +462,39 @@ AKT.widgets.statement_template.display = function (widget) {
     }
 
 
+/* About the templates:
+The first distinction is between single templates and double (causal) ones.
+
+Single templates are divided into:
+- attval (reresented by the att_value/3 in AKT's formal-statement notation)
+- object (represented by the object/2 or object/3)
+- process (represented by process/2 or process/3)
+- action (represented by action/2 or aaction/3)   
+
+attval itself has 3 possible forms:
+- attval_object
+- attval_process (with several distinct forms, corresponding to which optional bits are provided)
+- attval_action (with several distinct forms, corresponding to which optional bits are provided)
+There are *NOT* separate tenplates for these distinct forms.   Rather, some of the fields in
+the template are optional.
+
+The above options are managed by radio buttons, which are displayed as necessary.  For example, if you 
+select a single (non-causal) option first, then it displays 4 radio buttons (for attval, object, process
+and action).   Then, if you selet the attval option, it displays 3 radio buttons for the 3 formsthis can take. 
+As soon as you have selected the relevant radio buttons, it displays the relevant template.
+
+The local_id for each field corresponds to the choices made.   
+
+To confuse things further (but reflecting my decision to remain faithful to AKT's statement grammar), the 
+term "object" has 3 distinct meanings:
+- one type of single template is the object type;
+- one argument (in the formal Prolog att_value clause) is for an object;
+- the argument can either be an atom ("nyanya") or a compound term of the form object(object,part), e.g.
+  (object(nyanya,leaf).
+Sorry, but that's the way it is, and you just have to cope with it.
+
+And we haven't got onto double templates yet, for causal statements...
+*/
 
 
 AKT.widgets.statement_template.html = `
@@ -471,9 +504,9 @@ AKT.widgets.statement_template.html = `
 
         <div class="statement_type_options">   
             <div style="font-weight:bold;">Statement type</div>
-            <input type="radio" class="statement_type_option" name="statement_type" value="attval">
+            <input type="radio" class="statement_type_option" local_id="radio_single" name="statement_type" value="attval">
             <label>Attribute_value</label><br>
-            <input type="radio" class="statement_type_option" name="statement_type" value="causal">
+            <input type="radio" class="statement_type_option" local_id="radio_causal" name="statement_type" value="causal">
             <label>Causal</label><br>
         </div>
             
@@ -490,22 +523,22 @@ AKT.widgets.statement_template.html = `
 
                 <!-- nodetype options -->
                 <div class="nodetype_options" style="float:left; margin-left:10px;">
-                    <input type="radio" class="attval_option" name="node_types1" value="attval">
+                    <input type="radio" class="attval_option" local_id="radio_attval" name="node_types1" value="attval">
                     <label>an attribute of:</label><br>
-                    <input type="radio" class="object_option" name="node_types1" value="object">
+                    <input type="radio" class="object_option" local_id="radio_object" name="node_types1" value="object">
                     <label>an object</label><br>
-                    <input type="radio" class="process_option" name="node_types1" value="process">
+                    <input type="radio" class="process_option" local_id="radio_process" name="node_types1" value="process">
                     <label>a process</label><br>
-                    <input type="radio" class="action_option" name="node_types1" value="action">
+                    <input type="radio" class="action_option" local_id="radio_action" name="node_types1" value="action">
                     <label>an action</label><br>
                 </div>
 
                 <div class="attval_options" style="float:left; margin-left:6px;">
-                    <input type="radio" class="attval_option attval_object_option" checked name="attval_types1" value="attval_object">
+                    <input type="radio" class="attval_option attval_object_option" local_id="radio_attval_object" checked name="attval_types1" value="attval_object">
                     <label>an object</label><br>
-                    <input type="radio" class="attval_option attval_process_option" name="attval_types1" value="attval_process">
+                    <input type="radio" class="attval_option attval_process_option" local_id="radio_attval_process" name="attval_types1" value="attval_process">
                     <label>a process</label><br>
-                    <input type="radio" class="attval_option attval_action_option" name="attval_types1" value="attval_action">
+                    <input type="radio" class="attval_option attval_action_option" local_id="radio_attval_action" name="attval_types1" value="attval_action">
                     <label>an action</label><br>
                 </div>
 
@@ -519,84 +552,84 @@ AKT.widgets.statement_template.html = `
                 <div class="template attval_object_template" style="display:block;" name="attval_object">
                     <div class="line">
                         <div style="float:left; width:60px;">Object</div>
-                        <input class="object1"   list="object"    style="float:left;"/>
-                        <input class="part1"     list="part"      placeholder="Part (optional)" style="float:left;"/>
+                        <input type="text" class="object1"   local_id="input_attval_object_object1" list="object"    style="float:left;"/>
+                        <input type="text" class="part1"     local_id="input_attval_object_part1" list="part"      placeholder="Part (optional)" style="float:left;"/>
                     </div>
                     <div style="clear:both"></div>
                     <div class="line"> 
                         <div style="float:left; width:60px;">Attribute</div>
-                        <input class="attribute" list="attribute" />
+                        <input type="text" class="attribute" local_id="input_attval_object_attribute" list="attribute" />
                     </div>
                     <div style="clear:both"></div>
                     <div class="line line_value"> 
                         <div style="float:left; width:60px;">Value</div>
-                        <input class="value" list="value" />
+                        <input type="text" class="value" local_id="input_attval_object_value" list="value" />
                     </div>
                 </div>
 
                 <div class="template attval_process_template" style="display:none;" data-myclass="attval_process_template" name="attval_process">
                     <div class="line"> 
                         <div style="float:left; width:60px;">Object1</div>
-                        <input class="object1"   list="object"    placeholder="Optional"  style="float:left;"/>
-                        <input class="part1"     list="part"      placeholder="Part (optional)"  style="float:left;"/>
+                        <input type="text" class="object1"   local_id="input_attval_process_object1" list="object"    placeholder="Optional"  style="float:left;"/>
+                        <input type="text" class="part1"     local_id="input_attval_process_part1" list="part"      placeholder="Part (optional)"  style="float:left;"/>
                     </div>
                     <div style="clear:both"></div>
                     <div class="line"> 
                         <div style="float:left; width:60px;">Process</div>
-                        <input class="process"   list="process"  style="float:left;"/>
+                        <input type="text" class="process"   local_id="input_attval_process" list="process"  style="float:left;"/>
                     </div>
                     <div style="clear:both"></div>
                     <div class="line"> 
                         <div style="float:left; width:60px;">Object2</div>
-                        <input class="object2"   list="object"    placeholder="Optional"  style="float:left;"/>
-                        <input class="part2"     list="part"      placeholder="Part (optional)"  style="float:left;"/>
+                        <input type="text" class="object2"   local_id="input_attval_process_object2" list="object"    placeholder="Optional"  style="float:left;"/>
+                        <input type="text" class="part2"     local_id="input_attval_process_part2" list="part"      placeholder="Part (optional)"  style="float:left;"/>
                     </div>
                     <div style="clear:both"></div>
                     <div class="line"> 
                         <div style="float:left; width:60px;">Attribute</div>
-                        <input class="attribute" list="attribute" style="float:left;"/>
+                        <input type="text" class="attribute" local_id="input_attval_process_attribute" list="attribute" style="float:left;"/>
                     </div>
                     <div style="clear:both"></div>
                     <div class="line line_value"> 
                         <div style="float:left; width:60px;">Value</div>
-                        <input class="value" list="value" />
+                        <input type="text" class="value" local_id="input_attval_process_value" list="value" />
                     </div>
                 </div>
 
                 <div class="template attval_action_template" style="display:none;" name="attval_action">
                     <div class="line"> 
                         <div style="float:left; width:60px;">Action</div>
-                        <input class="action"    list="action" style="float:left;"/>
+                        <input type="text" class="action"    local_id="input_attval_action" list="action" style="float:left;"/>
                     </div>
                     <div style="clear:both"></div>
                     <div class="line"> 
                         <div style="float:left; width:60px;">Object1</div>
-                        <input class="object1"   list="object"    placeholder="Optional"  style="float:left;"/>
-                        <input class="part1"     list="part"      placeholder="Part (optional)"  style="float:left;"/>
+                        <input type="text" class="object1"   local_id="input_attval_action_object1" list="object"    placeholder="Optional"  style="float:left;"/>
+                        <input type="text" class="part1"     local_id="iinput_attval_action_part1" list="part"      placeholder="Part (optional)"  style="float:left;"/>
                     </div>
                     <div style="clear:both"></div>
                     <div class="line"> 
                         <div style="float:left; width:60px;">Object2</div>
-                        <input class="object2"      list="object"    placeholder="Optional"  style="float:left;"/>
-                        <input class="part2"          list="part"      placeholder="Part (optional)"  style="float:left;"/>
+                        <input type="text" class="object2"      local_id="input_attval_action_object2 list="object"    placeholder="Optional"  style="float:left;"/>
+                        <input type="text" class="part2"        local_id="input_attval_action_part2" list="part"      placeholder="Part (optional)"  style="float:left;"/>
                     </div>
                     <div style="clear:both"></div>
                     <div class="line"> 
                         <div style="float:left; width:60px;">Attribute</div>
-                        <input class="attribute"  list="attribute" style="float:left;"/>
+                        <input type="text" class="attribute"  local_id="input_attval_action_attribute" list="attribute" style="float:left;"/>
                     </div>
                     <div style="clear:both"></div>
                     <div class="line line_value"> 
                         <div style="float:left; width:60px;">Value</div>
-                        <input class="value" list="value" />
+                        <input type="text" class="value" local_id="input_attval_action_value" list="value" />
                     </div>
                 </div>
 
                 <div class="template object_template" style="display:none;" name="object">   
                     <div class="line"> 
                         <div style="float:left; width:60px;">Object</div>
-                        <input class="object1"   list="object"    style="float:left;"/>
-                        <input class="part1"     list="part"      placeholder="Part (optional)" style="float:left;" />
+                        <input type="text" class="object1"   local_id="input_object_object1" list="object"    style="float:left;"/>
+                        <input type="text" class="part1"     local_id="input_object_part1" list="part"      placeholder="Part (optional)" style="float:left;" />
                     </div>
                     <div style="clear:both"></div>
                 </div>
@@ -604,38 +637,38 @@ AKT.widgets.statement_template.html = `
                 <div class="template process_template" style="display:none;" name="process">
                     <div class="line"> 
                         <div style="float:left; width:60px;">Object1</div>
-                        <input class="object1"   list="object"    placeholder="Optional"  style="float:left;"/>
-                        <input class="part1"     list="part"      placeholder="Part (optional)"  style="float:left;"/>
+                        <input type="text" class="object1"   local_id="input_process_object1" list="object"    placeholder="Optional"  style="float:left;"/>
+                        <input type="text" class="part1"     local_id="input_process_part1" list="part"      placeholder="Part (optional)"  style="float:left;"/>
                     </div>
                     <div style="clear:both"></div>
                     <div class="line"> 
                         <div style="float:left; width:60px;">Process</div>
-                        <input class="process"   list="process" />
+                        <input type="text" class="process"   local_id="input_process" list="process" />
                     </div>
                     <div style="clear:both"></div>
                     <div class="line"> 
                         <div style="float:left; width:60px;">Object2</div>
-                        <input class="object2"   list="object"    placeholder="Optional"  style="float:left;"/>
-                        <input class="part2"     list="part"      placeholder="Part (optional)"  style="float:left;"/>
+                        <input type="text" class="object2"   local_id="input_process_object2" list="object"    placeholder="Optional"  style="float:left;"/>
+                        <input type="text" class="part2"     local_id="input_process_part2" list="part"      placeholder="Part (optional)"  style="float:left;"/>
                     </div>
                 </div>
 
                 <div class="template action_template" style="display:none;" name="action">
                     <div class="line"> 
                         <div style="float:left; width:60px;">Action</div>
-                        <input class="action"    list="action"  style="float:left;"/>
+                        <input type="text" class="action"    local_id="input_action" list="action"  style="float:left;"/>
                     </div>
                     <div style="clear:both"></div>
                     <div class="line"> 
                         <div style="float:left; width:60px;">Object1</div>
-                        <input class="object1"   list="object"    placeholder="Optional"  style="float:left;"/>
-                        <input class="part1"     list="part"      placeholder="Part (optional)"  style="float:left;"/>
+                        <input type="text" class="object1"   local_id="input_action_object1" list="object"    placeholder="Optional"  style="float:left;"/>
+                        <input type="text" class="part1"     local_id="input_action_part1" list="part"      placeholder="Part (optional)"  style="float:left;"/>
                     </div>
                     <div style="clear:both"></div>
                     <div class="line"> 
                         <div style="float:left; width:60px;">Object2</div>
-                        <input class="object2"   list="object"    placeholder="Optional"  style="float:left;"/>
-                        <input class="part2"     list="part"      placeholder="Part (optional)"  style="float:left;"/>
+                        <input type="text" class="object2"   local_id="input_action_object2" list="object"    placeholder="Optional"  style="float:left;"/>
+                        <input type="text" class="part2"     local_id="input_action_part2" list="part"      placeholder="Part (optional)"  style="float:left;"/>
                     </div>
                 </div>
 
@@ -662,9 +695,9 @@ AKT.widgets.statement_template.html = `
         <div style="float:left;width:60px;">English:</div><div class="div_statement_english" style="float:left;"></div><div style="clear:both;"></div>
     </div>
 
-    <button class="button_ok link_causes1way_dialog_ok" style="float:right;">OK</button>
-    <input  id="button_node_type_dialog_display" type="button" class="link_causes1way_dialog_ok" style="float:right;" value="Display">
-    <input  id="button_node_type_dialog_cancel" type="button" class="link_causes1way_dialog_cancel" style="float:right;" value="Cancel">
+    <button class="button_ok link_causes1way_dialog_ok" local_id="button_ok" style="float:right;">OK</button>
+    <button class="link_causes1way_dialog_display" local_id="button_display" style="float:right;">Display</button>
+    <button class="link_causes1way_dialog_cancel" local_id="button_cancel" style="float:right;">Cancel</button>
 
 </div>
 `;

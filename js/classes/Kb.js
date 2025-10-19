@@ -23,25 +23,30 @@ class Kb {
 		this._images = {};
 		this._metadata = {};
 		this._objectHierarchies = {};
+        this._regions = {};
 		this._sources = {};
 		this._source_user_labels = {};
 		this._statements = {};
 		this._topics = {};
 		this._topicHierarchies = {};
+        this._zones = {};
         this._keys = {};   // Synonym keys
         this._lookup = {    // container for various efficiency lookups
             formal_terms_for_topic:{}
         };  
 
+        // Why keep these?  Are they used?
 		this.diagrams = {};
 		this.formalTerms = {};
 		this.images = {};
 		this.objectHierarchies = {};
+        this.regions = {};
 		this.sources = {};
 		this.source_user_labels = {};
 		this.statements = {};
 		this.topics = {};
 		this.topicHierarchies = {};
+        this.zones = {};
         this.keys = {};
 		
         this._id = spec.name;
@@ -364,6 +369,16 @@ class Kb {
 
     getObjectHierarchies () {
         return this._objectHierarchies;
+    }
+
+
+    getRegions () {
+        return this._regions;
+    }
+
+
+    getZones () {
+        return this._zones;
     }
 
 

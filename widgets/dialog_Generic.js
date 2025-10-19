@@ -137,8 +137,8 @@
     function display(widget, results) {
         AKT.widgets[widget.options.widget_name].display(widget);
 
-        var zindex = AKT.incrementZindex("dialog_Generic");
-        $(widget.element).css({display:'block','z-index':zindex});
+        //var zindex = AKT.incrementZindex("dialog_Generic");
+        //$(widget.element).css({display:'block','z-index':zindex});
     }
 
 })(jQuery);

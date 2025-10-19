@@ -66,62 +66,8 @@ class Panel {
         var left = side*600 + offset;
         var top = 40+offset*2;
 
-        var zindex = AKT.incrementZindex('Panel.js: constructor. dialogId:',panelId,'\nOptions:',options);
-
         //var settings = AKT.widgets[options.widget_name].settings;
 
-/*
-        if (!AKT.state.panel_counter[subname]) {
-            AKT.state.panel_counter[subname] = 1;
-            var panelId = subname + '_1';
-
-            // Use this one if attempt (below) to autofit the panel's <div> around its elements fails.
-            //$('#workspace').append('<div id="'+panelId+'" class="panel dialog" style="position:absolute;display:block;left:'+size.left+';top:'+size.top+';width:'+settings.width+';height:'+settings.height+';"></div>');
-
-            var panelDiv = $('<div id="'+panelId+'" class="panel dialog" style="z-index:'+zindex+'; position:absolute; display:block; left:'+left+'px; top:'+top+'px;"></div>');
-            $(panelDiv).resizable();
-            $('#workspace').append(panelDiv);
-            //$('#'+panelId)[dialogId]({visible:true, kbId:AKT.state.current_kb});
-
-
-            // This is where widget instance is actually created.
-            var widgetInstance = $('#'+panelId)[dialogId](options);
-            var widge = $('#'+panelId)[dialogId]('instance');
-            console.log(112,widgetInstance);
-            console.log(114,$(widgetInstance));
-            console.log(115,widge);
-
-            $('#'+panelId).on('click',function() {
-                var zindex = AKT.incrementZindex("menu_handlers.js: AKT.menuHandler.menu_kb_statements()");
-                $(this).css('z-index',zindex);
-            });
-            $('#'+panelId).on('drag',function() {
-                var zindex = AKT.incrementZindex("menu_handlers.js: AKT.menuHandler.menu_kb_statements()");
-                $(this).css('z-index',zindex);
-            });
-            $('#'+panelId).on('start',function() {
-                var zindex = AKT.incrementZindex("menu_handlers.js: AKT.menuHandler.menu_kb_statements()");
-                $(this).css('z-index',zindex);
-            });
-
-        } else {
-            AKT.state.panel_counter[subname] += 1;
-            panelId = subname + '_' + AKT.state.panel_counter[subname];
-            console.debug('panelId rest: ',panelId);
-            //$('#workspace').append('<div id="'+panelId+'" class="panel dialog" style="position:absolute;display:block;left:75px;top:70px;width:580px;height:580px;"></div>');
-
-            // Use this one if attempt (below) to autofit the panel's <div> around its elements fails.
-            //$('#workspace').append('<div id="'+panelId+'" class="panel dialog" style="position:absolute;display:block;left:'+size.left+';top:'+size.top+';width:'+settings.width+';height:'+settings.height+';"></div>');
-
-            var panelDiv = $('<div id="'+panelId+'" class="panel dialog" style="z-index:zindex; ; position:absolute; display:block; left:'+left+'px;top:'+top+'px;"></div>');
-            $('#workspace').append(panelDiv);
-            $('#'+panelId)[dialogId](options);
-            $('#'+panelId).on('click',function() {
-                var zindex = AKT.incrementZindex("menu_handlers.js: AKT.menuHandler.menu_kb_statements()");
-                $(this).css('z-index',zindex);
-            });
-        }
-*/
 
         if (!AKT.state.panel_counter[subname]) {
             AKT.state.panel_counter[subname] = 0;
@@ -147,12 +93,16 @@ class Panel {
             top = 60;
         }
 
+        console.log(5601,AKT.state.zindex);
+        var zindex = AKT.incrementZindex('Panel.js: constructor.'+panelId,1);
+        console.log(5602,zindex,AKT.state.zindex);
+
         var panelDiv = $('<div id="'+panelId+'" class="panel dialog" style="z-index:'+zindex+'; position:absolute; display:block; left:'+left+'px; top:'+top+'px;"></div>');
         $('#workspace').append(panelDiv);
         $(panelDiv).resizable();
         $(panelDiv).draggable({handle:".titlebar",containment:"#workspace"});
 
-        $('#panel_list').append('<div class="'+panelId+'" style="float:left;background:#e0e0e0;font-size:10px;margin-right:11px;">'+panelIdDisplay+'</div> ');
+        $('#panel_list').append('<div class="panel_list_item '+panelId+'" local_id="'+panelId+'" style="float:left;background:#e0e0e0;font-size:10px;margin-right:11px;">'+panelIdDisplay+'</div> ');
 
         // So, what is happening here is that sometimes we need to somehow constrain the width of the panel.
         // The trigger example is for the statements widgette, which has an AKT.myListbox which we want to
@@ -177,14 +127,18 @@ class Panel {
         }
 
         // Make titlebar, including panel Close button.
-        var titlebarDiv = $('<div class="w3-row titlebar" style="height:21px; background:'+titleColour+'; padding:2px;border-bottom:solid 1px black;font-size:12px;"></div>');
-        var closeButtonDiv = ('<div class="w3-right dialog_close_button" style="width:18px;max-height:20px;background:#e0e0e0; margin-right:5px;" title="Close panel"><b>X</b></div>');
-        var minimiseButtonDiv = ('<div class="w3-right dialog_minimise_button" style="width:18px;max-height:17px;font-size:20px;background:#e0e0e0; margin-right:5px;"><div style="font-size:20px;margin-top:-16px;height:40px;" title="Minimise panel"><b>_</b></div></div>');
-        var helpButtonDiv = ('<div class="w3-right dialog_help_button" style="width:18px;max-height:20px;background:#e0e0e0; margin-right:5px;" title="Help"><b>?</b></div></div>');
-        var settingsButtonDiv = ('<div class="w3-right dialog_settings_button" style="width:18px;max-height:20px;background:#e0e0e0; margin-right:5px;" title="Settings"><b>&#x2699</b></div></div>');
+        var titlebarDiv = $('<div class="w3-row titlebar" local_id="titlebar" label="titlebar" style="height:21px; background:'+titleColour+'; padding:2px;border-bottom:solid 1px black;font-size:12px;"></div>');
+
+        var closeButtonDiv = ('<button class="w3-right dialog_close_button" local_id="button_close" label="close button" style="width:18px;max-height:20px;font-size:12px;background:#e0e0e0; margin-right:5px;" title="Close panel">&#128939</button>');
+
+        var minimiseButtonDiv = ('<button class="w3-right dialog_minimise_button" local_id="button_minimise" label="minimise button" style="width:18px;max-height:20px;background:#e0e0e0; margin-right:5px;"><b>&#9601;</b></button>');
+
+        var helpButtonDiv = ('<button class="w3-right dialog_help_button" local_id="button_help" label="help button" style="width:18px;max-height:20px;background:#e0e0e0; margin-right:font-size:16px;5px;" title="Help"><b>?</b></button>');
+
+        var settingsButtonDiv = ('<button class="w3-right dialog_settings_button" local_id="button_settings" label="settings button" style="width:18px;max-height:20px;font-size:12px;background:#e0e0e0; margin-right:5px;" title="Settings">&#128957</button>');  // &#x2699
 
         var panelLabel = panelId;
-        var titleDiv = $('<div class="w3-rest" style="text-align:center;">'+panelIdDisplay+'</div>');
+        var titleDiv = $('<div class="w3-rest div_title" style="text-align:center;">'+panelIdDisplay+'</div>');
         $(titlebarDiv).append(closeButtonDiv).append(minimiseButtonDiv).append(settingsButtonDiv).append(helpButtonDiv).append(titleDiv);
         $(panelDiv).append(titlebarDiv);
 
@@ -206,21 +160,30 @@ class Panel {
         //console.log('widgetInstance: ',widgetInstance);
         //console.log('widge         : ',widge);
 
+        AKT.incrementZindex('Panel.js: constructor(): '+panelId,1);
+        $('#'+panelId).css('z-index',zindex);
+
         $('#'+panelId).on('click',function(event) {
-            event.stopPropagation();
-            var zindex = AKT.incrementZindex('Panel.js: click. dialogId:',panelId,'\nOptions:',options);
-            $(this).css('z-index',zindex);
+            //event.stopPropagation();
+            //var zindex = AKT.incrementZindex('Panel.js: click. dialogId:'+panelId,1);
+            //$(this).css('z-index',zindex);
+            var zindex = $('#'+panelId).css('z-index');
+            //console.log('zindex before:',panelId,zindex);
+            var zindex = AKT.incrementZindex("Panel.js:$('#'+panelId).on('click'...): "+panelId, 1);
+            $('#'+panelId).css('z-index',zindex);
+            //console.log('zindex after:',panelId,zindex);
         });
 
         $('#'+panelId).on('mousedown',function(event) {
-        event.stopPropagation();
-        var zindex = AKT.incrementZindex('Panel.js: start. dialogId:',panelId,'\nOptions:',options);
+            //event.stopPropagation();
+            var zindex = AKT.incrementZindex("Panel.js: $('#'+panelId).on('mousedown'...): "+panelId, 1);
             $(this).css('z-index',zindex);
         });
 
         $('#panel_list').find('.'+panelId).on('click',function() {
-            var zindex = AKT.incrementZindex('Panel.js: click. dialogId:',panelId,'\nOptions:',options);
+            var zindex = AKT.incrementZindex("Panel.js: $('#'+panel_list).find('.'+panelId).on('click'...): "+panelId, 1);
             $('#'+panelId).css({display:'block','z-index':zindex});
+/*
              var action = new Action({
                 element_id: 'panel_list',
                 selector:   '.'+panelId,
@@ -233,10 +196,12 @@ class Panel {
                prompt:     'prompt'
             });
             AKT.action_list.add(action);
+*/
        });
 
-        $('#'+panelId).find('.dialog_minimise_button').on('click', function () {
+        $('#'+panelId).find('[local_id="button_minimise"]').on('click', function () {
             $('#'+panelId).css({display:'none'});
+/*
             var action = new Action({
                 element_id: panelId,
                 selector:   '.dialog_minimise_button',
@@ -249,13 +214,28 @@ class Panel {
                 prompt:     'prompt'
             });
             AKT.action_list.add(action);
+*/
         });
 
-        $('#'+panelId).find('.dialog_close_button').on('click', function () {
+        $('#'+panelId).find('[local_id="button_close"]').on('click', function () {
+
+            // I need to explain why the next line is here:
+            // Unlike all other events, closing (deleting) a panel means that the event cannot be
+            // picked up by the generic button-click recording code - by the time the event bubbles
+            // up to it, the panel is no longer in the DOM.   Therefore, the code for deleting it must be
+            // in the generic code.    But that code is not executed during the 'normal' and 'playback'
+            // setting for AKT.state.action_mode.   So we have the code below twice: once here, and once in the
+            // generic event-recording block, each guarded by an appropriate condition for AKT.state.action_mode.
+            if (AKT.state.action_mode === 'recording') return;
+
+            console.log('\n\n### CLICKED ON PANEL CLOSE BUTTON!!');
+            console.log('#'+panelId);
+            console.log(dialogId);
             $('#panel_list').find('.'+panelId).remove();
             $('#'+panelId).remove();
             $('#'+panelId)[dialogId]('destroy');
             $('#'+panelId).css({display:'none'});
+/*
             var action = new Action({
                 element_id: panelId,
                 selector:   '.dialog_close_button',
@@ -268,6 +248,7 @@ class Panel {
                prompt:     'prompt'
             });
             AKT.action_list.add(action);
+*/
         });
 
         $('#div_help').on('click',function() {
@@ -289,7 +270,7 @@ top=pixels	The top position of the window. Negative values not allowed
 width=pixels	The width of the window. Min. value is 100
 */
 
-        $('#'+panelId).find('.dialog_help_button').on('click', function () {
+        $('#'+panelId).find('[local_id="button_help"]').on('click', function () {
             console.log(AKT.state.ref);
             var helpname = helpName(subname);
             var elementId = '#ref_'+helpname;
@@ -329,7 +310,7 @@ width=pixels	The width of the window. Min. value is 100
 
 
 
-        $('#'+panelId).find('.dialog_settings_button').on('click', function () {
+        $('#'+panelId).find('[local_id="button_settings"]').on('click', function () {
             console.log(options);
             console.log('Clicked on settings button for ',subname);
             console.log('item_type = ',options.item_type);
@@ -443,7 +424,7 @@ width=pixels	The width of the window. Min. value is 100
             var panelId = $(panelDiv).attr('id');
             var elementClass = event.target.classList[0];
             var selectedOption = $(widge.element).find('.'+elementClass).find(":selected").val();
-
+/*
             var action = new Action({
                 element_id: widge.element[0].id,
                 selector:   '.'+elementClass,
@@ -455,6 +436,7 @@ width=pixels	The width of the window. Min. value is 100
 
             console.log('action: ',action);
             AKT.action_list.add(action);   // Only actually does add it if (AKT.state.event_recording && !AKT.state.playing_events)
+*/
         });
 
         $('input').on('changexxx', function (event) {  // March 2025 Disabled as it doesn't actually do anything useful.

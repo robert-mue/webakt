@@ -3,6 +3,11 @@
     var akt = {};
     AKT.cola;
     AKT.state = {
+        action_mode: 'normal',  // Options are 'normal', 'recording' and 'playback'
+                                // 'normal' is ususal mode, no involvement of the action/event mechanism.
+                                // 'recording' means that actions are being recorded in an action log (script).
+                                // 'playback' means that the event triggers come from the script, not from the
+                                // user (so they won't be picked up by the action-recording mechanism.
         current_kb: null,
         current_listener: {uuid:null,type:null},
         event_recording: true,
@@ -15,7 +20,8 @@
         panel_last_of_type: {},
         panel_counter: {},   // One counter for each panel type.
         panels_counter:{total:0,left:0,right:0}, // The total number of panels that have been created.
-        stepCounter: 0
+        stepCounter: 0,
+        use_mode: 'normal'   // Or: 'creating_action_log', in which case no saveKbInLocalStorage().
     };
     AKT.tools = {};
     AKT.diagrams ={};  // Temporary measure, to hold the JSON for diagrams (currently just acheampong).
@@ -23,16 +29,18 @@
         show_zindex_incrementing: true,
         layout_max_number_of_nodes: 300
     };
-    AKT.event_records = [];
+
 
     AKT.kbs = {};
     AKT.KBs = {};
     AKT.bulk = {};
     AKT.widgets = {};
-    AKT.tutorials = {};
-    AKT.eventRecord = [];   // A record of events, captured in Panel and elsewhere,
+    AKT.tutorials = {a:'b'};
+    AKT.action_logs = {};   // [Sept 2025] New version of events/recordings...
+    AKT.eventRecord = [];   // [Sept 2025 Now absolete] A record of events, captured in Panel and elsewhere,
                             // which can be used to build a tutorial or UI test.
 
+    AKT.event_records = [];
     AKT.menuHandler = {};   // Functions that respond to a menu command
     AKT.dialogOpener = {};  // Functions that open a dialog with function-specific parameters
 
@@ -94,7 +102,7 @@ AKT.processQueryString = function () {
 
         var divElement = $('<div style="float:left; font-family:sans; margin:2px;margin-left:15px;"></div>');
         var legendElement =  $('<legend class="legend_'+className+'" style="float:left; font-size:11px;text-align:right;width:120px;">'+legend+'</legend>');
-        var selectElement = $('<select class="listbox_'+className+'" style="float:left; margin-left:5px;border:none;background:white;font-size:11px;width:120px;"></select>');
+        var selectElement = $('<select class="listbox_'+className+'" local_id="select_'+className+'" style="float:left; margin-left:5px;border:none;background:white;font-size:11px;width:120px;"></select>');
         $(divElement).append(legendElement).append(selectElement).append('<div style="clear:both;"></div>');
 
         $.each(optionArray, function(i,option) {
@@ -126,8 +134,8 @@ AKT.processQueryString = function () {
     // This should now rightly be called something like "makeNewHighestZindex(),
     // since it is designed to cope with rogue situations where someone
     // gives a panel a high z-index but does not update AKT.state.zindex.
-    AKT.incrementZindex = function (calledFrom) {
-        console.log('\n*** Function AKT.incrementZindex: calledFrom: ',calledFrom);
+    AKT.incrementZindex = function (calledFrom,increment) {
+        //console.log('\n*** Function AKT.incrementZindex: calledFrom: ',calledFrom);
         var index_highest = 0;   
         $('.panel').each(function() {
             // always use a radix (10) when using parseInt
@@ -136,9 +144,13 @@ AKT.processQueryString = function () {
                 index_highest = index_current;
             }
         });
-        AKT.state.zindex = index_highest+1;
+        if (!increment) {
+            increment = 1;
+        }
+        AKT.state.zindex = index_highest+increment;
         if (AKT.options.show_zindex_incrementing) {
-            //console.log('ZINDEX: ',index_highest, '>',AKT.state.zindex,calledFrom);
+            //console.log('ZINDEX: increment = ',increment,': ',index_highest, ' > ',AKT.state.zindex,' : ',calledFrom);
+            console.log('Z',AKT.state.zindex,': ',calledFrom);
         }
         return AKT.state.zindex;
     };
@@ -1094,46 +1106,48 @@ AKT.showMessage = function (message,extras) {
 
 
 AKT.saveKbInLocalStorage = function (kbId) {
-    var kb = AKT.KBs[kbId];
-	var kbObjectToSave = kb.generateJsonFromKb();
-    console.log(9010,kbObjectToSave);
-	kbObjectToSave.metadata.id = kbId;
-	var kbStringToSave = JSON.stringify(kbObjectToSave,null,1);
-    // Note that we save it twice: once, as the current KB, so that it can be
-    // automatically loaded next time we use webAKT; and once under the name
-    // that we have given to the KB.   The latter is to provide a way of 
-    // accessing one of a set of KBs which is easier than using file Save/Open.
-    var recentKbsString = localStorage.getItem('recent_kbs');
-    if (!recentKbsString) {
-        var recentKbs = [];
-    } else { 
-        recentKbs = JSON.parse(localStorage.getItem('recent_kbs'));
-    }
-
-    // Remove kbId element from the recentKbs array if it's already in the array,
-    // so that it's not there twice.
-    recentKbs = removeFromArray(recentKbs,kbId);
-
-    // Adds kbId element at *start* of the array.
-    if (kbId) {   // To ignore case where kbId is null.
-        recentKbs.unshift(kbId); 
-    }  
-    if (recentKbs.length>20) {
-        recentKbs.pop();   // Removes last element;
-    }
-    console.log(recentKbs);
-    if (kbStringToSave) {    // To ignore case where kbStringToSave is null.
-        localStorage.setItem('recent_kbs',JSON.stringify(recentKbs));
-	    localStorage.setItem('current_kb',kbStringToSave);
-	    localStorage.setItem(kbId,kbStringToSave);
-    }
-
-    function removeFromArray(array,item) {
-        var index = array.indexOf(item);
-        if (index > -1) {
-            array.splice(index,1);
+    if (AKT.state.use_mode === 'normal') {
+        var kb = AKT.KBs[kbId];
+        var kbObjectToSave = kb.generateJsonFromKb();
+        console.log(9010,kbObjectToSave);
+        kbObjectToSave.metadata.id = kbId;
+        var kbStringToSave = JSON.stringify(kbObjectToSave,null,1);
+        // Note that we save it twice: once, as the current KB, so that it can be
+        // automatically loaded next time we use webAKT; and once under the name
+        // that we have given to the KB.   The latter is to provide a way of 
+        // accessing one of a set of KBs which is easier than using file Save/Open.
+        var recentKbsString = localStorage.getItem('recent_kbs');
+        if (!recentKbsString) {
+            var recentKbs = [];
+        } else { 
+            recentKbs = JSON.parse(localStorage.getItem('recent_kbs'));
         }
-        return array;
+
+        // Remove kbId element from the recentKbs array if it's already in the array,
+        // so that it's not there twice.
+        recentKbs = removeFromArray(recentKbs,kbId);
+
+        // Adds kbId element at *start* of the array.
+        if (kbId) {   // To ignore case where kbId is null.
+            recentKbs.unshift(kbId); 
+        }  
+        if (recentKbs.length>20) {
+            recentKbs.pop();   // Removes last element;
+        }
+        console.log(recentKbs);
+        if (kbStringToSave) {    // To ignore case where kbStringToSave is null.
+            localStorage.setItem('recent_kbs',JSON.stringify(recentKbs));
+            localStorage.setItem('current_kb',kbStringToSave);
+            localStorage.setItem(kbId,kbStringToSave);
+        }
+
+        function removeFromArray(array,item) {
+            var index = array.indexOf(item);
+            if (index > -1) {
+                array.splice(index,1);
+            }
+            return array;
+        }
     }
 }
 
@@ -2011,4 +2025,151 @@ AKT.makeId = function(structure,args) {
             return 'ERROR in AKT.makeId() in webakt.js: '+structure+' not recognised';
     }
 }
+
+    AKT.processPendingEvent = function(event,pendingEvent) {
+        var top = $(event.target.closest('.panel'));
+        if (!top) {
+            var id = 'menus';
+        } else if (top && top[0]) {
+            id = top[0].id;
+        }
+        if (id) {
+            var localId = $(event.target).attr('local_id');
+            var value = $(event.target).text();
+            var eventType = event.type;
+            var elementType = event.target.localName;
+            //var value = $('#'+id).find('[local_id="'+localId+'"]').val();
+        }
+
+        var pendingTop = $(pendingEvent.target.closest('.panel'));
+        if (pendingTop && pendingTop[0]) {
+            var pendingId = pendingTop[0].id;
+            var pendingLocalId = $(pendingEvent.target).attr('local_id');
+            var pendingValue = $(pendingEvent.target).val();
+            var pendingEventType = pendingEvent.type;
+            var pendingElementType = pendingEvent.target.localName;
+        }
+
+        if (pendingId !== id || pendingLocalId !== localId) {
+            var pendingActionSpec = {
+                element_id: pendingId,
+                selector: '[local_id="'+pendingLocalId+'"]',
+                type: pendingEventType,
+                message:'Clicked on a key',
+                before:'previous_action',
+                after:'next_action',
+                prompt:'Click on a key',
+                value: pendingValue,
+                upper_selector: '#'+pendingId,
+                local_selector: '[local_id="'+localId+'"]'
+           }
+            AKT.state.current_action_log.add(pendingActionSpec);
+        }
+
+        AKT.state.pending_event = null;
+   }
+
+    AKT.myPrompt = function (prompt,suggested) {
+        console.log('myPrompt()',prompt,suggested);
+        $('#myprompt').find('.div_name').text(prompt);
+        $('#myprompt').find('.input_name').val(suggested);
+        $('#myprompt').css({display:'block'});
+
+        $('#myprompt').find('.button_cancel').on('click', function() {
+            $('#myprompt').css({display:'none'});
+        });
+
+        $('#myprompt').find('.button_ok').on('click', function(event) {
+            console.log('\nmyprompt.button_ok');
+            console.log(AKT.state);
+            if (AKT.state.action_mode !== 'recording') {
+                event.stopPropagation();
+
+            } else {
+                if (AKT.state.pending_event) {
+                    AKT.processPendingEvent(event,AKT.state.pending_event);
+                }
+
+                AKT.incrementZindex("myprompt, OK button click:",'myprompt');
+                //var localId = $(event.target).attr('local_id');
+                //var value = $(event.target).text();
+                //var eventType = event.type;
+                //var elementType = event.target.localName;
+
+                var actionSpec = {
+                    element_id: 'myprompt',
+                    selector: '[local_id="button_ok"]',
+                    type:           'click',
+                    message:        'Clicked on a button',
+                    before:         'previous_action',
+                    after:          'next_action',
+                    prompt:         'Click on a button',
+                    value:          'value',
+                    event_type:     'click',
+                    upper_selector: '#myprompt',
+                    local_selector: '[local_id="button_ok"]'
+                }
+                AKT.state.current_action_log.add(actionSpec);
+            }
+ 
+            $('#myprompt').css({display:'none'});
+
+            var name = $('#myprompt').find('.input_name').val();
+            var title = name;
+            var kbId = name;
+            var kb = new Kb({name:name});
+            AKT.KBs[kbId] = kb;
+            AKT.changeKb(kbId);
+            AKT.saveKbInLocalStorage(kbId);
+            AKT.showMessage('New KB created: '+kbId);
+
+            var panel = AKT.panelise({
+                widget_name:'metadata',
+                position:{left:'20px',top:'20px'},
+                size:{width:'550px',height:'540px'},
+                options:{kbId:AKT.state.current_kb}
+            });
+        });
+    }
+
+
+
+    // ===========================================================================================================
+    // Text-to-speech 
+    AKT.text_to_speech = function (text) {
+        const synth = window.speechSynthesis;
+        speak(text);
+        
+
+        function speak(text) {
+            if (synth.speaking) {
+                console.error("speechSynthesis.speaking");
+                return;
+            }
+
+            var voices = synth.getVoices()
+
+                const utterThis = new SpeechSynthesisUtterance(text);
+
+                utterThis.onend = function (event) {
+                    console.log("SpeechSynthesisUtterance.onend");
+                };
+
+                utterThis.onerror = function (event) {
+                    console.error("SpeechSynthesisUtterance.onerror");
+                };
+
+                const selectedOption = 'Microsoft Hazel - English (United Kingdom)';
+
+                for (let i = 0; i < voices.length; i++) {
+                    if (voices[i].name === selectedOption) {
+                        utterThis.voice = voices[i];
+                        break;
+                    }
+                }
+                utterThis.pitch = 1.0;
+                utterThis.rate = 0.8;
+                synth.speak(utterThis);
+        }
+    }
 

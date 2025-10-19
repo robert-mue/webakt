@@ -13,7 +13,7 @@
 // by a custom event(selected from an AKT.myListBox menu).
 
 // Finally, note that they come together when we test for their equality, e.g.
-// if (node_id === args.item_id) {...
+// if (nodeId === args.item_id) {...
 
 // 22 March 2023 Attempting to put a lot of the business code into the Hierarchy.js
 // class, to improve the logic and readability, and to simplify the code in this
@@ -74,9 +74,6 @@ AKT.widgets.hierarchy_details.setup = function (widget) {
 		alert('System error in hierarchy_details.js\nNot your fault\nUnrecognised mode '+mode+' in setup()');
 	}
 
-    //var table_treetable = makeTreetable(widget);
-    //$(widget.element).find('.div_treetable').append(table_treetable);
-
     $(widget.element).find('.button_new_branch').on('click', function (event) {    // The new_branch button
         //event.stopPropagation();
         console.log('BUTTON: Clicked on new_branch button');
@@ -87,10 +84,10 @@ AKT.widgets.hierarchy_details.setup = function (widget) {
         var trSelected = $(widget.element).find('table.table_treetable').find('tr.selected');
         var table = $(trSelected).parents('table')[0];   // Gets the first parent element that is a table.
         var hierarchyId = $(table).attr('data-hierarchy-id');
-        var node_id = $(trSelected).data('tt-id');
-        if (hierarchyId && node_id) {
+        var nodeId = $(trSelected).data('tt-id');
+        if (hierarchyId && nodeId) {
             var hierarchy = kb._objectHierarchies[hierarchyId];
-            hierarchy._tree_down[node_id] = [];
+            hierarchy._tree_down[nodeId] = [];
             self.hierarchy = hierarchy;
         } else {
             alert('Please first select a node (object or topic) in the hierarchy.');
@@ -133,9 +130,7 @@ AKT.widgets.hierarchy_details.setup = function (widget) {
         var kbId = AKT.state.current_kb;
         var kb = AKT.KBs[kbId];
 
-        console.log(5701,widget.options);
-
-//        if (widget.options.item_type === 'object_hierarchy') {
+        if (widget.options.item_type === 'object_hierarchy') {
 /*
             var widgies = AKT.getWidgiesByKbAndType(kbId,'formal_term_collection')
             console.log(widgies, widgies.length)
@@ -152,32 +147,29 @@ AKT.widgets.hierarchy_details.setup = function (widget) {
                 console.log('There is a formal_terms widgette instance!');
             }
 */
-/*
             if (parentId) {
                 var hierarchy = kb._objectHierarchies[parentId];
             } else {
-                var hierarchy = kb._objectHierarchies[node_id];
+                var hierarchy = kb._objectHierarchies[nodeId];
             }
         } else if (widget.options.item_type === 'topic_hierarchy') {
             if (parentId) {
                 var hierarchy = kb._topicHierarchies[parentId];
             } else {
-                var hierarchy = kb._topicHierarchies[node_id];
+                var hierarchy = kb._topicHierarchies[nodeId];
             }
         }
-*/
-        var hierarchy = widget.options.item;
         self.hierarchy = hierarchy;
         
 		$(this).css({background:'yellow'});
         AKT.state.listening_for_formal_term = true;
 		AKT.state.active_panel_id = widget.element[0].id;
 
-        var trSelected = $(widget.element).find('table.table_treetable').find('tr').attr('data-node_id');
-		console.log('append-node:',$(trSelected));
-        var node_id = $(trSelected).data('id');
-        //var parentId = $(trSelected).data('tt-parent-id');
-        console.log('node_id: ', node_id);
+        var trSelected = $(widget.element).find('table.table_treetable').find('tr.selected');
+		console.log('add_nodes:',trSelected);
+        var nodeId = $(trSelected).data('tt-id');
+        var parentId = $(trSelected).data('tt-parent-id');
+        console.log('nodeId,parentId: ', nodeId, parentId);
 
         AKT.recordEvent({
             file:'hierarchy_details.js',
@@ -235,8 +227,6 @@ AKT.widgets.hierarchy_details.setup = function (widget) {
         self.hierarchy = hierarchy;
         AKT.state.current_hierarchy = hierarchy;
         widget.options.hierarchy = hierarchy;
-        widget.options.item = hierarchy;
-
         AKT.recordEvent({
             file:'hierarchy_details.js',
             function:'AKT.widgets.setup()',
@@ -350,8 +340,6 @@ AKT.widgets.hierarchy_details.setup = function (widget) {
             console.log(9002,AKT.state.listening_for_formal_term, AKT.state.active_panel_id, widget.element[0].id);
 			console.log(9003,'listener:item_selected_event:',args,widget.element[0].id);
             console.log(9004,widget.options);
-            console.log(9006,widget.selected_node_id);
-
             if (widget.options.item) {
                 var hierarchy = widget.options.item;
             } else {
@@ -374,42 +362,18 @@ AKT.widgets.hierarchy_details.setup = function (widget) {
             self.hierarchy = hierarchy;
 			var trSelected = $(widget.element).find('.div_hierarchies').find('tr.selected');
 
-			var parentId = widget.selected_node_id;
-			var newnode_id = args.item_id;  // The ID of the topic or formal term object that is being added.
+			var parentId = $(trSelected).data('tt-id');
+			var newNodeId = args.item_id;  // The ID of the topic or formal term object that is being added.
 				// This is picked up from e.g. a click in a formal_terms myListbox.
-			hierarchy.addNode(parentId,newnode_id);  
-			console.log(7777,hierarchy);
-
-            $(widget.element).find('.div_treetable').empty();
-            var tableTreetable = hierarchy.makeTreetable(widget);
-            $(widget.element).find('.div_treetable').append(tableTreetable);
-
-            $(widget.element).find('.div_expand_collapse').on('click', function(event) {
-                //event.stopPropagation();
-                console.log('CLICKED ON ARROW!');
-                console.log(event);
-                console.log($(event.target).parent().parent().parent().data('node_id'));
-                var nodeId = $(event.target).parent().parent().parent().data('node_id');
-                console.log(nodeId);
-                var color = $(event.target).css('color');
-                console.log(color);
-                if (color === 'rgb(0, 0, 255)') {
-                    hierarchy.setDisplayMode(widget, nodeId, 1, 'none');
-                    $(event.target).css({color:'red'});
-                } else {
-                    hierarchy.setDisplayMode(widget, nodeId, 1, 'table-row');
-                    $(event.target).css({color:'blue'});
-                }
-            });
-
-
+			hierarchy.addNode(parentId,newNodeId);  
+			console.log(widget.options);
 
 			AKT.trigger('kb_changed_event',{
 				source_panel_id:widget.element[0].id,
 				kb_id:widget.options.kbId,
 				category:'object_hierarchies',
 				instance:hierarchy,
-				change:{type:'node_added',parentId:parentId,node_id:newnode_id}
+				change:{type:'node_added',parentId:parentId,nodeId:newNodeId}
 			});
 
 
@@ -421,14 +385,13 @@ AKT.widgets.hierarchy_details.setup = function (widget) {
     });
 
 
-	$(document).on('kb_changed_eventxxx', function(event,args) {
+	$(document).on('kb_changed_event', function(event,args) {
 		if (args.kb_id === widget.options.kbId &&
 				args.category === 'object_hierarchies') {
 			console.log('listener:kb_changed_event:',args,widget.element[0].id);
 			var hierarchy = args.instance;
             self.hierarchy = hierarchy;
 			var divTreetable = hierarchy.makeTreetableDiv();
-            var table = hierarchy.makeTreetable(widget);
 			$(widget.element).find('.div_hierarchies').html(divTreetable);
 		}
 	});
@@ -473,22 +436,13 @@ AKT.widgets.hierarchy_details.display = function (widget) {
     if (!hierarchy) return;
     self.hierarchy = hierarchy;
 
-    console.log(hierarchy);
-    hierarchy.recurse(hierarchy._tree_down,'odoma',0)
-
-    //var divTreetable = hierarchy.makeTreetableDiv(widget);
+    var divTreetable = hierarchy.makeTreetableDiv(widget);
     var tableTreetable = hierarchy.makeTreetable(widget);
-
     var itemId = widget.options.item_id;
     //var itemId = 'crop';
 
-    $(widget.element).find('.div_treetable').append(tableTreetable);
+    $(widget.element).find('.div_hierarchies').append(divTreetable);
     //$(divTreetable).append(tableTreetable);
-
-    //hierarchy.setDisplayMode(widget, 'timber_tree', 1, 'none');
-    //hierarchy.setDisplayMode(widget, 'timber_tree', 1, 'table-row');
-
-/*
     console.log(3304,widget.options);
     console.log(3305,itemId);
     if (itemId) {   // This throws an error ("Unknown node [Hierarchy ID]"), but can't work out
@@ -509,11 +463,11 @@ AKT.widgets.hierarchy_details.display = function (widget) {
         var node = $(tableTreetable).treetable('node', itemId);
         $(node.row).css('background','yellow');
     }
-*/
 
 
 
-	$(widget.element).find('.div_hierarchies').find('.treetable_trxxxxx').on('click', function (event, value) {
+
+	$(widget.element).find('.div_hierarchies').find('.treetable_tr').on('click', function (event, value) {
 		//event.stopPropagation();
 		console.log('1501 --> ',$(this));
 		// Needed this, since this.value is blank when triggered (in AKT.singleStep).
@@ -556,26 +510,7 @@ AKT.widgets.hierarchy_details.display = function (widget) {
 	});
 
 
-    //hierarchy.setDisplayMode(widget, 'timber_tree', 1, 'none');
-    //hierarchy.setDisplayMode(widget, 'timber_tree', 1, 'table-row');
 
-    $(widget.element).find('.div_expand_collapse').on('click', function(event) {
-        //event.stopPropagation();
-        console.log('CLICKED ON ARROW!');
-        console.log(event);
-        console.log($(event.target).parent().parent().parent().data('node_id'));
-        var nodeId = $(event.target).parent().parent().parent().data('node_id');
-        console.log(nodeId);
-        var color = $(event.target).css('color');
-        console.log(color);
-        if (color === 'rgb(0, 0, 255)') {
-            hierarchy.setDisplayMode(widget, nodeId, 1, 'none');
-            $(event.target).css({color:'red'});
-        } else {
-            hierarchy.setDisplayMode(widget, nodeId, 1, 'table-row');
-            $(event.target).css({color:'blue'});
-        }
-    });
 
 /*
     $(widget.element).find('.div_hierarchy').empty();
@@ -689,7 +624,7 @@ AKT.widgets.hierarchy_details.html = `
         </div>
 
         <div class="w3-rest w3-container">
-            <div class="div_treetable" style="min-width:300px; min-height:300px; max-height:400px;background:white; border:solid 1px blue; margin-top:7px; overflow-y:auto;"></div>
+            <div class="div_hierarchies" style="min-width:300px; min-height:300px; max-height:400px;background:white; border:solid 1px blue; margin-top:7px; overflow-y:auto;"></div>
         </div>
     </div>
 

@@ -10,15 +10,17 @@ class ActionList {
         if (AKT.state.playing_events) return;
 
         this._actions.push(action);
-        
-        this.saveActionListToLocalStorage('webakt_actions_latest');
+        console.log('AKT.state.current_action_list:\n',AKT.state.current_action_list);
+        AKT.state.current_action_list = this._actions;
+        this.saveActionListToLocalStorage('current_action_list');
 
-        var actionListSpec = [];
-        for (var i=0; i<this._actions.length; i++) {
-            var action = this._actions[i];
-            actionListSpec.push(action.makeActionSpec());
-        }
-        localStorage.setItem('webakt_actions_latest',JSON.stringify(actionListSpec));
+        // Legacy code?
+        //var actionListSpec = [];
+        //for (var i=0; i<this._actions.length; i++) {
+            //var action = this._actions[i];
+            //actionListSpec.push(action.makeActionSpec());
+        //}
+        //localStorage.setItem('webakt_actions_latest',JSON.stringify(actionListSpec));
     }
 
 
@@ -35,12 +37,12 @@ class ActionList {
 
 
     saveActionListToLocalStorage (key) {
-        var actionListSpec = [];
-        for (var i=0; i<this._actions.length; i++) {
-            var action = this._actions[i];
-            actionListSpec.push(action.makeActionSpec());
-        }
-        localStorage.setItem(key,JSON.stringify(actionListSpec));
+        //var actionListSpec = [];
+        //for (var i=0; i<this._actions.length; i++) {
+        //    var action = this._actions[i];
+         //   actionListSpec.push(action.makeActionSpec());
+        //}
+        localStorage.setItem(key,JSON.stringify(this._actions));
     }
 
 
@@ -57,7 +59,7 @@ class ActionList {
             AKT.state.event_recording = false;
             AKT.state.playing_events = true;
             if (!id) {
-                this._actions = this.getActionListFromLocalStorage('webakt_actions_latest');
+                this._actions = this.getActionListFromLocalStorage('current_action_list');
             } else {
                 this._actions = this.getActionListFromLocalStorage('webakt_actions_'+id);
             }

@@ -82,19 +82,6 @@ class Hierarchy {
         this._state.last_added[nodeId] = true;
     }
 
-/*        
-                if (hierarchy._tree_down[nodeId]) {
-                    hierarchy._tree_down[nodeId].push(args.item_id);
-                } else {
-                    hierarchy._tree_down[nodeId] = [];
-                    hierarchy._tree_down[nodeId].push(args.item_id);
-                }
-                hierarchy._tree_up[args.item_id] = nodeId;
-
-                hierarchy._state.recently_added[args.item_id] = true;
-                hierarchy._state.last_added = {};
-                hierarchy._state.last_added[args.item_id] = true;
-*/
 
 // TODO: This code is still needed!   It handles legacy KBs, in AKT5's old format
 // for repesenting hierarchies.   See constructor.
@@ -198,267 +185,6 @@ class Hierarchy {
     };
 
 
-    makeTreetableDiv (widget) {
-        console.log('Hierarchy.makeTreetableDiv()');
-        var hierarchyId = this._id;
-        console.log(this._id);
-        var div = $('<div class="div_hierarchy hierarchy_'+hierarchyId+'" data-hierarchy-id="' + hierarchyId + '" style="padding:5px;"></div>');
-        //var divHierarchyName = $('<div class="hierarchy_hierarchy_id" style="padding-left:5px;padding-right:5px;">'+hierarchyId+'</div>');
-        //$(div).append(divHierarchyName);
-        //$(widget.element).find('.div_hierarchies').append(div);
-
-/*
-        $(divHierarchyName).on('click', function(event) {
-            console.log('Clicked on name div');
-            $(widget.element).find('.hierarchy_hierarchy_id').css({background:''});
-            $(widget.element).find('.hierarchy_hierarchy_id').removeClass('selected');
-            $(this).css({background:'b'});
-            $(this).addClass('selected');
-
-            var hierarchyId = $(this).text();
-            AKT.recordEvent({
-                file:'Hierarchy.js',
-                function:'makeTreetableDiv()',
-                element:widget.element,
-                finds:['.hierarchy_hierarchy_id'],
-                event:'click',
-                value: hierarchyId,
-                message:'Clicked on a hierarchy name in the hierarchies panel.'});
-            //var hierarchyId = $(this).parent().attr('data-hierarchy-id');
-        });
-*/
-		var table = this.makeTreetable(widget);
-		$(div).append(table);
-        return div;
-    };
-
-
-    // Built using the treetable jQuery plugin
-    // https://www.jqueryscript.net/demo/jQuery-Plugin-For-Displaying-A-Tree-Of-Data-In-A-Table-treetable/
-    makeTreetable (widget) {
-        var hierarchyId = this._id;
-        var type = this._type;
-        var kb = this._kb;
-        var rootId = this._root;
-        var treeDown = this._tree_down;
-        var self = this;
-
-        var table = $('<table class="table_treetable '+this._id+'" data-hierarchy-id="' + hierarchyId + '"style="margin:2px;font-size:10px;"></table>');
-        //var thead = $('<thead><tr><th>Object</th><th>Position</th></tr></thead>');
-        var tbody = $('<tbody></tbody>');
-        $(table).append(tbody);
-
-        // This is where we actually build the table, recursing down the levels in the hierarchy,
-        // and inserting a table row for every node (branch or leaf) in the hierarchy..
-        //console.log('\n\n\n??????????????????????????????????????????????????');
-        //.log('tbody:',tbody);
-        //console.log('treeDown:',treeDown);
-        //console.log('rootId:',rootId);
-        //console.log('\n');
-        if (Object.keys(treeDown).length > 0) {
-            var k=0;
-            var level = 0;
-            getAll(tbody, treeDown, null, rootId, level);  // parentId is null.
-        }
-        //$(widget.element).find('.hierarchy_'+hierarchyId).append(table);
-
-        $(table).treetable({ 
-            expandable: true,
-        });
-
-        $(table).treetable({ 
-          branchAttr: "ttBranch",
-          clickableNodeNames: false,
-          column: 0,
-          columnElType: "td", // i.e. 'td', 'th' or 'td,th'
-          expandable: true,
-          expanderTemplate: "<a href='#'>&nbsp;</a>",
-          indent: 19,
-          indenterTemplate: "<span class='indenter'></span>",
-          cellTemplate: '',
-          initialState: "collapsed",
-          nodeIdAttr: "ttId", // <a href="https://www.jqueryscript.net/tags.php?/map/">map</a>s to data-tt-id
-          parentIdAttr: "ttParentId", // maps to data-tt-parent-id
-          stringExpand: "Expand",
-          stringCollapse: "Collapse",
-
-          // Events
-          onInitialized: null,
-          onNodeCollapse: null,
-          onNodeExpand: null,
-          onNodeInitialized: null
-        });
-        $(table).on("mousedown", "tr", function() {
-          $(".selected").not(this).removeClass("selected");
-          $(this).toggleClass("selected");
-        });
-		
-        //$(table).treetable('expandNode',hierarchy._id);
-		$(table).treetable('expandAll',true);
-
-        //if (this._state && hierarchyId === 'trees') {
-        //    $(table).treetable('expandNode','odoma');
-        //}
-        if (!this._state) {
-            this._state = {
-                expanded:{},       // Show subtree for specified node(s).
-                selected:{},       // Mark this node as having been selected.
-                last_added:{},     // Mark this node as being the last one added.
-                recently_added:{}  // Mark these node(s) as having been added recently.
-            };
-        }
-
-        for (var id in this._state.expanded) {
-            $(table).treetable('expandNode',id);
-        }
-
-        for (var id in this._state.selected) {
-            $(table).find('tr[data-tt-id=' + id + ']').addClass("selected");
-        }
-
-        for (var id in this._state.last_added) {
-            $(table).find('tr[data-tt-id=' + id + ']').addClass("last_added");
-        }
-
-        for (var id in this._state.recently_added) {
-            $(table).find('tr[data-tt-id=' + id + ']').addClass("recently_added");
-        }
-
-        //$(table).find('.recently_added').css({color:'blue'});
-        //$(table).find('.last_added').css({background:'yellow'});
-
-		console.log(1999,table);
-        return table;
-
-
-        function getAll(tbody, treeDown, parentId, nodeId, level) {
-            //console.log('\ngetAll:',level,parentId,nodeId);
-            //console.log(treeDown);
-
-            if (treeDown[nodeId] && treeDown[nodeId].length === 0) {
-                var isEmptyBranch = true;
-            } else {
-                isEmptyBranch = false;
-            }
-
-            // Obviously, following is temporary hack until a proper selection mechanism for user.
-            if (type === 'object') {
-                var tr = self.buildTableRow(parentId,nodeId,level,isEmptyBranch,type,['_id','_synonyms']);
-            } else if (type === 'topic') {
-                tr = self.buildTableRow(parentId,nodeId,level,isEmptyBranch,type,['_id','_search_term']);
-            }
-            $(tbody).append(tr);
-
-            if (treeDown[nodeId]) {
-                level += 1;
-                var children = treeDown[nodeId].sort();
-                //console.log(children);
-
-                for (var i=0; i<children.length; i++) {
-                    //k += 1;
-                    var childId = children[i];
-                    //if (treeDown[childId]) {
-                        getAll(tbody, treeDown, nodeId, childId, level);
-                    //}
-                }
-            }
-        }
-    }
-
-
-    buildTableRow (parentId,nodeId,level,isEmptyBranch,hierType,propertyIds) {
-        var kb = this._kb;
-        var kbId = AKT.state.current_kb;
-        var kb = AKT.KBs[kbId];
-
-        if (!level) {
-            var level = 0;
-        }
-/*
-        if (thisId === state.selected[thisItem]) {
-            var trString = '<tr class="treetable_tr levelxx selected'+level+'" data-tt-id="'+thisId+'" data-tt-parent-id="'+parentId+'"></tr>';
-        } else {
-            var trString = '<tr class="treetable_tr levelxx'+level+'" data-tt-id="'+thisId+'" data-tt-parent-id="'+parentId+'"></tr>';
-        }
-*/
-        var tr = $('<tr class="treetable_tr levelxx'+level+' '+nodeId+'" data-tt-id="'+nodeId+'"></tr>');
-
-        if (parentId) {
-            $(tr).attr('data-tt-parent-id',parentId);
-        }
-        if (isEmptyBranch || !parentId) {
-            $(tr).attr('data-tt-branch',true);
-        }
-
-        // item is either a formal term of type object, or a topic, depending on the 
-        // type of hierarchy.
-        if (hierType === 'object') {
-            if (kb._formalTerms[nodeId]) {
-                var item = kb._formalTerms[nodeId];
-            } else {
-                item = new FormalTerm();   // Use default settings - TODO: remove this temporary measure
-                kb._formalTerms[nodeId] = item;
-            }
-        } else {
-            item = kb._topics[nodeId];
-        }
-		
-		//console.log('hier..',item,propertyIds);
-        if (item) {
-            for (var i=0; i<propertyIds.length; i++) {
-                var propId = propertyIds[i];
-                // Remove JSON double-quotes, and insert a space after every comma to
-                // get word-wrapping for Boolean expressions (only needed for topics).
-                if (item[propId]) {
-                    var tdString = JSON.stringify(item[propId]).replaceAll('"','').replaceAll(',',', ');
-                } else {
-                    tdString = '-+-';
-                }
-
-                // This is needed to stop long first cell starting at left-hand edge.
-                if (i === 0) {
-                    var td = $('<td style="min-width:200px;max-width:300px;vertical-align:top;">'+tdString+'</td>');
-                } else {
-                    var td = $('<td style="width:140px;max-width:300px;vertical-align:top;">'+tdString+'</td>');
-                }
-                $(tr).append(td);
-            }
-        } else {
-            for (var i=0; i<propertyIds.length; i++) {
-                var td = $('<td>+++</td>');
-                $(tr).append(td);
-            }
-        }
-
-        if ($(tr).hasClass('selected')) {
-            $(tr).css({color:'black',background:'red'});
-        } else {
-            $(tr).css({color:'black'});
-        }
-        
-        return tr;
-    }
-
-
-/*
-    makeTree (treeType) {
-        var treeDown = {};
-        var treeUp = {};
-        var item = 'object';
-        var subitem = 'subobject';
-        var links = AKT.kbs['atwima'][treeType];
-        for (var i=0; i<links.length; i++) {
-            var link = links[i];
-            if (!treeDown[link[item]]) {
-                treeDown[link[item]] = [];
-            }
-            treeDown[link[item]].push(link[subitem]);
-            treeUp[link[subitem]] = link[item];
-        }
-        return [treeDown,treeUp];
-    }
-*/
-
     findChildren (node) {
         var treeDown = this._tree_down;
         var children = treeDown[node];
@@ -547,5 +273,258 @@ class Hierarchy {
 	createBranch () {
 
 	}
+
+
+    // This is a generic template for any task that requires recursing down through the 
+    // hierarchy tree.   
+    // For any specific use, I suggest copying this code then adapting it as required.
+    // See getAll() for an example (generating one <tr> for each node).
+    // To order the nodes at a particular level, change
+    //     var children = treeDown[node_id];
+    // to
+    //     var children = treeDown[node_id].sort();
+    // To use, call it with:
+    //   treeDown: the hierarchy's tree_down property;
+    //   node_id: the id of any node in the tree, typicaly the top one;
+    //   level: usually 0.
+
+    recurse (treeDown, nodeId, level) {
+        console.log(level, nodeId);
+        if (treeDown[nodeId]) {
+            level += 1;
+            var children = treeDown[nodeId];
+
+            for (var i=0; i<children.length; i++) {
+                var childId = children[i];
+                this.recurse(treeDown, childId, level);
+            }
+        }
+    }
+
+
+    setDisplayMode (widget, nodeId, level, mode) {
+        if (this._tree_down[nodeId]) {
+            level += 1;
+            var children = this._tree_down[nodeId];
+            for (var i=0; i<children.length; i++) {
+                var childId = children[i];
+                $(widget.element).find('tr.'+childId).css({display:mode});
+                this.setDisplayMode(widget, childId, level, mode);
+            }
+        }
+    }
+
+
+    // =========================================================================================
+    // Treetable display
+
+
+    makeTreetable (widget) {
+        console.log('TREETABLE makeTreetable:::', widget.options);
+        var hierarchyId = widget.options.item._id;
+        var type = widget.options.item._type;
+        var kb = widget.options.item._kb;
+        var rootId = widget.options.item._root;
+        var treeDown = widget.options.item._tree_down;
+        var self = widget.options.item;
+
+        var table = $('<table class="table_treetable '+this._id+'" data-hierarchy-id="' + hierarchyId + '"style="margin:2px;font-size:10px;"></table>');
+        //var thead = $('<thead><tr><th>Object</th><th>Position</th></tr></thead>');
+        var tbody = $('<tbody></tbody>');
+        $(table).append(tbody);
+
+        // This is where we actually build the table, recursing down the levels in the hierarchy,
+        // and inserting a table row for every node (branch or leaf) in the hierarchy..
+        //console.log('\n\n\n??????????????????????????????????????????????????');
+        //.log('tbody:',tbody);
+        //console.log('treeDown:',treeDown);
+        //console.log('rootId:',rootId);
+        //console.log('\n');
+        if (Object.keys(treeDown).length > 0) {
+            var k=0;
+            var level = 0;
+            getAll(tbody, treeDown, null, rootId, level);  // parentId is null.
+        }
+/*
+        $(table).on("click", "tr", function() {
+            console.log(5711,$(this));
+            console.log(5712,$(this).data('node_id'));
+            if ($(this).attr('data-selected') === 'yes') {
+                $(this).css({background:'white'});
+                $(this).attr('data-selected','no');
+                widget.selected_node_id = null;
+            } else {
+                $('*[data-selected="yes"]').css({background:'white'});
+                $('*[data-selected="yes"]').attr('data-selected','no');
+                $(this).css({background:'yellow'});
+                $(this).attr('data-selected','yes');
+                widget.selected_node_id = $(this).data('node_id');
+            }
+            console.log(this);
+            console.log($(this));
+        });
+*/
+        $(table).on("click", ".div_id", function() {
+            var tr = $(this).parent().parent().parent();
+
+            console.log(5711,$(this));
+            console.log(5712,$(tr));
+            console.log(5713,$(tr).data('node_id'));
+            if ($(tr).attr('data-selected') === 'yes') {
+                $(tr).css({background:'white'});
+                $(tr).attr('data-selected','no');
+                widget.selected_node_id = null;
+            } else {
+                $('*[data-selected="yes"]').css({background:'white'});
+                $('*[data-selected="yes"]').attr('data-selected','no');
+                $(tr).css({background:'yellow'});
+                $(tr).attr('data-selected','yes');
+                widget.selected_node_id = $(tr).data('node_id');
+            }
+        });
+	
+
+        if (!this._state) {
+            this._state = {
+                expanded:{},       // Show subtree for specified node(s).
+                selected:{},       // Mark this node as having been selected.
+                last_added:{},     // Mark this node as being the last one added.
+                recently_added:{}  // Mark these node(s) as having been added recently.
+            };
+        }
+
+/*
+        for (var id in this._state.expanded) {
+            $(table).treetable('expandNode',id);
+        }
+
+        for (var id in this._state.selected) {
+            $(table).find('tr[data-tt-id=' + id + ']').addClass("selected");
+        }
+
+        for (var id in this._state.last_added) {
+            $(table).find('tr[data-tt-id=' + id + ']').addClass("last_added");
+        }
+
+        for (var id in this._state.recently_added) {
+            $(table).find('tr[data-tt-id=' + id + ']').addClass("recently_added");
+        }
+*/
+
+        return table;
+
+        function getAll(tbody, treeDown, parentId, node_id, level) {
+            //console.log('\ngetAll:',level,parentId,node_id);
+            //console.log(treeDown);
+
+            if (treeDown[node_id] && treeDown[node_id].length > 0) {
+                var isEmptyBranch = false;
+            } else {
+                isEmptyBranch = true;
+            }
+
+            // Obviously, following is temporary hack until a proper selection mechanism for user.
+            if (type === 'object') {
+                var tr = buildTableRow(parentId,node_id,level,isEmptyBranch,type,['_id','_synonyms']);
+            } else if (type === 'topic') {
+                tr = buildTableRow(parentId,node_id,level,isEmptyBranch,type,['_id','_search_term']);
+            }
+            $(tbody).append(tr);
+
+            if (treeDown[node_id]) {
+                level += 1;
+                var children = treeDown[node_id].sort();
+                //console.log(children);
+
+                for (var i=0; i<children.length; i++) {
+                    //k += 1;
+                    var childId = children[i];
+                    //if (treeDown[childId]) {
+                        getAll(tbody, treeDown, node_id, childId, level);
+                    //}
+                }
+            }
+        }
+
+
+        function buildTableRow (parentId,node_id,level,isEmptyBranch,hierType,propertyIds) {
+            console.log('TREETABLE - buildTableRow');
+            console.log(parentId,node_id,level,isEmptyBranch,hierType);
+
+            var kbId = AKT.state.current_kb;
+            var kb = AKT.KBs[kbId];
+
+            if (!level) {
+                var level = 0;
+            }
+
+            var tr = $('<tr class="treetable_tr '+node_id+'" data-level="'+level+'" data-node_id="'+node_id+'"></tr>');
+
+            if (parentId) {
+                $(tr).attr('data-parent_id',parentId);
+            }
+
+            // item is either a formal term of type object, or a topic, depending on the 
+            // type of hierarchy.
+            if (hierType === 'object') {
+                if (kb._formalTerms[node_id]) {
+                    var item = kb._formalTerms[node_id];
+                } else {
+                    item = new FormalTerm();   // Use default settings - TODO: remove this temporary measure
+                    kb._formalTerms[node_id] = item;
+                }
+            } else {
+                item = kb._topics[node_id];
+            }
+
+            if (item) {
+                //var td = $('<td><button>'+level+'</button></td>');
+                
+                var td = $('<td style="vertical-align:top;"></td>');
+                $(tr).append(td);
+
+                var div = $('<div></div>');
+                $(td).append(div);
+                var indent = 20*level;
+                // Triangles: https://www.w3schools.com/charsets/ref_utf_geometric.asp
+                var div1 = $('<div class="div_indent" style="float:left;vertical-align:top;color:white;width:'+indent+'px;">.</div>');
+                if (isEmptyBranch) {
+                    var div2 = $('<div class="div_expand_collapse" style="float:left;vertical-align:top;width:20px;color:white;">.</div>');
+                } else {
+                    var div2 = $('<div class="div_expand_collapse" local_id="div_expand_collapse_'+node_id+'" style="float:left;font-size:14px;line-height:12px;padding-left:4px;max-height:12px;color:blue;">&#11167;</div>');  // 9660
+                }
+                var div3 = $('<div class="div_id"  local_id="div_id_'+node_id+'" style="float:left;vertical-align:top;max-width:150px;">'+node_id+'</div>');
+                var divClear = $('<div style="clear:both;"></div>');
+                $(div).append(div1).append(div3).append(div2).append(divClear);
+
+                for (var i=1; i<propertyIds.length; i++) {
+                    var propId = propertyIds[i];
+                    // Remove JSON double-quotes, and insert a space after every comma to
+                    // get word-wrapping for Boolean expressions (only needed for topics).
+                    if (item[propId]) {
+                        var tdString = JSON.stringify(item[propId]).replaceAll('"','').replaceAll(',',', ');
+                    } else {
+                        tdString = '-+-';
+                    }
+
+                    // This is needed to stop long first cell starting at left-hand edge.
+                    if (i === 0) {
+                        var td = $('<td style="vertical-align:top;max-width:200px;vertical-align:top;">'+spaces[level]+tdString+'</td>');
+                    } else {
+                        var td = $('<td style="vertical-align:top;max-width:200px;vertical-align:top;">'+tdString+'</td>');
+                    }
+                    $(tr).append(td);
+                }
+            } else {
+                for (var i=0; i<propertyIds.length; i++) {
+                    var td = $('<td>+++</td>');
+                    $(tr).append(td);
+                }
+            }
+           
+            return tr;
+        }
+
+    }
 
 }

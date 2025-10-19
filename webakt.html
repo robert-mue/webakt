@@ -75,12 +75,12 @@ table.sortable thead {
 
 
 <!-- webAKT API: classes -->
-<script src="js/classes/Action.js"></script>
-<script src="js/classes/ActionList.js"></script>
+<script src="js/classes/ActionLog.js"></script>
 <script src="js/classes/Kb.js"></script>
 <script src="js/classes/Diagram.js"></script>
 <script src="js/classes/FormalTerm.js"></script>
 <script src="js/classes/Hierarchy.js"></script>
+<script src="js/classes/HierarchyDisplay.js"></script>
 <script src="js/classes/Image.js"></script>
 <script src="js/classes/Listbox.js"></script>
 <script src="js/classes/Source.js"></script>
@@ -160,7 +160,15 @@ but check.
 
 <!--script src="kbs/bulk_import.js"></script-->
 
+
 <script src="images/urls_for_flickr_images.js"></script>
+
+
+<!-- ACTION LOGS (was events/recordings...) -->
+<script src="action_logs/log_test1.js"></script>
+<script src="action_logs/log_test2.js"></script>
+<script src="action_logs/log_test3.js"></script>
+
 
 <!-- TUTORIALS -->
 <script src="tutorials/tour.js"></script>
@@ -201,13 +209,15 @@ but check.
         <div  style="float:right;">
             <div style="float:right;">
                 <div style="float:left;margin-right:4px;margin-top:5px;">Recording</div>
-                <button class="inwidget_recording" style="float:left;padding:3px;" onclick="AKT.action_list.open()">Open</button>
-                <button class="inwidget_recording" style="float:left;padding:3px;" onclick="AKT.action_list.save()">Save</button>
-                <button class="inwidget_recording" style="float:left;padding:3px;" onclick="AKT.action_list.stop()">Stop</button>
-                <button class="inwidget_recording" style="float:left;padding:3px;" onclick="AKT.action_list.play()">Play</button>
+                <button class="inwidget_recording" style="float:left;padding:3px;" onclick="AKT.state.current_action_log = new ActionLog({actions:[],meta:{}}); AKT.state.use_mode = 'creating_action_log'; AKT.state.action_mode='recording'; console.log('New action_log');$('#message').text('New action log created.');
+">New</button>
+                <button class="inwidget_recording do_not_log" style="float:left;padding:3px;" onclick="$('#div_action_log_open').css({display:'block'});">Open</button>
+                <button class="inwidget_recording do_not_log" style="float:left;padding:3px;" onclick="AKT.state.current_action_log.save()">Save</button>
+                <button class="inwidget_recording do_not_log" style="float:left;padding:3px;" onclick="AKT.state.current_action_log.stop()">Stop</button>
+                <button class="inwidget_recording do_not_log" style="float:left;padding:3px;" onclick="AKT.state.current_action_log.play()">Play</button>
                 <div style="float:left;margin-left:5px;margin-top:5px;margin-right:2px;">Time step:</div>
-                <input class="inwidget_recording" id="recording_timestep" style="float:left;width:40px;padding:3px;margin-right:15px;" type="text"></input>
-                <button class="inwidget_recordingxxx" style="float:left;padding:3px;" onclick="AKT.action_list.stepThroughRecording()">Step</button>
+                <input class="inwidget_recording do_not_log" id="recording_timestep" style="float:left;width:40px;padding:3px;margin-right:15px;" type="text"></input>
+                <button class="inwidget_recordingxxx" style="float:left;padding:3px;" onclick="AKT.state.current_action_log.stepThroughRecording()">Step</button>
                 <!--button style="float:left;padding:3px;margin-right:15px;" onclick="AKT.showRecording()">Show</button-->
                 <!-..................--><span>
                 8 June 2025</span>
@@ -221,31 +231,13 @@ but check.
 
     <!-- The workspace, in which all panels are displayed. -->
     <!--div id="workspace" style="position:relative;overflow-x:scroll; width:2000px; height:1000px; background:#e0e0e0;"--> <!-- Normal -->
-        <div id="workspace" style="margin-top:60px; background:white;float:left;overflow-x:scroll; overflow-y:scroll; top:60; width:2000px; height:2000px;"></div>  
+    <div id="workspace" style="margin-top:60px; background:white;float:left;overflow-x:scroll; overflow-y:scroll; top:60; width:2000px; height:2000px;"></div>  
 
     <!-- Miscellaneous dialog windows, displayed as needed. -->
-    <div id="dialog1" style="z-index:50000; background:#f0f0f0;" title="Synonym dialog">
-        <p>Enter the synonym and, optionally, select its language.</p>
-        <div style="height:auto; margin:7px;">
-            <div style="float:left; width:80px;">Name: </div>
-            <input type="text" style="float:left; width:100px;"></input>
-            <div style="clear:both;"></div>
-        </div>
 
-        <div style="height:auto; margin:7px;">
-            <div style="float:left; width:80px;">Language: </div>
-            <select style="float:left; width:100px; height:20px; background:white;">
-                <option></option>
-                <option>english</option>
-                <option>french</option>
-                <option>latin</option>
-                <option>local1</option>
-                <option>local2</option>
-            </select>
-            <div style="clear:both;"></div>
-        </div>
-
-        <button style="float:right; margin:10px;">OK</button>
+    <div id="test_alert" style="position:absolute; border:solid 1px black; background:#d4d0c8; width:800px; left:50px;top:30px;z-index:10000;display:none;">
+        <p>Hello</p>
+        <button>Go</button>
     </div>
 
     <!-- File new dialog  -->
@@ -259,6 +251,13 @@ but check.
         <button id="button_file_new" style="float:left">OK</button>
     </div>
 
+
+    <div id="myprompt" class="dialog panelxxxx" style="display:none;position:absolute; border:solid 1px black; background:#e0e000; top:200px;left:200px;width:200px;height:200px;z-index:100000">
+        <div class="div_name">Name: </div><br/>
+        <input class="input_name" local_id="input_name" type="text"></input>
+        <button class="button_cancel" local_id="button_cancel">Cancel</button>
+        <button class="button_ok" local_id="button_ok">OK</button>
+    </div>
 
 
     <!-- Node template dialog (container element for the node_template.js widget) -->
@@ -307,6 +306,13 @@ but check.
    
     <div id="div_settings_container" class="dialog always_on_top" style="display:none; position:absolute; left:100px;top:100px;padding:10px; background:#e0ffe0; border:solid 1px black; z-index:100000;">
         <div><h1>SETTINGS</h1></div>
+    </div>
+
+
+    <div id="div_action_log_open" style="display:none; position:absolute; left:100px;top:200px; width:300px;height:300px; padding:10px; background:#e0ffe0; border:solid 1px black; z-index:100000;">
+        <select id="select_action_log_open"></select>
+        <button id="button_action_log_cancel">Cancel</button>
+        <button id="button_action_log_open">Open</button>
     </div>
 
  

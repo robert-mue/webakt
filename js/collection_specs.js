@@ -115,6 +115,19 @@ AKT.collection_specs = {
         }
     },
 
+    region:{
+        width:'400px',
+        height:'260px',
+        name_for_kb_get_function:'getRegions',
+        name_for_property_value_get_function:null,
+        plural:'regions',
+        properties:{
+            id:{listbox:true},
+        },
+        filters:{
+        }
+    },
+
     source:{
         width:'400px',
         height:'260px',
@@ -192,7 +205,7 @@ AKT.collection_specs = {
         name_for_property_value_get_function:null,
         plural:'topics',
         properties:{
-            id:{listbox:true},
+            id:{listbox:true}
         },
         filters:{
         }
@@ -209,6 +222,20 @@ AKT.collection_specs = {
         },
         filters:{
         }
-    }
+    },
+
+    zone:{
+        width:'400px',
+        height:'260px',
+        name_for_kb_get_function:'getZones',
+        name_for_property_value_get_function:null,
+        plural:'zones',
+        properties:{
+            id:{listbox:true}
+        },
+        filters:{
+        }
+    },
+
 };
 

@@ -72,11 +72,11 @@ class Listbox {
         } else {
             // Now build up all the rows in the body of the table.
             $.each(args.items, function(key,item) {
-                var trElement = $('<tr class="tr_listbox '+key+'" data-key="'+key+'"></tr>');
+                var trElement = $('<tr class="tr_listbox '+key+'" local_id="tr_listbox_'+key+'" data-key="'+key+'"></tr>');
                 if (args.include_key) {   // Include the item's key if wanted.
                     $(trElement).append('<td style="text-align:left;vertical-align:top;">'+key+'</td>');
                 }
-                $(trElement).append('<td style="text-align:left; max-width:100px; vertical-align:top; background:white;"><input type="checkbox"></input></td>');   
+                $(trElement).append('<td style="text-align:left; max-width:100px; vertical-align:top; background:white;"><input type="checkbox" local_id="checkbox_'+key+'"></input></td>');   
 
                 $.each(args.property_names, function(i, propertyName) {
                     var propertyValue = item.getPropertyValue(propertyName);
@@ -218,7 +218,7 @@ class Listbox {
         });
 
         $(divElement).find('.tr_listbox').on('click', function (event, value) {
-            event.stopPropagation();
+            //event.stopPropagation();
             // Needed this, since this.value is blank when triggered (in AKT.singleStep).
             //if (this.value === '') {
             //    var optionValue = value;
@@ -251,6 +251,7 @@ class Listbox {
                     value:key
                 });
     */
+/*
                 var action = new Action({
                     file:       'Listbox.js',
                     function:   "$(divElement).find('.tr_listbox').on('click', function (event, value) {}",
@@ -267,6 +268,7 @@ class Listbox {
 
                 AKT.event_records.push(action._event);
                 AKT.setEventRecords('event_records', AKT.event_records);
+*/
             }
         });
 

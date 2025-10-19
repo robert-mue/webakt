@@ -24,6 +24,8 @@ AKT.menus = [
         {id:'kb_topics', caption:'Topics', status:'live'},
         {id:'kb_topichierarchies', caption:'Topic hierarchies', status:'live'},
         {id:'kb_images', caption:'Images', status:'live'},
+        {id:'kb_regions', caption:'Regions', status:'live'},
+        {id:'kb_zones', caption:'Zones', status:'live'},
         {id:'kb_separator2', caption:'==============', status:'inactive'},
         {id:'kb_booleansearch', caption:'Boolean Search', status:'live'},
         {id:'kb_separator1', caption:'==============', status:'inactive'},

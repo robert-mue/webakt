@@ -1,34 +1,25 @@
-// Local test images
-// file:///home/robert/Projects/AKT/webakt/dev/test_image_access.gif
-// file:///home/robert/Projects/AKT/webakt/dev/images/Panicum_maximum_reduced.jpg
 
-AKT.widgets.formal_term_details = {};
+AKT.widgets.region_details = {};
 
 
-// Original CSS for slider tool is at the bottom of this file, commented out.
+AKT.widgets.region_details.setup = function (widget) {
 
-AKT.widgets.formal_term_details.setup = function (widget) {
-
-    console.log(7201,widget.options);
+    console.log('\nAKT.widgets.region_details.setup:widget.options:',widget.options);
     AKT.state.current_widget = widget;
     var self = this;
-
-    // Thanks to https://webdesign.tutsplus.com/how-to-build-a-simple-carousel-with-vanilla-javascript--cms-41734t 
-
-    console.log('window',AKT.state.window);
 
     var kbId = widget.options.kbId;
     var kb = AKT.KBs[kbId];
 
     if (widget.options.mode === 'new') {
-        var tempFormalTerm = new FormalTerm({kb:kb});
+        var tempRegion = new Region({kb:kb});
     } else if (widget.options.mode === 'view' || widget.options.mode === 'edit') {
-        var formalTerm = widget.options.item;
-        var formalTermSpec = formalTerm.makeSpec();
-        tempFormalTerm = new FormalTerm(formalTermSpec);
+        var region = widget.options.item;
+        var regionSpec = region.makeSpec();
+        tempRegion = new Region(regionSpec);
     }
 
-    widget.temp_formal_term = tempFormalTerm;  // So it's available. 
+    widget.temp_region = tempRegion;  // So it's available. 
 
     //var widgetSettings = $('<div></div>');
     //$(widget.element).find('.content').prepend(widgetSettings);
@@ -52,51 +43,31 @@ AKT.widgets.formal_term_details.setup = function (widget) {
             ['Select term type...','action','attribute','comparison','link','object','process','value'], 
             '---',                 // Default value.
             'term_type',           // Name of the widget option that is assigned the listbox (<select>) option.
-            'formal_term_type',    // Class name for the listbox (<select>) element.
+            'region_type',    // Class name for the listbox (<select>) element.
             'div_type');           // Class name for this widget's container element for the <select> element.
             // Note that the last argument will either hold the non-editable formal term type (for modes view
             // and edit), or the <select> element (for mode new).
 
-        $(widget.element).find('.div_type').append(selectElement);
-        $(widget.element).find('.button_in_hierarchy').css({display:'none'});
+        //$(widget.element).find('.div_type').append(selectElement);   // For a region this should probably be 
+            // populated with a list of zones (= region types).   Disabled for now.
         $(selectElement).css({'margin-left':'0px',padding:'3px;'});
-        //$(widget.element).find('.div_name').prop('disabled',false);
-
-        var selectElement = AKT.makeReprocessSelector(
-            widget.element, 
-            widget.widgetName,
-            '',                    // Label: here, provided for container element with class .div_type
-            ['Select language...','english','french','latin','local','blank'], 
-            '---',                 // Default value.
-            'language',           // Name of the widget option that is assigned the listbox (<select>) option.
-            'formal_term_language',    // Class name for the listbox (<select>) element.
-            'div_language');           // Class name for this widget's container element for the <select> element.
-            // Note that the last argument will either hold the non-editable formal term type (for modes view
-            // and edit), or the <select> element (for mode new).
-
-        $(widget.element).find('.div_language').append(selectElement);
-        $(selectElement).css({'margin-left':'0px',padding:'3px;'});
-        //$(widget.element).find('.div_name').prop('disabled',false);
 		
 	} else if (mode === 'view') {
 		$(widget.element).find('.button_update').css({display:'none'});
         $(widget.element).find('button').filter('.modal').attr('disabled',true);
-		$(widget.element).find('.button_add_image').css({display:'none'});
+		$(widget.element).find('.button_add_image').css({display:'none'});  // We could well want images for regions.
 		$(widget.element).find('.button_remove_image').css({display:'none'});
         $(widget.element).find('div').filter('.editable').attr('contenteditable',false);
-        $(widget.element).find('.input_id').val(widget.options.item_id);
-        $(widget.element).find('.div_type').append('<div class="modes_view_and_edit" disabled style="padding-left:3px;font-weight:bold; background:white;">'+tempFormalTerm._type+'</div>');
-        $(widget.element).find('.div_language').append('<div class="modes_view_and_edit" disabled style="padding-left:3px;font-weight:bold; background:white;">'+tempFormalTerm._language+'</div>');
-        //$(widget.element).find('.div_name').prop('disabled',true);
-        if (widget.options.item._type !== 'object') {
-            $(widget.element).find('.button_in_hierarchy').css({display:'none'});
-		}
+        $(widget.element).find('.div_name').text(widget.options.item_id);
+        $(widget.element).find('.div_type').append('<div class="modes_view_and_edit" disabled style="padding-left:3px;font-weight:bold; background:white;">'+tempRegion._type+'</div>');
+        $(widget.element).find('.div_language').append('<div class="modes_view_and_edit" disabled style="padding-left:3px;font-weight:bold; background:white;">'+tempRegion._language+'</div>');
+
 	} else if (mode === 'edit') {
         $(widget.element).find('button').filter('.modal').attr('disabled',false);
         $(widget.element).find('div').filter('.editable').attr('contenteditable',true);
-        $(widget.element).find('.input_id').val(widget.options.item_id);
-        $(widget.element).find('.div_type').append('<div class="modes_view_and_edit" disabled style="padding-left:3px;font-weight:bold; background:white;">'+tempFormalTerm._type+'</div>');
-        $(widget.element).find('.div_language').append('<div class="modes_view_and_edit" disabled style="padding-left:3px;font-weight:bold; background:white;">'+tempFormalTerm._language+'</div>');
+        $(widget.element).find('.div_name').text(widget.options.item_id);
+        $(widget.element).find('.div_type').append('<div class="modes_view_and_edit" disabled style="padding-left:3px;font-weight:bold; background:white;">'+tempRegion._type+'</div>');
+        $(widget.element).find('.div_language').append('<div class="modes_view_and_edit" disabled style="padding-left:3px;font-weight:bold; background:white;">'+tempRegion._language+'</div>');
         //$(widget.element).find('.div_name').prop('disabled',true);
         if (widget.options.item._type !== 'object') {
             $(widget.element).find('.button_in_hierarchy').css({display:'none'});
@@ -111,10 +82,8 @@ AKT.widgets.formal_term_details.setup = function (widget) {
     // ----------------------------------------------------------------------
     // User interaction event handlers
 
-    $(widget.element).find('[local_id="button_statements"]').on('click', function(event) {
-        if (AKT.state.action_mode !== 'recording') {
-            event.stopPropagation();
-        }
+    $(widget.element).find('.button_statements').on('click', function() {
+        event.stopPropagation();
         console.log('Clicked on Statements button');
         var kbId = widget.options.kbId;
         var kb = AKT.kbs[kbId];
@@ -126,7 +95,7 @@ AKT.widgets.formal_term_details.setup = function (widget) {
             position:{left:'200px',top:'20px'},
             size:{width:'550px',height:'540px'},
             shift_key: event.shiftKey,
-            options:{kbId:kbId, filters:{formal_term:true,formal_term_value:tempFormalTerm._id}}
+            options:{kbId:kbId, filters:{region:true,region_value:tempRegion._id}}
         });
 */
         var panel = AKT.panelise({
@@ -134,40 +103,38 @@ AKT.widgets.formal_term_details.setup = function (widget) {
             position:{left:'20px',top:'20px'},
             size:{width:'550px',height:'540px'},
             shift_key: eventShiftKey,
-            options:{kbId:AKT.state.current_kb,item_type:'statement',filters:{formal_term:{[tempFormalTerm._id]:true}}}
+            options:{kbId:AKT.state.current_kb,item_type:'statement',filters:{region:{[tempRegion._id]:true}}}
         });
-/*
+
         var action = new Action({
             element_id: widget.element[0].id,
             selector:   '.button_statements',
             type:       'click',
-            file:       'formal_term_details.js',
-            function:   "$(widget.element).find('.button_statements').on('click', function(event) {})",
-            message:    'Clicked on the Statements button in the formal_term_details.js widgette.',
+            file:       'region_details.js',
+            function:   "$(widget.element).find('.button_statements').on('click', function() {})",
+            message:    'Clicked on the Statements button in the region_details.js widgette.',
             prompt:     'prompt',
-            value:      tempFormalTerm._id
+            value:      tempRegion._id
         });
         console.log(9001,action);
         AKT.action_list.add(action);
-*/
+
 /*
         AKT.recordEvent({
-            file:'formal_term_details.js',
-            function:'AKT.widgets.formal_term_details.setup()',
+            file:'region_details.js',
+            function:'AKT.widgets.region_details.setup()',
             element:widget.element,
             finds:['.button_statements'],
             event:'click',
-            value: tempFormalTerm._id,
-            message:'Clicked on the Statements button in the formal_term_details panel.'
+            value: tempRegion._id,
+            message:'Clicked on the Statements button in the region_details panel.'
         });
 */
     });
 
 
-    $(widget.element).find('[local_id="button_images"]').on('click', function(event) {
-        if (AKT.state.action_mode !== 'recording') {
-            event.stopPropagation();
-        }
+    $(widget.element).find('.button_images').on('click', function() {
+        event.stopPropagation();
         console.log('Clicked on Images button');
         var kbId = widget.options.kbId;
         var kb = AKT.kbs[kbId];
@@ -179,40 +146,36 @@ AKT.widgets.formal_term_details.setup = function (widget) {
             position:{left:'200px',top:'20px'},
             size:{width:'550px',height:'540px'},
             shift_key: event.shiftKey,
-            //options:{kbId:kbId, filters:{formal_term:true,formal_term_value:tempFormalTerm._id}}
             options:{kbId:kbId, filters:{}}
         });
-/*
+
         var action = new Action({
             element_id: widget.element[0].id,
             selector:   '.button_images',
             type:       'click',
-            file:       'formal_term_details.js',
-            function:   "$(widget.element).find('.button_images').on('click', function(event) {})",
-            message:    'Clicked on the Images button in the formal_term_details.js widgette.',
+            file:       'region_details.js',
+            function:   "$(widget.element).find('.button_images').on('click', function() {})",
+            message:    'Clicked on the Images button in the region_details.js widgette.',
             prompt:     'prompt',
-            value:      tempFormalTerm._id
+            value:      tempRegion._id
         });
         AKT.action_list.add(action);
 
         AKT.recordEvent({
-            file:'formal_term_details.js',
-            function:'AKT.widgets.formal_term_details.setup()',
+            file:'region_details.js',
+            function:'AKT.widgets.region_details.setup()',
             element:widget.element,
             finds:['.button_images'],
             event:'click',
-            value: tempFormalTerm._id,
-            message:'Clicked on the Images button in the formal_term_details panel.'
+            value: tempRegion._id,
+            message:'Clicked on the Images button in the region_details panel.'
         });
-*/
 
     });
 
 
-    $(widget.element).find('[local_id="button_in_hierarchy"]').on('click', function(event) {
-        if (AKT.state.action_mode !== 'recording') {
-            event.stopPropagation();
-        }
+    $(widget.element).find('.button_in_hierarchy').on('click', function() {
+        event.stopPropagation();
         console.debug('Clicked on In hierarchy button');
         var kbId = widget.options.kbId;
         var kb = AKT.KBs[kbId];
@@ -242,48 +205,47 @@ AKT.widgets.formal_term_details.setup = function (widget) {
                 position:{left:'20px',top:'20px'},
                 size:{width:'450px',height:'540px'},
                 shift_key: event.shiftKey,
-                options:{kbId:kbId, mode:'view', tree_type:'object', item_type:'object_hierarchy', item:hierarchy, item_id:hierarchyId, extra:tempFormalTerm._id}
+                options:{kbId:kbId, mode:'view', tree_type:'object', item_type:'object_hierarchy', item:hierarchy, item_id:hierarchyId, extra:tempRegion._id}
             });
         }
 
         // Obsolete code - left in as reminder to fix it.
         AKT.recordEvent({
-            file:'formal_term_details.js',
-            function:'AKT.widgets.formal_term_details.setup()',
+            file:'region_details.js',
+            function:'AKT.widgets.region_details.setup()',
             element:widget.element,
             finds:['.button_in_hierarchy'],
             event:'click',
-            value: tempFormalTerm._id,
-            message:'Clicked on the In Hierarchy button in the formal_term_details panel.'
+            value: tempRegion._id,
+            message:'Clicked on the In Hierarchy button in the region_details panel.'
         });
 
     });
 
 
-    $(widget.element).find('[local_id="button_wizard"]').on('click', function(event) {
-        if (AKT.state.action_mode !== 'recording') {
-            event.stopPropagation();
-        }
+    $(widget.element).find('.button_wizard').on('click', function() {
+        event.stopPropagation();
         console.debug('Clicked on Wizard button');
         var kb = AKT.KBs['atwima'];  // Or AKT.kbs['atwima'];   ??
 		
-		var formalTerms = kb._formalTerms;
-		for (var id in formalTerms) {
-			var formalTerm = formalTerms[id];
+		var region = kb._regions;
+		for (var id in regions) {
+			var region = regions[id];
 			
-			var type = formalTerm._type;
-            var definition = formalTerm._definition;
-            var memo = formalTerm._memo;
+            var name = id;
+			var type = region._type;
+            var definition = region._definition;
+            var memo = region._memo;
 			var synonyms = 'no,synonyms';
 			
  			
 			//$(widget.element).find('.div_definition').selected = type;   /// TODO: fix this!!
-			//$(widget.element).find('.formal_term_type').find('option[value="'+type+'"]').attr('selected',true);
+			//$(widget.element).find('.region_type').find('option[value="'+type+'"]').attr('selected',true);
 			widget.options.term_type = type;
-			$(widget.element).find('.input_id').val(id);
-            $(widget.element).find('.textarea_definition').val(definition);
-            $(widget.element).find('.textarea_synonyms').val(synonyms);
-            $(widget.element).find('.textarea_memo').val(memo);
+			$(widget.element).find('.div_name').text(name);
+            $(widget.element).find('.div_definition').text(definition);
+            $(widget.element).find('.div_synonyms').text(synonyms);
+            $(widget.element).find('.div_memo').text(memo);
 			
 			$(widget.element).find('.button_update').trigger('click');
 		}
@@ -291,10 +253,8 @@ AKT.widgets.formal_term_details.setup = function (widget) {
 
 
     // Adapted from source_details
-    $(widget.element).find('[local_id="button_update"]').on('click', function(event) {
-        if (AKT.state.action_mode !== 'recording') {
-            event.stopPropagation();
-        }
+    $(widget.element).find('.button_update').on('click', function() {
+        event.stopPropagation();
         console.log('update',widget.options);
         //var kbId = widget.options.kbId;
         var kbId = AKT.state.current_kb;
@@ -302,26 +262,27 @@ AKT.widgets.formal_term_details.setup = function (widget) {
         console.log(kbId,kb);
 
         if (widget.options.mode ==='new') {
-            var id = $(widget.element).find('.input_id').val();
-            if (kb._formalTerms[id]) {
-                alert('The formal term "' + id + '" already exists.   Please click the "Edit" button in the formal_terms panel instead.');
+            var name = $(widget.element).find('.div_name').text();
+            if (kb._regions[name]) {
+                alert('The region "' + name + '" already exists.   Please click the "Edit" button in the regions panel instead.');
                 $(widget.element).find('.dialog_close_button').click();
                 return;
             }
             var type = widget.options.term_type;
-            console.log('id:',id,':   type:',type);
+            console.log('name:',name,':   type:',type);
             if (!type || type === 'Select the term type...') {
                 alert('Please select the type of formal term from the drop-down box.');
                 return;
-            } else if (!id) {
-                alert('Please provide an ID for the formal term.');
+            } else if (!name) {
+                alert('Please provide a name for the formal term.');
             }
+            var id = name;
             var type = widget.options.term_type;
             var language = widget.options.language;
-            var definition = $(widget.element).find('.textarea_definition').val();
-            //var synonyms = $(widget.element).find('.textarea_synonyms').val().split(',');
-            var memo = $(widget.element).find('.textarea_memo').val();
-            //AKT.loadTable(widget.element, 'table_synonyms', formalTerm.synonyms, true);   // Loads rows
+            var definition = $(widget.element).find('.div_definition').text();
+            //var synonyms = $(widget.element).find('.div_synonyms').text().split(',');
+            var memo = $(widget.element).find('.div_memo').text();
+            //AKT.loadTable(widget.element, 'table_synonyms', region.synonyms, true);   // Loads rows
             // into a one-column table, one <tr<td>...</td></tr> for each instance of the 3rd argument.
 
             // Gather up the synonyms.
@@ -331,7 +292,7 @@ AKT.widgets.formal_term_details.setup = function (widget) {
                 var jqSynonym = jqSynonyms[i];
                 var term = $(jqSynonym).find('input').val();
                 if (term) {
-                    var lang = $(jqSynonym).find('select option:selected').val();  // *** CHECK
+                    var lang = $(jqSynonym).find('select option:selected').text();
                     if (lang) {
                         var synonym = {term:term,language:lang};
                     } else {
@@ -342,8 +303,8 @@ AKT.widgets.formal_term_details.setup = function (widget) {
             }
 
             var images = {};
-            $(widget.element).find('.input_image_id').each(function(event){
-                var imageId = $(this).val();
+            $(widget.element).find('.div_image_id').each(function(){
+                var imageId = $(this).text();
                 var image = kb._images[imageId];
                 images[imageId] = image;
             });
@@ -353,21 +314,23 @@ AKT.widgets.formal_term_details.setup = function (widget) {
 
         } else if (widget.options.mode === 'edit') {
             console.log('EDIT: ',widget.options.item);
-            var formalTerm = widget.options.item;
-            var id = formalTerm._id;
-            var type = formalTerm._type;
-            var definition = $(widget.element).find('.textarea_definition').val();
-            var synonyms = $(widget.element).find('.textarea_synonyms').val().split(',');
-            var memo = $(widget.element).find('.textarea_memo').val();
- 
+            var region = widget.options.item;
+            var name = region._name;
+            var type = region._type;
+            var definition = $(widget.element).find('.div_definition').text();
+            var synonyms = $(widget.element).find('.div_synonyms').text().split(',');
+            var memo = $(widget.element).find('.div_memo').text();
+            id = region._id;
+
             var images = {};
-            $(widget.element).find('.input_image_id').each(function(event){  // *** !! Check
-                var imageId = $(this).val();
+            $(widget.element).find('.div_image_id').each(function(){
+                var imageId = $(this).text();
                 var image = kb._images[imageId];
                 images[imageId] = image;
             });
         }
 
+        tempFormalTerm._name = name;
         tempFormalTerm._id = id;
         tempFormalTerm._type = type;
         tempFormalTerm._definition = definition;
@@ -376,52 +339,53 @@ AKT.widgets.formal_term_details.setup = function (widget) {
         tempFormalTerm._images = images;
         console.log(9601,tempFormalTerm);
 
-        $(widget.element).find('.input_id').val(id);
+        $(widget.element).find('.div_id').text(id);
 
-        kb._formalTerms[id] = tempFormalTerm;
+        kb._regions[id] = tempFormalTerm;
 		AKT.saveKbInLocalStorage(kbId)
         $('#message').text('The Formal Terms list has been updated');
 
         if (widget.options.mode==='new') {
-            AKT.trigger('new_item_created_event',{kb:kb,item_type:'formal_term',item:formalTerm});
+            AKT.trigger('new_item_created_event',{kb:kb,item_type:'region',item:region});
         } else if (widget.options.mode==='edit') {
-            AKT.trigger('item_changed_event',{kb:kb,item_type:'formal_term',item:formalTerm});
+            AKT.trigger('item_changed_event',{kb:kb,item_type:'region',item:region});
         }
 
-        //AKT.trigger('new_formal_term_created_event',{kb:kb,formal_term:formalTerm});
+        //AKT.trigger('new_region_created_event',{kb:kb,region:region});
         $('#message').text('The Formal Terms list has been updated');
 	    AKT.saveKbInLocalStorage(kbId);
     });
 
 
-    $(widget.element).find('[local_id="button_add_synonym"]').on('click', function(event) {
+    $(widget.element).find('.button_add_synonym').on('click', function() {
 
         $('.ui-dialog').css('z-index',1000000);
-        var synonymDialog = $(widget.element).find('.div_synonym');
-        $(synonymDialog).css({display:'block'});
-        $(synonymDialog).find('button').on('click', function(event) {
-            var name = $(synonymDialog).find('[local_id="input_synonym_name').val();
-            var language = $(synonymDialog).find('option:selected').text();  // *** CHECK
+        $('#dialog1').dialog('open');
+        $('#dialog1').find('button').on('click', function() {
+            var name = $('#dialog1').find('input').val();
+            var language = $('#dialog1').find('option:selected').text();
             if (language) {
                 $(widget.element).find('.table_synonyms').append('<tr><td>'+name+' ('+language+')</td></tr>');
             } else {
                 $(widget.element).find('.table_synonyms').append('<tr><td>'+name+'</td></tr>');
             }
-            var formalTerm = new FormalTerm({id:name,type:'object',kb:kb,synonyms:[],definition:''});
-            kb._formalTerms[name] = formalTerm;
-            $(synonymDialog).css({display:'none'});
+            var region = new Region({id:name,type:'object',kb:kb,synonyms:[],definition:''});
+            kb._regions[name] = region;
+            $('#dialog1').dialog('close');
         });   
+        //});
+        //var region = prompt('Formal term: ');
+        //console.log(region);
+        //$(widget.element).find('.table_synonyms').append('<tr><td>'+region+'</td></tr>');
     });
 
 
     // Image-related buttons
 
 
-    $(widget.element).find('[local_id="button_add_image"]').on('click', function (event) {   // add_source button
+    $(widget.element).find('.button_add_image').on('click', function (event) {   // add_source button
         console.log('BUTTON: Clicked on Add image button');
-        if (AKT.state.action_mode !== 'recording') {
-            event.stopPropagation();
-        }
+        event.stopPropagation();
 
         var kbId = widget.options.kbId;
         var kb = AKT.KBs[kbId];
@@ -440,11 +404,9 @@ AKT.widgets.formal_term_details.setup = function (widget) {
     });
 
 
-    $(widget.element).find('[local_id="button_remove_image"]').on('click', function (event) {   
+    $(widget.element).find('.button_remove_image').on('click', function (event) {   
         console.log('BUTTON: Clicked on Remove image button - currently does nothing!');
-        if (AKT.state.action_mode !== 'recording') {
-            event.stopPropagation();
-        }
+        event.stopPropagation();
 
         var kbId = widget.options.kbId;
         var kb = AKT.KBs[kbId];
@@ -494,9 +456,9 @@ AKT.widgets.formal_term_details.setup = function (widget) {
             var imageId = args.item_id;
             var image = kb._images[imageId];
             console.log(7004,image);
-            var formalTerm = widget.options.item;
-            if (formalTerm && formalTerm._images) {
-                formalTerm._images[imageId] = image;
+            var region = widget.options.item;
+            if (region && region._images) {
+                region._images[imageId] = image;
             } else {
                 tempFormalTerm._images = {imageId:image};
             }
@@ -520,20 +482,20 @@ AKT.widgets.formal_term_details.setup = function (widget) {
 
 
 
-AKT.widgets.formal_term_details.display = function (widget) {
-    console.log('formal_term_details options:/n',widget.options);
+AKT.widgets.region_details.display = function (widget) {
+    console.log('region_details options:/n',widget.options);
     var kbId = widget.options.kbId;
     var kb = AKT.KBs[kbId];
 
-    var tempFormalTerm = widget.temp_formal_term;  // For convenience.
+    var tempFormalTerm = widget.temp_region;  // For convenience.
 
-    $(widget.element).find('.input_term').val(tempFormalTerm._id);
+    $(widget.element).find('.div_term').text(tempFormalTerm._id);
     $(widget.element).find('.div_type').text(tempFormalTerm._type);
-    $(widget.element).find('.input_language').val(tempFormalTerm._language);
-    $(widget.element).find('.textarea_definition').val(tempFormalTerm._definition);
-    $(widget.element).find('.textarea_memo').val(tempFormalTerm._memo);
+    $(widget.element).find('.div_language').text(tempFormalTerm._language);
+    $(widget.element).find('.div_definition').text(tempFormalTerm._definition);
+    $(widget.element).find('.div_memo').text(tempFormalTerm._memo);
 
-    //AKT.loadOptions(widget.element, 'select_synonyms', formalTerm.synonyms, true);
+    //AKT.loadOptions(widget.element, 'select_synonyms', region.synonyms, true);
     AKT.loadTable(widget.element, 'table_synonyms', tempFormalTerm._synonyms, true);   // Loads rows into a one-column table,
             // one <tr><td>...</td></tr> for each instance of the 3rd argument.
 
@@ -556,18 +518,18 @@ AKT.widgets.formal_term_details.display = function (widget) {
 };
 
 
-AKT.widgets.formal_term_details.html = `
+AKT.widgets.region_details.html = `
 <div class="content" style="background:inherit;border:none; padding:10px;">
     <div>
-        <div style="float:left;height:20px;padding-right:5px;">ID:</div>
-        <input type="text" class="input_id" local_id="input_id" style="font-weight:bold; float:left; background:white; width:170px; height:20px; resize:horizontal; padding-left:3px;"></input>
+        <div style="float:left;height:20px;padding-right:5px;">Name:</div>
+        <div class="div_name" contenteditable style="font-weight:bold; float:left; background:white; width:170px; height:20px; resize:horizontal; padding-left:3px;"></div>
         
         <div style="float:left;">
             <div style="float:left;height:20px;width:65px;margin-left:15px;padding-right:5px;">Type:</div>
-            <div class="div_type" local_id="div_type" style="float:left; width:100px; height:20px;"></div>
+            <div class="div_type" style="float:left; width:100px; height:20px;"></div>
         <div style="clear:both;"></div>
             <div style="float:left;height:20px;width:65px;margin-left:15px;padding-right:5px;">Language:</div>
-            <div class="div_language" local_id="div_language" style="float:left; width:100px; height:20px;"></div>
+            <div class="div_language" style="float:left; width:100px; height:20px;"></div>
         <div style="clear:both;"></div>
     </div>
 
@@ -575,10 +537,10 @@ AKT.widgets.formal_term_details.html = `
 
         <div class="object_only">
             <div style="float:left;width:60px;height:20px;">Part of :</div>
-            <select class="select_superobjects" local_id="select_superobjects" size=3 style="float:left;width:140px; background:white"></select>
+            <select class="select_superobjects" size=3 style="float:left;width:140px; background:white"></select>
 
             <div style="float:left;width:45px;height:20px;margin-left:15px;">Parts:</div>
-            <select class="select_subobjects" local_id="select_subobjects"  size=3 style="float:left;width:140px; background:white"></select>
+            <select class="select_subobjects" size=3 style="float:left;width:140px; background:white"></select>
 
             <div style="clear:both;"></div>
         </div>
@@ -592,32 +554,26 @@ AKT.widgets.formal_term_details.html = `
             <!-- DEFINITION -->
             <div style="margin-top:10px;">
                 <div style="width:70px;height:20px;">Definition: </div>
-                <textarea class="textarea_definition" local_id="testarea_definition" style="border:solid 1px black; background:white; width:180px;height:65px;"></textarea>
+                <div class="div_definition" contenteditable style="border:solid 1px black; background:white; width:180px;height:65px;"></div>
             </div>
 
 
             <!--SYNONYMS -->
-            <!-- Aug 2025 *** IMPORTANT NOTE ***
-                Synonyms are currently held in a table in the Synonym box, one row per synonym.
-                They are added with the Add button.
-                This approach allows them to be added/removed individually, and to display attributes, such as their "language".
-                HOWEVER, at the time of writing, the Add mechanism (and presumably at some stage in the future a Delete
-                mechanism) has NOT BEEN INTEGRATED INTO THE EVENT/ACTION-LOG SYSTEM. -->
             <div style="margin-top:10px;">
                 <div>
                     <div style="float:left;width:70px;height:20px;">Synonym(s):</div>
-                    <button class="button_add_synonym" local_id="button_add_synonym" style="float:left;padding-left:3px;padding-right:3px;margin-bottom:2px;">Add</button>
+                    <button class="button_add_synonym" style="float:left;padding-left:3px;padding-right:3px;margin-bottom:2px;">Add</button>
                     <div style="clear:both;"></div>
                 </div>
                 <div style="overflow:auto; border:solid 1px black; background:white; width:180px; height:0; min-height:65px;">
-                    <table class="table_synonyms" local_id="table_synonyms" style="margin:0px;">
+                    <table class="table_synonyms" style="margin:0px;">
                     </table>
                 </div>
                 
 
                 <div style="display:none;margin-top:0px;">
-                    <button class="button_add" local_id="button_add" style="margin:0px;width:50px;height:30px;">Add</button><br/>
-                    <button class="button_delete" local_id="button_delete" style="margin-top:6px;width:50px;height:30px;">Delete</button>
+                    <button class="button_add" style="margin:0px;width:50px;height:30px;">Add</button><br/>
+                    <button class="button_delete" style="margin-top:6px;width:50px;height:30px;">Delete</button>
                 </div>
             </div>
 
@@ -625,7 +581,7 @@ AKT.widgets.formal_term_details.html = `
             <!-- MEMO -->
             <div style="margin-top:10px;">
                 <div style="width:70px;height:20px;">Memo: </div>
-                <textarea class="textarea_memo" local_id="textarea_memo" style="border:solid 1px black; background:white; width:180px;height:65px;"></textarea>
+                <div class="div_memo" contenteditable style="border:solid 1px black; background:white; width:180px;height:65px;"></div>
             </div>
         </div>
 
@@ -633,11 +589,10 @@ AKT.widgets.formal_term_details.html = `
         <!-- IMAGE -->
         <!-- Thanks to https://webdesign.tutsplus.com/how-to-build-a-simple-carousel-with-vanilla-javascript--cms-41734t -->
         <!-- Orginal HTML first, then my adapted version.   Eventually all code will be packaged in a single function -->
-        <!-- Aug 2025 *** IMPORTANT NOTE *** Currently not integrated into the event-action-log system. -->
         <div class="div_image" style="float:left;width:252px;height:252px;margin:7px;margin-top:30px;background:white;border:solid 1px black;">
             <section class="slider-wrapper">
-                <button class="slide-arrow" local_id="slide_arrow_prev" id="slide-arrow-prev">&#8249;</button>
-                <button class="slide-arrow" local_id="slide_arrow_next" id="slide-arrow-next">&#8250;</button>
+                <button class="slide-arrow" id="slide-arrow-prev">&#8249;</button>
+                <button class="slide-arrow" id="slide-arrow-next">&#8250;</button>
               
                 <ul class="slides-container" id="slides-container" style="padding-inline-start:0px;">
               </ul>
@@ -650,47 +605,22 @@ AKT.widgets.formal_term_details.html = `
 
     <!-- BUTTONS -->
     <div style="margin-bottom:8px;">
-        <button class="button_statements" local_id="button_statements" style="float:left;width:80px;height:25px;margin-left:10px;" title="Shows the statements that contain this formal term.">Statements</button>
-        <button class="button_in_hierarchy" local_id="button_in_hierarchy" style="float:left;width:80px;height:25px;margin-left:10px;" title="If this term is an object, shows where it occurs in its object hierarchy." >In Hierarchy</button>
+        <button class="button_statements" style="float:left;width:80px;height:25px;margin-left:10px;" title="Shows the statements that contain this formal term.">Statements</button>
+        <button class="button_in_hierarchy" style="float:left;width:80px;height:25px;margin-left:10px;" title="If this term is an object, shows where it occurs in its object hierarchy." >In Hierarchy</button>
 
         <div class="div_images_buttons" style="float:left;">
-            <button class="button_images" local_id="button_images" style="float:left;width:50px;height:25px;margin-left:10px;" title="Open the Images panel to display all images" >Images</button>
-            <button class="button_add_image" local_id="button_add_image" style="float:left;width:40px;height:25px;margin-left:0px;" title="To add an image, click on the Images button if not already done, then click on an image in the images panel.">Add</button>
-            <button class="button_remove_image" local_id="button_remove_image" style="float:left;width:50px;height:25px;margin-left:0px;" title="Remove image">Remove</button>
+            <button class="button_images" style="float:left;width:50px;height:25px;margin-left:10px;" title="Open the Images panel to display all images" >Images</button>
+            <button class="button_add_image" style="float:left;width:40px;height:25px;margin-left:0px;" title="To add an image, click on the Images button if not already done, then click on an image in the images panel.">Add</button>
+            <button class="button_remove_image" style="float:left;width:50px;height:25px;margin-left:0px;" title="Remove image">Remove</button>
             <div style="clear:both;"></div>
         </div>
 
-        <button class="button_update" local_id="button_update" style="float:right;width:60px;height:25px;margin-left:10px;" title="Updates this entry in the knowledge base.">Update</button>
-        <a class="button_help" local_id="button_help" href="help.html#ref_formal_term_details" target="_blank" style="float:right;width:60px;height:25px;margin-left:10px;" title="Help on this widget">Help</a>
+        <button class="button_update" style="float:right;width:60px;height:25px;margin-left:10px;" title="Updates this entry in the knowledge base.">Update</button>
+        <a class="button_help" href="help.html#ref_region_details" target="_blank" style="float:right;width:60px;height:25px;margin-left:10px;" title="Help on this widget">Help</a>
 
     </div>
     
     <div style="clear:both;"></div>
-
-    <div class="div_synonym" style="z-index:50000; display:none; background:#f0f0f0;" title="Synonym dialog">
-        <p>Enter the synonym and, optionally, select its language.</p>
-        <div style="height:auto; margin:7px;">
-            <div style="float:left; width:80px;">Name: </div>
-            <input type="text" local_id="input_synonym_name" style="float:left; width:100px;"></input>
-            <div style="clear:both;"></div>
-        </div>
-
-        <div style="height:auto; margin:7px;">
-            <div style="float:left; width:80px;">Language: </div>
-            <select style="float:left; width:100px; height:20px; background:white;" local_id="select_synonym_language">
-                <option></option>
-                <option>english</option>
-                <option>french</option>
-                <option>latin</option>
-                <option>local1</option>
-                <option>local2</option>
-            </select>
-            <div style="clear:both;"></div>
-        </div>
-
-        <button style="float:right; margin:10px;" local_id="button_synonym_ok">OK</button>
-    </div>
-
 
 </div>     <!-- End of content div -->
 `;
@@ -791,7 +721,7 @@ AKT.widgets.formal_term_details.html = `
             var alreadyKnowns = [];
             for (var i=0; i<synonyms.length; i++) {
                 var synonym = synonyms[i];
-                if (kb._formalTerms[synonym.name]) {
+                if (kb._regions[synonym.name]) {
                     nAlreadyKnown += 1;
                     alreadyKnowns.push(synonym);  
                 }

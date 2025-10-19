@@ -29,6 +29,534 @@ $(document).ready(function() {
 
     $('section').css({display:'none'});
 
+    var spec = {};
+    spec.tree = {top:['a','b','c','d'],c:['e','f']};
+    var hierarchyDisplay = new HierarchyDisplay(spec);
+
+
+    // Text-to-speech - search below for test_text_to_speech()
+    //AKT.text_to_speech('Click on the View button');
+
+
+    // -----------------------------------------------------------------------------
+    // ACTION LOGS
+
+
+
+    for (var logId in AKT.action_logs) {
+        $('#select_action_log_open').append('<option value="'+logId+'">'+logId+'</option>');
+    }
+
+
+    $('#select_action_log').on('change', function() {
+        var logId = $(this).selected();
+        console.log('open_action_log:',logId);
+        var current_action_log = AKT.action_logs[logId];
+        AKT.state.current_action_log = current_action_log;
+    })
+ 
+
+
+    // -----------------------------------------------------------------------------
+
+    AKT.state.pendingEvent = null;
+
+    var actionLogString = localStorage.getItem('current_action_log');
+    if (actionLogString) {
+        try {
+            AKT.state.current_action_log = new ActionLog(JSON.parse(actionLogString));
+        }
+        catch(error) {
+            console.log('ERROR - cannot parse current_action_log in LocalStorage.');
+            console.log('error:',error);
+            localStorage.removeItem('current_action_log');
+            AKT.state.current_action_log = new ActionLog({actions:[],meta:{}})       }
+    } else {
+        console.log('WARNING - No current_action_log in LocalStorage.');
+        AKT.state.current_action_log = new ActionLog({actions:[],meta:{}});
+    }
+
+
+    $('body').on('click','button', function(event) {
+
+        console.log('$$$$',AKT.state);
+        if (AKT.state.action_mode !== 'recording') return;
+
+        console.log(event);
+        console.log(AKT.state);
+        var localId = $(event.target).attr('local_id');
+
+        var value = $(event.target).text();
+        console.log('\n\n\n\n',AKT.state.current_action_log._actions.length+' 010000000000000000000\nclick: button: '+value+': '+localId);
+        event.stopPropagation();
+
+        if (AKT.state.pending_event) {
+            AKT.processPendingEvent(event,AKT.state.pending_event);
+        }
+
+        var top = $(event.target.closest('.panel'));
+        if (top && top[0]) {
+            
+            var id = top[0].id;
+
+            if (localId === 'button_close') {
+                var panelId = id;
+                $('#panel_list').find('.'+panelId).remove();
+                $('#'+panelId).remove();
+                $('#'+panelId)['dialog_Generic']('destroy');
+                $('#'+panelId).css({display:'none'});
+            }
+
+            AKT.incrementZindex("$('body').on('click','button', function(event) {...})",id);
+            var localId = $(event.target).attr('local_id');
+            var value = $(event.target).text();
+            var eventType = event.type;
+            var elementType = event.target.localName;
+
+            var actionSpec = {
+                element_id: id,
+                selector: '[local_id="'+localId+'"]',
+                type:           eventType,
+                message:        'Clicked on a button',
+                before:         'previous_action',
+                after:          'next_action',
+                prompt:         'Click on a button',
+                value:          value,
+                event_type:     'click',
+                upper_selector: '#'+id,
+                local_selector: '[local_id="'+localId+'"]'
+            }
+            AKT.state.current_action_log.add(actionSpec);
+        }
+    });
+
+
+
+
+    $('body').on('click','div.panel',function(event) {
+        if (AKT.state.action_mode !== 'recording') return;
+
+        console.log('\n\nmousedown: div.panel: ',event);
+        console.log(event);
+        console.log(AKT.state);
+        var localId = $(event.target).attr('local_id');
+
+        var value = $(event.target).text();
+        //console.log('\n\n\n\n',AKT.state.current_action_log._actions.length+' 000000000000000000000\nclick: button: '+value+': '+localId);
+        event.stopPropagation();
+
+        if (AKT.state.pending_event) {
+            AKT.processPendingEvent(event,AKT.state.pending_event);
+        }
+
+        var top = $(event.target.closest('.panel'));
+        if (top && top[0]) {
+            
+            var id = top[0].id;
+            var panelId = id;
+
+            var actionSpec = {
+                element_id: id,
+                selector:       '#'+id,
+                type:           'click',
+                message:        'Clicked on a panel',
+                before:         'previous_action',
+                after:          'next_action',
+                prompt:         'Click anywhere in the panel '+id,
+                value:          null,
+                event_type:     'click',
+                upper_selector: '#'+id,
+                local_selector: null
+            }
+            AKT.state.current_action_log.add(actionSpec);
+/*
+            var zindex = $('#'+panelId).css('z-index');
+            console.log('zindex before:',panelId,zindex);
+            var zindex = AKT.incrementZindex("webakt1.js: $('body').on('click','div.panel',...): click. ID:"+panelId,1);
+            $('#'+panelId).css('z-index',zindex);
+            console.log('zindex after:',panelId,zindex);
+*/
+        }
+    });
+
+
+
+    $('body').on('mousedown','div.div_title',function(event) {
+        if (AKT.state.action_mode !== 'recording') return;
+
+        console.log('\n\nmousedown: div.div_title: ',event);
+        AKT.state.panel_start = {x:event.clientX,y:event.clientY};
+    });
+
+
+    $('body').on('mouseup','div.div_title',function(event) {
+        if (AKT.state.action_mode !== 'recording') return;
+
+        console.log('\n\nmouseup: div.panel.titlebar: ',event);
+        var start = AKT.state.panel_start;
+        var end = {x:event.clientX,y:event.clientY}
+        if (Math.abs(start.x-start.y,end.x-end.y)<10) {
+            return;
+        } else {
+            var top = $(event.target.closest('.panel'));
+            if (top && top[0]) {
+                var id = top[0].id;
+                AKT.incrementZindex("$('body').on('click','button', function(event) {...})",id);
+                var localId = 'statement_collection_1';   //$(event.target).attr('local_id');
+                var value = $(event.target).text();
+                var eventType = event.type;
+                var elementType = event.target.localName;
+
+                var actionSpec = {
+                    element_id:     id,
+                    selector:       '[local_id="'+localId+'"]',
+                    type:           'end_drag',
+                    message:        'Clicked on a button',
+                    before:         'previous_action',
+                    after:          'next_action',
+                    prompt:         'Click on a button',
+                    value:          end,
+                    event_type:     'end_drag',
+                    upper_selector: '#'+id,
+                    local_selector: '[local_id="'+localId+'"]'
+                }
+                AKT.state.current_action_log.add(actionSpec);
+            } else {
+                return;
+            }
+        }
+    });
+
+
+
+
+    $('body').on('click','div.div_expand_collapse', function(event) {
+        if (AKT.state.action_mode !== 'recording') return;
+
+        var localId = $(event.target).parent().attr('local_id');
+        var value = $(event.target).text();
+        console.log('\n\n\n\n',AKT.state.current_action_log._actions.length+' 0000000000000000000123\nclick: tr.treetable_tr: '+value+': '+localId);
+        console.log(event);
+        console.log(AKT.state);
+        event.stopPropagation();
+
+        if (AKT.state.pending_event) {
+            AKT.processPendingEvent(event,AKT.state.pending_event);
+        }
+
+        var top = $(event.target.closest('.panel'));
+        if (top && top[0]) {
+            
+            console.log(top[0].id);
+            console.log($(event.target));
+            console.log($(event.target).parent());
+            console.log($(event.target).parent().parent());
+            console.log($(event.target).parent().parent().parent());
+            var id = top[0].id;
+            var localId = $(event.target).attr('local_id');
+            var value = $(event.target).text();
+            var eventType = event.type;
+            var elementType = event.target.localName;
+
+            var actionSpec = {
+                element_id: id,
+                selector: '[local_id="'+localId+'"]',
+                type:           eventType,
+                message:        'Clicked on a treetable_tr',
+                before:         'previous_action',
+                after:          'next_action',
+                prompt:         'Click on a treetable_tr',
+                value:          value,
+                event_type:     'click',
+                upper_selector: '#'+id,
+                local_selector: '[local_id="'+localId+'"]'
+            }
+            AKT.state.current_action_log.add(actionSpec);
+        }
+    });
+
+
+
+
+    $('body').on('click','div.div_id', function(event) {
+        if (AKT.state.action_mode !== 'recording') return;
+
+        var localId = $(event.target).parent().attr('local_id');
+        var value = $(event.target).text();
+        console.log('\n\n\n\n',AKT.state.current_action_log._actions.length+' 0000000000000000000124\nclick: tr.treetable_tr: '+value+': '+localId);
+        console.log(event);
+        console.log(AKT.state);
+        event.stopPropagation();
+
+        if (AKT.state.pending_event) {
+            AKT.processPendingEvent(event,AKT.state.pending_event);
+        }
+
+        var top = $(event.target.closest('.panel'));
+        if (top && top[0]) {
+            
+            console.log(top[0].id);
+            console.log($(event.target));
+            console.log($(event.target).parent());
+            console.log($(event.target).parent().parent());
+            console.log($(event.target).parent().parent().parent());
+            var id = top[0].id;
+            var localId = $(event.target).attr('local_id');
+            var value = $(event.target).text();
+            var eventType = event.type;
+            var elementType = event.target.localName;
+
+            var actionSpec = {
+                element_id: id,
+                selector: '[local_id="'+localId+'"]',
+                type:           eventType,
+                message:        'Clicked on a treetable_tr',
+                before:         'previous_action',
+                after:          'next_action',
+                prompt:         'Click on a treetable_tr',
+                value:          value,
+                event_type:     'click',
+                upper_selector: '#'+id,
+                local_selector: '[local_id="'+localId+'"]'
+            }
+            AKT.state.current_action_log.add(actionSpec);
+        }
+    });
+
+
+
+    $('body').on('input','textarea', function(event) {
+        if (AKT.state.action_mode !== 'recording') return;
+
+        console.log('\n\n\n\n',AKT.state.current_action_log._actions.length+' 0000000000000000000000000000000000000\ninput: textarea');
+        event.stopPropagation();
+
+        if (AKT.state.pending_event) {
+            AKT.processPendingEvent(event,AKT.state.pending_event);
+        }
+        AKT.state.pending_event = event;
+    });
+
+
+    $('body').on('input','input[type="text"]', function(event) {
+        if (AKT.state.action_mode !== 'recording') return;
+
+        console.log('\n\n\n\n',AKT.state.current_action_log._actions.length+' 1200000000000000000000000000000000000\ninput: input[type="text"]');
+        event.stopPropagation();
+
+        if (AKT.state.pending_event) {
+            AKT.processPendingEvent(event,AKT.state.pending_event);
+        }
+        AKT.state.pending_event = event;
+    });
+
+
+    $('body').on('click','input[type="checkbox"]', function(event) {
+        if (AKT.state.action_mode !== 'recording') return;
+
+        console.log(6011,event);
+        //console.log('\n\n\n\n',AKT.state.current_action_log._actions.length+' 0000000000000000000000000000000000000\ninput: input[type="checkbox"]');
+        event.stopPropagation();
+
+        if (AKT.state.pending_event) {
+            AKT.processPendingEvent(event,AKT.state.pending_event);
+        }
+
+        var top = $(event.target.closest('.panel'));
+        console.log(6012,top);
+        if (top && top[0]) {
+            console.log(6013,top[0]);
+            var id = top[0].id;
+            var localId = $(event.target).attr('local_id');
+            var value = $(event.target).is(':checked');
+            var eventType = event.currentTarget.type;
+            var elementType = event.target.localName;
+
+            var actionSpec = {
+                element_id:   id,
+                element_type: elementType,
+                selector:     '[local_id="'+localId+'"]',
+                type:         eventType,
+                event_type:   'click',
+                input_type:   'checkbox',   //event.target.type,
+                message:      'Clicked on checkbox',
+                before:       'next_action',
+                prompt:       'Click on a button',
+                value:        value,
+                upper_selector: '#'+id,
+                local_selector: '[local_id="'+localId+'"]'
+           }
+            AKT.state.current_action_log.add(actionSpec);
+            console.log(6014,actionSpec);
+        }
+    });
+
+
+
+
+    $('#panel_list').on('click','.panel_list_item', function(event) {
+        if (AKT.state.action_mode !== 'recording') return;
+
+        console.log(event);
+        console.log(AKT.state);
+        var localId = $(event.target).attr('local_id');
+
+        var value = $(event.target).text();
+        console.log('\n\n\n\n',AKT.state.current_action_log._actions.length+' 000000000000000000000\nclick: button: '+value+': '+localId);
+        event.stopPropagation();
+
+        if (AKT.state.pending_event) {
+            AKT.processPendingEvent(event,AKT.state.pending_event);
+        }
+
+        var id = 'panel_list';
+
+        AKT.incrementZindex("$('body').on('click','button', function(event) {...})",id);
+        var localId = $(event.target).attr('local_id');
+        var eventType = event.type;
+        var elementType = event.target.localName;
+
+        var actionSpec = {
+            element_id: id,
+            selector: '[local_id="'+localId+'"]',
+            type:           eventType,
+            message:        'Clicked on a button',
+            before:         'previous_action',
+            after:          'next_action',
+            prompt:         'Click on a button',
+            value:          value,
+            event_type:     'click',
+            upper_selector: '#'+id,
+            local_selector: '[local_id="'+localId+'"]'
+        }
+        AKT.state.current_action_log.add(actionSpec);
+    });
+
+
+    $('body').on('click','input[type="radio"]', function(event) {
+        if (AKT.state.action_mode !== 'recording') return;
+
+        console.log(6001);
+        //console.log('\n\n\n\n',AKT.state.current_action_log.actions._length+' 0000000000000000000000000000000000000\ninput: input[type="radio"]');
+        event.stopPropagation();
+
+        if (AKT.state.pending_event) {
+            AKT.processPendingEvent(event,AKT.state.pending_event);
+        }
+
+        var top = $(event.target.closest('.panel'));
+        console.log(6002,top);
+        if (top && top[0]) {
+            console.log(6003,top[0]);
+            var id = top[0].id;
+            var localId = $(event.target).attr('local_id');
+            var value = $(event.target).is(':checked');
+            var eventType = event.type;
+            var elementType = event.target.localName;
+
+            var actionSpec = {
+                element_id: id,
+                selector: '[local_id="'+localId+'"]',
+                type: eventType,
+                event_type:   'click',  
+                input_type:   'radio',   //event.target.type,
+                message:'Clicked on a button',
+                before:'previous_action',
+                after:'next_action',
+                prompt:'Click on a button',
+                value: value,
+                upper_selector: '#'+id,
+                local_selector: '[local_id="'+localId+'"]'
+           }
+            AKT.state.current_action_log.add(actionSpec);
+            console.log('\n\n== '+actionSpec);
+        }
+    });
+
+
+    $('body').on('change','select', function(event) {
+        if (AKT.state.action_mode !== 'recording') return;
+
+        console.log('\n\n\n\n',AKT.state.current_action_log._actions.length+' 0000000000000000000000000000000000000\nchange:select');
+        event.stopPropagation();
+
+        console.log(3331,event);
+        console.log(3332,$(event.target).val(),$(event.currentTarget).val());
+
+        if (AKT.state.pending_event) {
+            AKT.processPendingEvent(event,AKT.state.pending_event);
+        }
+
+        var top = $(event.target.closest('.panel'));
+        if (top && top[0]) {
+            
+            var id = top[0].id;
+            var localId = $(event.target).attr('local_id');
+            var value = $(event.target).val();
+            var eventType = event.type;
+            var elementType = event.target.localName;
+
+            var actionSpec = {
+                element_id: id,
+                selector: '[local_id="'+localId+'"]',
+                type: eventType,
+                message:'Changed the selected option in a select element',
+                before:'previous_action',
+                after:'next_action',
+                prompt:'Choose an option',
+                value: value,
+                upper_selector: '#'+id,
+                local_selector: '[local_id="'+localId+'"]'
+            }
+            AKT.state.current_action_log.add(actionSpec);
+        }
+    });
+
+
+
+    $('body').on('click','trxxx', function(event) {
+        if (AKT.state.action_mode !== 'recording') return;
+
+        console.log('\n\n\n\n',AKT.state.current_action_log._actions.length+' 0000000000000000000000000000000000000\nclick:tr');
+        //event.stopPropagation();
+
+        console.log(3341,event);
+        console.log(3342,$(event.target).val(),$(event.currentTarget).val());
+        console.log(3343,$(event.target).text(),$(event.currentTarget).text());
+        console.log(3344,$(event.target).parent().attr('local_id'));
+        console.log(3344,$(event.target).parent().parent().attr('local_id'));
+
+        if (AKT.state.pending_event) {
+            AKT.processPendingEvent(event,AKT.state.pending_event);
+        }
+
+        var top = $(event.target.closest('.panel'));
+        if (top && top[0]) {
+            
+            var id = top[0].id;
+            var localId = $(event.target).parent().parent().attr('local_id');
+            var value = $(event.target).val();
+            var eventType = event.type;
+            var elementType = event.target.localName;
+
+            var actionSpec = {
+                element_id: id,
+                selector: '[local_id="'+localId+'"]',
+                type: eventType,
+                message:'Changed the selected option in a select element',
+                before:'previous_action',
+                after:'next_action',
+                prompt:'Choose an option',
+                value: value
+            }
+            AKT.state.current_action_log.add(actionSpec);
+        }
+    });
+
+    // function AKT.processPendingEvent(event,pendingEvent) {} Put into webakt.js
+
+
+
     var a = 'a1';
     var ol = {a1:99};
     var ol1 = {[a]:98};
@@ -202,12 +730,12 @@ el1.addEventListener('click', async () => {
         alert('clicked '+a+'...'+b);
     });
 
-
+/*
     console.log('button event handler');
     $('button').on('click',function(event,aaa) {
         console.log('--- button event:',event,aaa);
     });
-
+*/
 /*
     var sentences = AKT.kbs[kbId].sentences;
     for (var i=0; i<sentences.length; i++) {
@@ -267,8 +795,6 @@ el1.addEventListener('click', async () => {
     $('#div_node_template_dialog').css({display:'none'});
 
 
-    // Actions
-    AKT.action_list = new ActionList();
 
     $(document).on('keydown',function(event) {
         //console.log('--',event,'--');
@@ -279,7 +805,7 @@ el1.addEventListener('click', async () => {
             $('#message').html(nextEventMessage);
             var key = event.originalEvent.key;
             //if (key === 'a') {
-                AKT.action_list.oneStep(AKT.action_list._actions);
+            //    AKT.action_list.oneStep(AKT.action_list._actions);
             //}
         }
     });

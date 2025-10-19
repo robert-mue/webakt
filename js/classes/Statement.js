@@ -1500,6 +1500,7 @@ class Statement {
     }
 
     makeEnglishFromJson (options) {
+        console.log(99901,this._json);
         if (options && options.colours) {
             var colours = options.colours;
         } else {

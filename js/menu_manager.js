@@ -166,7 +166,16 @@ AKT.processOneLevel = function (menus, element, level) {
 
 AKT.menusClickHandler = function (div) {
     $(div).find('li.menus-dropdown > a').on('click',function(event){
+        console.log(3301, 'AKT.menusClickHandler');
+
+        if (AKT.state.pending_event) {
+        console.log(3302, 'AKT.menusClickHandler: AKT.processPendingEvent');
+            AKT.processPendingEvent(event,AKT.state.pending_event);
+            AKT.state.pending_event = null;
+        }
+
         var menuItemId = $(this).parent().attr('id');
+        console.log(3303, 'AKT.menusClickHandler',menuItemId);
 
         var testElement = $(this).parent().parent().parent().parent()[0];
         if (testElement.id === 'menus') {
@@ -174,7 +183,8 @@ AKT.menusClickHandler = function (div) {
         } else {
             var prompt = 'Click on the <b>'+$(this)[0].innerText+'</b> menu command.'
         }
-        var action = new Action({
+/*
+        var action = {
             element_id: 'menus',
             selector:   '#'+menuItemId+' > a',
             type:       'click',
@@ -184,8 +194,22 @@ AKT.menusClickHandler = function (div) {
             before:     'About to click on '+menuItemId,
             after:      'Just clicked on '+menuItemId,
             prompt:     prompt
-        });
-        AKT.action_list.add(action);
+        };
+        //AKT.action_list.add(action);
+*/
+
+        var actionSpec = {
+            element_id: 'menus',
+            selector:   '#'+menuItemId+' > a',
+            type:       'click',
+            message:    'Clicked on a menu item',
+            before:     'previous_action',
+            after:      'next_action',
+            prompt:     'Click on a menu item',
+            value:      'none'
+        }
+        AKT.state.current_action_log.add(actionSpec);
+
 
         if ($('#'+menuItemId).attr('class').split(/\s+/).includes('leaf')) {
             var step1 = {

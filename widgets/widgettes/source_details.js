@@ -17,7 +17,7 @@
 // The basic code that handles this is thus something like:
 //    var type = widget.options.type;  // 'person' or 'reference'
 //    for (propId in widget.props[type]) {
-//        $(widget.element).find('.div_'+propId).text(source['_'+propId]);
+//        $(widget.element).find('.input_'+propId).val(source['_'+propId]);
 //    }
 
 AKT.widgets.source_details = {};
@@ -37,10 +37,10 @@ AKT.widgets.source_details.setup = function (widget) {
     // This is to allow for others, e.g. a <select> element,in which case it would be
     // an object which lists the options available, rather than a simple string.
     widget.props = {
-        person:{id:'div',type:'div',name:'div',interviewer:'div',location:'div',day:'div',month:'div',
-            year:'div',sex:'div',ethnic_origin:'div',memo:'div'},
-        reference:{id:'div',type:'div',name:'div',title:'div',publication:'div',year:'div',
-            volume:'div',number:'div',pages:'div',memo:'div'}
+        person:{id:'input',type:'select',name:'input',interviewer:'input',location:'input',day:'input',month:'input',
+            year:'input',sex:'input',ethnic_origin:'input',age:'input',memo:'textarea'},
+        reference:{id:'input',type:'select',authors:'textarea',title:'textarea',publication:'textarea',year:'input',
+            volume:'input',number:'input',pages:'input',memo:'textarea'}
     };
 
 
@@ -53,7 +53,7 @@ AKT.widgets.source_details.setup = function (widget) {
                 interviewer:'Agbo',
                 sex:'M',
                 day:23,'month':'jun','year':2000,
-                memo:'none',
+                memo:'This is a person memo No.1.',
                 ethnic_origin:'Northern',
                 age:'<35'},
 
@@ -64,19 +64,20 @@ AKT.widgets.source_details.setup = function (widget) {
                 interviewer:'Agbo',
                 sex:'M',
                 day:24,month:'jun',year:2000,
-                memo:'none',
+                memo:'This is a person memo No.2',
                 ethnic_origin:'Northern',
                 age:'<35'}
             ],
             reference:[
                 {id:'bandy',
                 type:'reference',
-                name:'Bandy,D.E., Garrity,D.P. and Sanchez,P.A.',
+                authors:'Bandy,D.E., Garrity,D.P. and Sanchez,P.A.',
                 title:'The worldwide problem of slash-and-burn agriculture',
                 publication:'Agroforestry Today',
                 volume:'3',
                 number:'5',
-                pages:'2-6'}
+                pages:'2-6',
+                memo:'This is a reference memo.'}
             ]          
         };
 
@@ -99,24 +100,21 @@ AKT.widgets.source_details.setup = function (widget) {
     // depends on the mode (i.e. new,view or edit).
     var mode = widget.options.mode;
     if (mode === 'new'){
-        $(widget.element).find('.div_input').attr('contenteditable',true);
-        $(widget.element).find('.div_id').attr('disabled',false);
+        $(widget.element).find('.input_id').attr('disabled',false);
         $(widget.element).find('.select_type').attr('disabled',false);
         $(widget.element).find('.button_update').attr('disabled',false);
 
 
     } else if (mode === 'view'){
-        $(widget.element).find('.div_input').attr('contenteditable',false);
-        $(widget.element).find('button').attr('disabled',true);
+        //$(widget.element).find('button').attr('disabled',true);
         $(widget.element).find('.button_statements').attr('disabled',false);
         $(widget.element).find('.button_update').css({display:'none'});
         $(widget.element).find('.button_wizard').css({display:'none'});
         $(widget.element).find('select').attr('disabled',true);
 
     } else if (mode === 'edit'){
-        $(widget.element).find('.div_input').attr('contenteditable',true);
-        $(widget.element).find('.div_id').attr({contenteditable:false,readonly:true});
-        $(widget.element).find('.div_id').css({background:'#e0e0e0'});
+        $(widget.element).find('.input_id').attr({readonly:true});
+        $(widget.element).find('.input_id').css({background:'#e0e0e0'});
         $(widget.element).find('.select_type').attr('disabled',true);
         $(widget.element).find('.button_update').attr('disabled',false);
     }
@@ -134,9 +132,11 @@ AKT.widgets.source_details.setup = function (widget) {
    
     // =============================================================EVENT HANDLERS
 
-    $(widget.element).find('.button_statements').on('click', function() {
+    $(widget.element).find('[local_id="button_statements"]').on('click', function(event) {
         console.log('\n*** [source_details.js] Click event on "Statements" button');
-        event.stopPropagation();
+        if (AKT.state.action_mode !== 'recording') {
+            event.stopPropagation();
+        }
         var kbId = widget.options.kbId;
         var kb = AKT.kbs[kbId];
 
@@ -162,8 +162,10 @@ AKT.widgets.source_details.setup = function (widget) {
     });
 	
 	
-    $(widget.element).find('.button_wizard').on('click', function() {
-        event.stopPropagation();
+    $(widget.element).find('[local_id="button_wizard"]').on('click', function(event) {
+        if (AKT.state.action_mode !== 'recording') {
+            event.stopPropagation();
+        }
         console.log('\n*** [source_details.js] Click event on "Wizard" button');
         var kb = AKT.KBs['atwima'];  // Or AKT.kbs['atwima'];   ??
 		// id,type,name,interviewer,location,sex,day,month,year,ethnic_origin,age,
@@ -173,7 +175,9 @@ AKT.widgets.source_details.setup = function (widget) {
         var sampleSource = widget.sample_sources[type][widget.counter[type]];
 
         for (propId in widget.props[type]) {
-            $(widget.element).find('.div_'+propId).text(sampleSource[propId]);
+            var elementType = widget.props[type][propId];  // elementType is 'input' or 'textarea'
+            var selector = '[local_id="'+elementType+'_'+propId+'"]';
+            $(widget.element).find(selector).val(sampleSource[propId]);
         }
 
         widget.counter[widget.source_type] += 1;
@@ -183,16 +187,18 @@ AKT.widgets.source_details.setup = function (widget) {
 	});
 
 
-    $(widget.element).find('.button_update').on('click', function() {
+    $(widget.element).find('[local_id="button_update"]').on('click', function(event) {
         console.log('\n*** [source_details.js] Click event on "Update" button');
-        event.stopPropagation();
+        if (AKT.state.action_mode !== 'recording') {
+            event.stopPropagation();
+        }
 
         var kbId = AKT.state.current_kb;
         var kb = AKT.KBs[kbId];
 
         if (widget.options.mode ==='new') {
 /*
-            var id = $(widget.element).find('.div_id').text();
+            var id = $(widget.element).find('.input_id').val();
             if (!id) {
                 alert('You must enter an ID before updating the knowledge base with this new Source.');
                 return;
@@ -206,7 +212,7 @@ AKT.widgets.source_details.setup = function (widget) {
             widget.temp_source._id = id;
             widget.temp_source._type = type;
 */ 
-            var id = $(widget.element).find('.div_id').text();
+            var id = $(widget.element).find('.input_id').val();
             if (!id) {
                 alert('You must enter an ID before updating the knowledge base with this new Source.');
                 return;
@@ -228,7 +234,11 @@ AKT.widgets.source_details.setup = function (widget) {
         for (var propId in widget.props[type]) {  // type is 'person' or 'reference'
             if (propId==='id') continue;
             if (propId==='type') continue;
-            source['_'+propId] = $(widget.element).find('.div_source_type_'+type).find('.div_'+propId).text();
+//            var tag = props[type][propId];  // tag is 'input' or 'textarea'
+//            source['_'+propId] = $(widget.element).find('.div_source_type_'+type).find('.'+tag+'_'+propId).val();
+            var elementType = widget.props[type][propId];  // elementType is 'input' or 'textarea'
+            var selector = '[local_id="'+elementType+'_'+propId+'"]';
+            source['_'+propId] = $(widget.element).find('.div_source_type_'+type).find(selector).val();
         }
 /*
         var tempSource = {
@@ -249,13 +259,13 @@ AKT.widgets.source_details.setup = function (widget) {
             finds:['.button_update'],
             event:'click',
             values:[
-                {value:name,        find:'.div_name',        type:'div'},
-                {value:location,    find:'.div_location',    type:'div'},
-                {value:year,        find:'.div_year',        type:'div'},
-                {value:suffix,      find:'.div_suffix',      type:'div'},
-                {value:interviewer, find:'.div_interviewer', type:'div'},
-                {value:interviewee, find:'.div_interviewee', type:'div'},
-                {value:sex,         find:'.div_sex',         type:'div'},
+                {value:name,        find:'.input_name',        type:'div'},
+                {value:location,    find:'.input_location',    type:'div'},
+                {value:year,        find:'.input_year',        type:'div'},
+                {value:suffix,      find:'.input_suffix',      type:'div'},
+                {value:interviewer, find:'.input_interviewer', type:'div'},
+                {value:interviewee, find:'.input_interviewee', type:'div'},
+                {value:sex,         find:'.input_sex',         type:'div'},
                 {value:month,       find:'.input_month',     type:'input'},
                 {value:day,         find:'.input_day',       type:'input'},
             ],
@@ -274,7 +284,7 @@ AKT.widgets.source_details.setup = function (widget) {
         $('#message').text('The Sources list has been updated');
     });
 
-    $(widget.element).find('.select_type').on('change', function(event) {
+    $(widget.element).find('[local_id="select_type"]').on('change', function(event) {
         console.log('\n*** [statement_details.js] Click event on "Type" <select> option');
         widget.source_type = $(this).find(":selected").val();
         var type = widget.source_type;
@@ -284,7 +294,10 @@ AKT.widgets.source_details.setup = function (widget) {
         var source = widget.sample_sources[type];
         for (propId in widget.props[type]) {
             //var prop = widget.props[type][propId];
-            $(widget.element).find('.source_type_'+type).find('.div_'+propId).text(source['_'+propId]);
+            //$(widget.element).find('.source_type_'+type).find('.input_'+propId).val(source['_'+propId]);
+            var elementType = widget.props[type][propId];  // elementType is 'input' or 'textarea'
+            var selector = '[local_id="'+elementType+'_'+propId+'"]';
+            $(widget.element).find(selector).val(source['_'+propId]);
         }
     });
 };
@@ -306,11 +319,15 @@ AKT.widgets.source_details.display = function (widget) {
 
         for (propId in widget.props[type]) {
             if (propId==='id') {
-                $(widget.element).find('.div_id').text(source['_id']);
+                $(widget.element).find('.input_id').val(source['_id']);
             } else if (propId==='type') {
                 $(widget.element).find('.select_type').val(source._type);
             } else {
-                $(widget.element).find('.div_source_type_'+type).find('.div_'+propId).text(source['_'+propId]);
+                //var tag = props[type][propId];  // tag is 'input' or 'textarea'
+                //$(widget.element).find('.div_source_type_'+type).find('.'+tag+'_'+propId).val(source['_'+propId]);
+                var elementType = widget.props[type][propId];  // elementType is 'input' or 'textarea'
+                var selector = '[local_id="'+elementType+'_'+propId+'"]';
+                $(widget.element).find(selector).val(source['_'+propId]);
             }
         }
 
@@ -318,10 +335,10 @@ AKT.widgets.source_details.display = function (widget) {
 /*
         if (localStorage.getItem('latest_sourcexxx')) {
             var tempSource = JSON.parse(localStorage.getItem('latest_source'));
-            //$(widget.element).find('.div_id').text('Will be derived from Source data');
+            //$(widget.element).find('.input_id').val('Will be derived from Source data');
             for (propId in widget.props[type]) {
                 //var prop = widget.props[type][propId];
-                $(widget.element).find('.div_'+propId).text(tempSource[propId]);
+                $(widget.element).find('.input_'+propId).val(tempSource[propId]);
             }
         }
 */
@@ -329,7 +346,8 @@ AKT.widgets.source_details.display = function (widget) {
 /*
         for (propId in widget.sample_sources[type]) {
             //var prop = widget.props[type][propId];
-            $(widget.element).find('.div_'+propId).text(widget.sample_sources[type][propId]);
+            var tag = props[type][propId];  // tag is 'input' or 'textarea'
+            $(widget.element).find('.'+tag+'_'+propId).val(widget.sample_sources[type][propId]);
         }
 */
     }
@@ -352,7 +370,7 @@ AKT.widgets.source_details.display = function (widget) {
     } else {
         memo = 'none';
     }
-    $(widget.element).find('.div_memo').text(memo);
+    $(widget.element).find('.textarea_memo').val(memo);
 
 
     // TODO: Get KB amended so above code works.   Need to list value set for each label.
@@ -375,13 +393,13 @@ AKT.widgets.source_details.html = `
     <div>
         <div style="margin-top:4px;">
             <div style="float:left;display:inline-block;width:20px;">ID</div>
-            <div class="div_id" contenteditable style="float:left; overflow:hidden; height:18px; width:125px; 
-                background:white; border:solid 1px black;padding-left:5px;"></div>
+            <input type="text" class="input_id" local_id="input_id" style="float:left; overflow:hidden; height:18px; width:125px; 
+                background:white; border:solid 1px black;padding-left:5px;"></input>
         </div>
 
         <div style="margin-top:4px;">
             <div style="float:left;display:inline-block;width:30px;margin-left:10px;">Type</div>
-            <select class="select_type">
+            <select class="select_type" local_id="select_type">
                 <option value="person">Person</option>
                 <option value="reference">Reference</option>
             </select>
@@ -397,60 +415,53 @@ AKT.widgets.source_details.html = `
 
             <div style="margin-top:4px;">
                 <div style="float:left;display:inline-block;width:70px;">Name</div>
-                <div class="div_input div_name" style="float:left;overflow:hidden;height:18px;width:125;background:white;border:solid 1px black;padding-left:5px;"></div>
+                <input type="text" class="input input_name" local_id="input_name" style="float:left;overflow:hidden;height:18px;width:300px;background:white;border:solid 1px black;padding-left:5px;"></input>
             </div>
             <div style="clear:both;"></div>
 
             <div style="margin-top:4px;">
                 <div style="float:left;display:inline-block;width:70px;">Interviewer</div>
-                <div class="div_input div_interviewer" style="float:left;overflow:hidden;height:18px;width:125px;background:white;border:solid 1px black;padding-left:5px;"></div>
+                <input type="text" class="input input_interviewer" local_id="input_interviewer" style="float:left;overflow:hidden;height:18px;width:300px;background:white;border:solid 1px black;padding-left:5px;"></input>
             </div>
             <div style="clear:both;"></div>
 
             <div style="margin-top:4px;">
                 <div style="float:left;display:inline-block;width:70px;">Location</div>
-                <div class="div_input div_location" style="float:left;overflow:hidden;height:18px;width:125;background:white;border:solid 1px black;padding-left:5px;"></div>
+                <input type="text" class="input input_location" local_id="input_location" style="float:left;overflow:hidden;height:18px;width:300px;background:white;border:solid 1px black;padding-left:5px;"></input>
             </div>
             <div style="clear:both;"></div>
 
             <div style="margin-top:4px;">
                 <div style="float:left;display:inline-block;width:70px;">Sex</div>
-                <div class="div_input div_sex" style="float:left;overflow:hidden;height:18px;width:25;background:white;border:solid 1px black;padding-left:5px;"></div>
+                <input type="text" class="input input_sex" local_id="input_sex" style="float:left;overflow:hidden;height:18px;width:25;background:white;border:solid 1px black;padding-left:5px;"></input>
                 <div style="float:left;display:inline-block;width:70px;margin-left:10px;">M or F</div>
             </div>
             <div style="clear:both;"></div>
 
             <div style="margin-top:4px;">
-                <div style="float:left;display:inline-block;width:25px;">Day</div>
-                <div class="div_input div_day" style="float:left;overflow:hidden;height:18px;width:25;background:white;border:solid 1px black;padding-left:3px;"></div>
-            </div>
-
-            <div style="margin-top:4px;">
-                <div style="float:left;display:inline-block;width:35px;margin-left:5px;">Month</div>
-                <div class="div_input div_month" style="float:left;overflow:hidden;height:18px;width:35;background:white;border:solid 1px black;padding-left:2px;"></div>
-            </div>
-
-            <div style="margin-top:4px;">
-                <div style="float:left;display:inline-block;width:27px;margin-left:5px;">Year</div>
-                <div class="div_input div_year" style="float:left;overflow:hidden;height:18px;width:35;background:white;border:solid 1px black;padding-left:3px;"></div>
+                <div style="float:left;display:inline-block;width:70px;">Date</div>
+                <input type="text" class="input input_day" local_id="input_day" style="float:left;overflow:hidden;height:18px;width:25;background:white;border:solid 1px black;padding-left:3px;"></input>
+                <input type="text" class="input input_month" local_id="input_month" style="float:left;overflow:hidden;height:18px;width:25;background:white;border:solid 1px black;padding-left:3px;"></input>
+                <input type="text" class="input input_year" local_id="input_year" style="float:left;overflow:hidden;height:18px;width:40;background:white;border:solid 1px black;padding-left:3px;"></input>
+                <div style="float:left;display:inline-block;width:70px;margin-left:10px;">DDMMYYYY</div>
             </div>
             <div style="clear:both;"></div>
 
             <div style="margin-top:4px;">
                 <div style="float:left;display:inline-block;width:70px;">Ethnic_origin</div>
-                <div class="div_input div_ethnic_origin" style="float:left;overflow:hidden;height:18px;width:125;background:white;border:solid 1px black;padding-left:5px;"></div>
+                <input type="text" class="input input_ethnic_origin" local_id="input_ethnic_origin" style="float:left;overflow:hidden;height:18px;width:125;background:white;border:solid 1px black;padding-left:5px;"></input>
             </div>
             <div style="clear:both;"></div>
 
             <div style="margin-top:4px;">
                 <div style="float:left;display:inline-block;width:70px;">Age</div>
-                <div class="div_input div_age" style="float:left;overflow:hidden;height:18px;width:125px;background:white;border:solid 1px black;padding-left:5px;"></div>
+                <input type="text" class="input input_age" local_id="input_age" style="float:left;overflow:hidden;height:18px;width:25px;background:white;border:solid 1px black;padding-left:5px;"></input>
             </div>
             <div style="clear:both;"></div>
 
             <div style="margin-top:4px;">
                 <div style="float:left;display:inline-block;width:70px;">Memo</div>
-                <div class="div_input div_memo" style="float:left;overflow:hidden;height:50px;width:300px;background:white;border:solid 1px black;padding-left:5px;"></div>
+                <textarea class="input textarea_memo" local_id="textarea_memo" style="float:left;overflow:hidden;height:50px;width:300px;background:white;border:solid 1px black;padding-left:5px;"></textarea>
             </div>
             <div style="clear:both;"></div>
 
@@ -528,35 +539,34 @@ AKT.widgets.source_details.html = `
         <div class="div_source_type div_source_type_reference" style="display:none;float:left;">
 
             <div style="margin-top:4px;">
-                <div style="float:left;display:inline-block;width:60px;">Author(s)</div>
-                <div class="div_input div_name" style="float:left;overflow:auto;height:50px;width:185px;background:white;border:solid 1px black;padding-left:5px;"></div>
+                <div style="float:left;display:inline-block;width:70px;">Author(s)</div>
+                <textarea type="text" class="input textarea_authors" local_id="textarea_authors" style="float:left;overflow:auto;height:50px;width:300px;background:white;border:solid 1px black;padding-left:5px;"></textarea>
             </div>
             <div style="clear:both;"></div>
 
             <div style="margin-top:4px;">
-                <div style="float:left;display:inline-block;width:60px;">Title</div>
-                <div class="div_input div_title" style="float:left;overflow:auto;height:50px;width:185;background:white;border:solid 1px black;padding-left:5px;"></div>
+                <div style="float:left;display:inline-block;width:70px;">Title</div>
+                <textarea type="text" class="input textarea_title" local_id="textarea_title" style="float:left;overflow:auto;height:50px;width:300px;background:white;border:solid 1px black;padding-left:5px;"></textarea>
             </div>
             <div style="clear:both;"></div>
 
             <div style="margin-top:4px;">
-                <div style="float:left;display:inline-block;width:60px;">Publication</div>
-                <div class="div_input div_publication" style="float:left;overflow:hidden;height:40px;width:185;background:white;border:solid 1px black;padding-left:5px;"></div>
+                <div style="float:left;display:inline-block;width:70px;">Publication</div>
+                <textarea type="text" class="input textarea_publication" local_id="textarea_publication" style="float:left;overflow:hidden;height:40px;width:300px;background:white;border:solid 1px black;padding-left:5px;"></textarea>
             </div>
+            <div style="clear:both;"></div>
 
-            <div style="float:left;display:inline-block;margin-left:5px;margin-right:4px;">Vol</div>
-            <div class="div_input div_volume" style="float:left;overflow:hidden;background:white;border:solid 1px black;padding-left:5px;padding-right:5px;"></div>
-
+            <div style="float:left;display:inline-block;margin-left:70px;margin-right:4px;">Vol</div>
+            <input type="text" class="input input_volume" local_id="input_volume" style="float:left;overflow:hidden;width:40px;background:white;border:solid 1px black;padding-left:5px;padding-right:5px;"></input>
             <div style="float:left;display:inline-block;margin-left:10px;margin-right:4px;">No.</div>
-            <div class="div_input div_number" style="float:left;overflow:hidden;background:white;border:solid 1px black;padding-left:5px;padding-right:5px;"></div>
-
+            <input type="text" class="input input_number" local_id="input_number" style="float:left;overflow:hidden;width:40px;background:white;border:solid 1px black;padding-left:5px;padding-right:5px;"></input>
             <div style="float:left;display:inline-block;margin-left:10px;margin-right:4px;">Pages</div>
-            <div class="div_input div_pages" style="float:left;overflow:hidden;background:white;border:solid 1px black;padding-left:5px;padding-right:5px;"></div>
+            <input type="text" class="input input_pages" local_id="input_pages" style="float:left;overflow:hidden;width:60px;background:white;border:solid 1px black;padding-left:5px;padding-right:5px;"></input>
             <div style="clear:both;"></div>
 
             <div style="margin-top:4px;">
                 <div style="float:left;display:inline-block;width:70px;">Memo</div>
-                <div class="div_input div_memo" style="float:left;overflow:hidden;height:50px;width:300px;background:white;border:solid 1px black;padding-left:5px;"></div>
+                <textarea type="text" class="input textarea_memo" local_id="textarea_memo" style="float:left;overflow:hidden;height:50px;width:300px;background:white;border:solid 1px black;padding-left:5px;"></textarea>
             </div>
             <div style="clear:both;"></div>
         </div> <!-- End of source_type_reference block -->
@@ -564,11 +574,12 @@ AKT.widgets.source_details.html = `
     </div>   <!-- End of main block -->
 
 
-    <div style="float:left;margin-left:15px;padding:top:15px;">
-        <button class="button_update" style="width:70px;height:20px;margin:2px;">Update</button><br/>
-        <button class="button_statements" style="width:70px;height:20px;margin:2px;">Statements</button><br/>
-        <button class="button_wizard" style="width:70px;height:20px;margin:2px;">Wizard</button>
-    </div>
+    <div style="float:left;width:90%;margin-left:15px;padding:top:15px;">
+        <button class="button_update" local_id="button_update" style="float:right;width:70px;height:20px;margin:2px;">Update</button>
+        <button class="button_statements" local_id="button_statements" style="float:right;width:70px;height:20px;margin:2px;">Statements</button>
+        <button class="button_wizard" local_id="button_wizard" style="float:right;width:70px;height:20px;margin:2px;">Wizard</button>
+        <div style="clear:both;"></div>
+   </div>
 
     <div style="clear:both;"></div>
 

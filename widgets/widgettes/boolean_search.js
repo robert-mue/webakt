@@ -50,28 +50,28 @@ AKT.widgets.boolean_search.setup = function (widget) {
             selectedsString += ')';
         }
 */
-        var selectedsString = $(widgetContent).find('.listbox_type_values').val();
-        var currentSearchExpression = $(widgetContent).find('.textarea_search_box').val();
-        $(widgetContent).find('.textarea_search_box').val(currentSearchExpression+selectedsString);
+        var selectedsString = $(widgetContent).find('[local_id="select_type_values"]').val();
+        var currentSearchExpression = $(widgetContent).find('[local_id="textarea_search_expression"]').val();
+        $(widgetContent).find('.textarea_search_expression').val(currentSearchExpression+selectedsString);
     });
 
     $(widgetContent).find('.button_and').on('click', function () {
-        var currentSearchExpression = $(widgetContent).find('.textarea_search_box').val();
-        $(widgetContent).find('.textarea_search_box').val(currentSearchExpression+' and ');
+        var currentSearchExpression = $(widgetContent).find('.textarea_search_expression').val();
+        $(widgetContent).find('.textarea_search_expression').val(currentSearchExpression+' and ');
     });
 
     $(widgetContent).find('.button_or').on('click', function () {
-        var currentSearchExpression = $(widgetContent).find('.textarea_search_box').val();
-        $(widgetContent).find('.textarea_search_box').val(currentSearchExpression+' or ');
+        var currentSearchExpression = $(widgetContent).find('.textarea_search_expression').val();
+        $(widgetContent).find('.textarea_search_expression').val(currentSearchExpression+' or ');
     });
 
     $(widgetContent).find('.button_not').on('click', function () {
-        var currentSearchExpression = $(widgetContent).find('.textarea_search_box').val();
-        $(widgetContent).find('.textarea_search_box').val(currentSearchExpression+' not ');
+        var currentSearchExpression = $(widgetContent).find('.textarea_search_expression').val();
+        $(widgetContent).find('.textarea_search_expression').val(currentSearchExpression+' not ');
     });
 
     $(widgetContent).find('.button_clear').on('click', function () {
-        $(widgetContent).find('.textarea_search_box').val('');
+        $(widgetContent).find('.textarea_search_expression').val('');
     });
 
 
@@ -80,7 +80,7 @@ AKT.widgets.boolean_search.setup = function (widget) {
         event.stopPropagation();
         var kbId = widget.options.kbId;
 
-        var searchExpression = $(widget.element).find('.textarea_search_box').val();
+        var searchExpression = $(widget.element).find('.textarea_search_expression').val();
         var searchExpressionJs = AKT.convertSearchExpressionToJavascript(searchExpression);
         console.log(2010,searchExpressionJs);
         var panel = AKT.panelise({
@@ -109,7 +109,7 @@ AKT.widgets.boolean_search.setup = function (widget) {
         if (kb._topics[id]) {
             delete kb._topics[id];
         }
-        var searchExpression = $(widget.element).find('.textarea_search_box').val();
+        var searchExpression = $(widget.element).find('.textarea_search_expression').val();
         //var description = $(widget.element).find('.div_description').text();
         var objects = 'object';
         var topic = new Topic({id:id,description:'null',search_expression:searchExpression,objects:objects});
@@ -188,9 +188,9 @@ AKT.widgets.boolean_search.html = `
 <div class="content" style="border:none; padding:7px; width:450px;">
 <div>
     <div style="float:left;margin-top:0px;">
-        <select class="listbox_type_values" size=10 style="width:240px; background:white;margin-top:10px;"></select><br/>
-        <button class="button_details" style="width:150px;height:25px;margin-top:5px;">Details for selected term</button>
-        <button class="button_select" style="width:60px;height:25px;margin:3px;">Select</button><br/>
+        <select class="listbox_type_values" local_id="select_type_values" size=10 style="width:240px; background:white;margin-top:10px;"></select><br/>
+        <button class="button_details" local_id="button_details" style="width:150px;height:25px;margin-top:5px;">Details for selected term</button>
+        <button class="button_select" local_id="button_select" style="width:60px;height:25px;margin:3px;">Select</button><br/>
     </div>
 
     <div style="float:left;text-align:left;margin-top:0px;">
@@ -212,11 +212,11 @@ AKT.widgets.boolean_search.html = `
 
     <fieldset style="float:left;width:95%;margin-top:5px;">
         <legend>Boolean Search String</legend>
-        <button class="button_and" style="width:35px;height:20px;">and</button>
-        <button class="button_or" style="width:35px;height:20px;margin-left:5px;">or</button>
-        <button class="button_not" style="width:35px;height:20px;margin-left:5px;">not</button>
-        <button class="button_clear" style="float:right;width:60px;height:20px;">Clear</button>
-        <textarea class="textarea_search_box" style="margin-top:4px;width:100%;height:45px;" title="Try entering: &#10&nbsp;&nbsp;trees&#10or &#10&nbsp;&nbsp;trees and (water or moisture)"></textarea>
+        <button class="button_and" local_id="button_and" style="width:35px;height:20px;">and</button>
+        <button class="button_or" local_id="button_or" style="width:35px;height:20px;margin-left:5px;">or</button>
+        <button class="button_not" local_id="button_not" style="width:35px;height:20px;margin-left:5px;">not</button>
+        <button class="button_clear" local_id="button_clear" style="float:right;width:60px;height:20px;">Clear</button>
+        <textarea class="textarea_search_expression" local_id="textarea_search_expression" style="margin-top:4px;width:100%;height:45px;" title="Try entering: &#10&nbsp;&nbsp;trees&#10or &#10&nbsp;&nbsp;trees and (water or moisture)"></textarea>
     </fieldset>
 
     <button class="button_create_topic" style="float:right;width:80px;height:30px;margin:10px;">Create topic</button>
@@ -296,7 +296,7 @@ AKT.widgets.boolean_search.html = `
 
     <fieldset style="float:left;width:95%;margin-top:5px;">
         <legend>Boolean Search String</legend>
-        <textarea class="textarea_search_box" style="width:100%;height:45px;" title="Try entering: &#10&nbsp;&nbsp;trees&#10or &#10&nbsp;&nbsp;trees and (water or moisture)"></textarea>
+        <textarea class="textarea_search_expression" style="width:100%;height:45px;" title="Try entering: &#10&nbsp;&nbsp;trees&#10or &#10&nbsp;&nbsp;trees and (water or moisture)"></textarea>
     </fieldset>
 
     <button class="button_create_topic" style="float:right;width:80px;height:30px;margin:10px;">Create topic</button>

@@ -113,7 +113,7 @@ AKT.widgets.metadata.setup = function (widget) {
         });
 
         console.log(widget.element);
-        var action = new Action({
+/*        var action = new Action({
             element_id: widget.element[0].id,
             selector:   '.button_update',
             type:       'click',
@@ -124,7 +124,7 @@ AKT.widgets.metadata.setup = function (widget) {
             value:      kb._metadata
         });
         AKT.action_list.add(action);
-
+*/
         $('#message').html('Metadata has been updated');
 
 		AKT.saveKbInLocalStorage(kbId);
@@ -169,57 +169,57 @@ AKT.widgets.metadata.html = `
             <div class="w3-row w3-border">
                 <div class="w3-container w3-half" style="padding:2px;">
                     <legend style="line-height:14px;">KB name</legend>
-                    <textarea class="textarea_name" disabled style="resize:vertical;overflow:hidden; width:100%; height:22px;">Freddy</textarea>
+                    <textarea class="textarea_name" local_id="textarea_kb_name" disabled style="resize:vertical;overflow:hidden; width:100%; height:22px;"></textarea>
                 </div>
                 <div class="w3-container w3-half" style="padding:2px;">
                     <legend style="line-height:14px;">File name</legend>
-                    <textarea class="textarea_file" disabled style="resize:vertical;overflow:hidden; width:100%; height:22px; color:#808080;"></textarea>
+                    <textarea class="textarea_file" local_id="textarea_file_name" disabled style="resize:vertical;overflow:hidden; width:100%; height:22px; color:#808080;"></textarea>
                 </div>
             </div>
 
             <div style="padding:2px;width:100%;">
                 <legend style="line-height:14px;">Title of the knowledge base</legend>
-                <textarea class="textarea_title" style="resize:vertical;width:100%;height:35px;"></textarea>
+                <textarea class="textarea_title" local_id="textarea_title" style="resize:vertical;width:100%;height:35px;"></textarea>
             </div>
 
             <div style="padding:2px;width:100%;">
                 <legend style="line-height:14px;">Description</legend>
-                <textarea class="textarea_description" style="resize:vertical;width:100%;height:60px;"></textarea>
+                <textarea class="textarea_description" local_id="textarea_description" style="resize:vertical;width:100%;height:60px;"></textarea>
             </div>
 
             <div class="w3-row w3-border">
                 <div class="w3-container w3-half" style="padding:2px;">
                     <legend style="line-height:14px;">Author of knowledge base</legend>
-                    <textarea class="textarea_author" style="resize:vertical;width:100%;height:40px;"></textarea>
+                    <textarea class="textarea_author" local_id="textarea_author" style="resize:vertical;width:100%;height:40px;"></textarea>
                 </div>
 
                 <div class="w3-container w3-half" style="padding:2px;">
                     <legend style="line-height:14px;">Acknowledgements</legend>
-                    <textarea class="textarea_acknowledgements" style="resize:vertical;width:100%;height:40px;"></textarea>
+                    <textarea class="textarea_acknowledgements" local_id="textarea_acknowledgements" style="resize:vertical;width:100%;height:40px;"></textarea>
                 </div>
             </div>
 
             <div class="w3-row w3-border">
                 <div class="w3-container w3-half" style="padding:2px;">
                     <legend style="line-height:14px;">Associated Documentation</legend>
-                    <textarea class="textarea_associated_documentation" style="resize:vertical;width:100%;height:35px;"></textarea>
+                    <textarea class="textarea_associated_documentation" local_id="textarea_associated_documentation" style="resize:vertical;width:100%;height:35px;"></textarea>
                 </div>
 
                 <div class="w3-container w3-half" style="padding:2px;">
                     <legend style="line-height:14px;">Study Area</legend>
-                    <textarea class="textarea_study_area" style="resize:vertical;width:100%;height:35px;"></textarea>
+                    <textarea class="textarea_study_area" local_id="textarea_study_area" style="resize:vertical;width:100%;height:35px;"></textarea>
                 </div>
             </div>
 
             <div class="w3-row w3-border">
                 <div class="w3-container w3-half" style="padding:2px;">
                     <legend style="line-height:14px;">Methods</legend>
-                    <textarea class="textarea_methods" style="resize:vertical;width:100%;height:35px;"></textarea>
+                    <textarea class="textarea_methods" local_id="textarea_methods" style="resize:vertical;width:100%;height:35px;"></textarea>
                 </div>
 
                 <div class="w3-container w3-half" style="padding:2px;">
                     <legend style="line-height:14px;">Timing</legend>
-                    <textarea class="textarea_timing" style="resize:vertical;width:100%;height:20px;"></textarea>
+                    <textarea class="textarea_timing" local_id="textarea_timing" style="resize:vertical;width:100%;height:20px;"></textarea>
                 </div>
             </div>
 

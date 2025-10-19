@@ -13,25 +13,10 @@ AKT.menuHandler.menu_file_newkb = function(arg) {
     if (AKT.state.playing_events) {
         kbId = arg;
     } else {
-        var kbId = prompt('New KB ID (just use letters, digits and underscores):','newkb');
-        AKT.recordEvent({
-            file:'menu_handlers.js',
-            function:'AKT.menuHandler.menu_file_newkb()',
-            event:'click',
-            element:'null',
-            finds:[],
-            value: kbId,
-            message:'Clicked on .button_save in statement_details.js.'
-        });
+        AKT.myPrompt('New KB ID (just use letters, digits and underscores):','newkb');
+        //var kbId = prompt('New KB ID (just use letters, digits and underscores):','newkb');
     }
-    var name = kbId;
-    var title = kbId;
 
-    var kb = new Kb({name:name});
-	AKT.KBs[kbId] = kb;
-    AKT.changeKb(kbId);
-	AKT.saveKbInLocalStorage(kbId);
-	
     //AKT.showDialog('metadata');
     //$('#metadata').draggable({containment:'#workspace',handle:".title-bar"});
     //$(this).find('a').css({background:'#d0d0d0',color:'black'});       
@@ -159,14 +144,6 @@ AKT.menuHandler.menu_file_newkb = function(arg) {
     $(this).find('a').css({background:'#d0d0d0',color:'black'});  
     //AKT.incrementZindex("menu_handlers.js: AKT.menuHandler.menu_kb_formalterms()");
     var eventShiftKey = event ? event.shiftKey : null;
-
-    var panel = AKT.panelise({
-        widget_name:'metadata',
-        position:{left:'20px',top:'20px'},
-        size:{width:'550px',height:'540px'},
-        shift_key:eventShiftKey,
-        options:{kbId:AKT.state.current_kb}
-    });
 
 };
 
@@ -610,6 +587,34 @@ AKT.menuHandler.menu_kb_topichierarchies = function() {
         size:{width:'410px',height:'375px'},
         shift_key: eventShiftKey,
         options:{kbId:AKT.state.current_kb, tree_type:'topic', item_type:'topic_hierarchy'}
+    });
+};
+
+
+AKT.menuHandler.menu_kb_regions = function() {
+    $(this).find('a').css({background:'#d0d0d0',color:'black'});  
+    var eventShiftKey = event ? event.shiftKey : null;
+
+    var panel = AKT.panelise({
+        widget_name:'collection',
+        position:{left:'20px',top:'20px'},
+        size:{width:'410px',height:'375px'},
+        shift_key: eventShiftKey,
+        options:{kbId:AKT.state.current_kb,item_type:'region'}
+    });
+};
+
+
+AKT.menuHandler.menu_kb_zones = function() {
+    $(this).find('a').css({background:'#d0d0d0',color:'black'});  
+    var eventShiftKey = event ? event.shiftKey : null;
+
+    var panel = AKT.panelise({
+        widget_name:'collection',
+        position:{left:'20px',top:'20px'},
+        size:{width:'410px',height:'375px'},
+        shift_key: eventShiftKey,
+        options:{kbId:AKT.state.current_kb,item_type:'zone'}
     });
 };
 

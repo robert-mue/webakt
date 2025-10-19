@@ -65,6 +65,7 @@ class Action {
             }
 
             var fullSelector = '#'+this._element_id+' '+this._selector;
+            console.log('Action():triggerEvent::fullSelector:',fullSelector);
             $(fullSelector).trigger('click',[values]);
             //if ($(eventRecord.selector)[0].localName === 'button') {
             //    $(eventRecord.selector).css('background','yellow');
