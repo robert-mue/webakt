@@ -219,7 +219,7 @@ AKT.widgets.statement_details.setup = function (widget) {
     });
 
 
-    $(widget.element).find('[local_id="button_formal_terms"]').on('click', function (event) {   // Source details button
+    $(widget.element).find('[local_id="button_source_details"]').on('click', function (event) {   // Source details button
         console.log('\n*** [statement_details.js] Click event on "Source details" button');
         if (AKT.state.action_mode !== 'recording') {
             event.stopPropagation();

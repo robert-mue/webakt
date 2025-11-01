@@ -206,7 +206,11 @@ AKT.menusClickHandler = function (div) {
             before:     'previous_action',
             after:      'next_action',
             prompt:     'Click on a menu item',
-            value:      'none'
+            value:      'none',
+            speech:     'Click on the menu '+menuItemId
+        }
+        if (!AKT.state.current_action_log) {
+            AKT.state.current_action_log = new ActionLog({meta:{},actions:[]});
         }
         AKT.state.current_action_log.add(actionSpec);
 

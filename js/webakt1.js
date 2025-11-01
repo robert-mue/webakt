@@ -38,23 +38,52 @@ $(document).ready(function() {
     //AKT.text_to_speech('Click on the View button');
 
 
+
+
+    // Load action scripts
+    for (var scriptId in AKT.actionscripts) {
+        $('#select_actionscripts_open').append('<option id="actionscript_'+scriptId+'" value="'+scriptId+'">'+scriptId+'</option>');
+    }
+
+    //$('#select_actionscripts').change(function(){
+    //    var selectedActionscript = $(this).children("option:selected").val();
+    //    console.log('You have selected the country - ' + selectedActionscript);
+    //    AKT.state.current_action_log = new ActionLog(AKT.actionscripts[selectedActionscript]);
+    //});
+    $('#button_actionscripts_open_cancel').on('click',function(){
+        console.log('cancel');
+        $('#div_actionscripts_open').css({display:'none'});
+    });
+    $('#button_actionscripts_open_ok').on('click',function(){
+        console.log('ok');
+        var selectedActionscript = $(this).parent().find('option:selected').val();
+        console.log('You have selected the actionscript - ' + selectedActionscript);
+        AKT.state.current_action_log = new ActionLog(AKT.actionscripts[selectedActionscript]);
+        $('#div_actionscripts_open').css({display:'none'});
+    });
+
+
+    //    var selectedActionscript = $(this).children("option:selected").val();
+    //    console.log('You have selected the country - ' + selectedActionscript);
+    //    AKT.state.current_action_log = new ActionLog(AKT.actionscripts[selectedActionscript]);
+    //});
     // -----------------------------------------------------------------------------
     // ACTION LOGS
 
 
 
-    for (var logId in AKT.action_logs) {
-        $('#select_action_log_open').append('<option value="'+logId+'">'+logId+'</option>');
-    }
+    //for (var logId in AKT.action_logs) {
+    //    $('#select_action_log_open').append('<option value="'+logId+'">'+logId+'</option>');
+    //}
 
-
+/*
     $('#select_action_log').on('change', function() {
         var logId = $(this).selected();
         console.log('open_action_log:',logId);
         var current_action_log = AKT.action_logs[logId];
         AKT.state.current_action_log = current_action_log;
     })
- 
+ */
 
 
     // -----------------------------------------------------------------------------
@@ -124,7 +153,8 @@ $(document).ready(function() {
                 value:          value,
                 event_type:     'click',
                 upper_selector: '#'+id,
-                local_selector: '[local_id="'+localId+'"]'
+                local_selector: '[local_id="'+localId+'"]',
+                speech:         'Click on the '+event.target.innerText+' button'
             }
             AKT.state.current_action_log.add(actionSpec);
         }
@@ -166,7 +196,8 @@ $(document).ready(function() {
                 value:          null,
                 event_type:     'click',
                 upper_selector: '#'+id,
-                local_selector: null
+                local_selector: null,
+                speech:         'Click anywhere in the panel labelled '+id
             }
             AKT.state.current_action_log.add(actionSpec);
 /*
@@ -218,7 +249,8 @@ $(document).ready(function() {
                     value:          end,
                     event_type:     'end_drag',
                     upper_selector: '#'+id,
-                    local_selector: '[local_id="'+localId+'"]'
+                    local_selector: '[local_id="'+localId+'"]',
+                    speech:         'Drag the panel labelled '+id+' by dragging its titlebar'
                 }
                 AKT.state.current_action_log.add(actionSpec);
             } else {
@@ -269,7 +301,8 @@ $(document).ready(function() {
                 value:          value,
                 event_type:     'click',
                 upper_selector: '#'+id,
-                local_selector: '[local_id="'+localId+'"]'
+                local_selector: '[local_id="'+localId+'"]',
+                speech:         'Click on the expand/collapse symbol'
             }
             AKT.state.current_action_log.add(actionSpec);
         }
@@ -317,7 +350,8 @@ $(document).ready(function() {
                 value:          value,
                 event_type:     'click',
                 upper_selector: '#'+id,
-                local_selector: '[local_id="'+localId+'"]'
+                local_selector: '[local_id="'+localId+'"]',
+                speech:         'Click on the table ID'
             }
             AKT.state.current_action_log.add(actionSpec);
         }
@@ -384,7 +418,8 @@ $(document).ready(function() {
                 prompt:       'Click on a button',
                 value:        value,
                 upper_selector: '#'+id,
-                local_selector: '[local_id="'+localId+'"]'
+                local_selector: '[local_id="'+localId+'"]',
+                speech:       'Click a checkbox for the required item'
            }
             AKT.state.current_action_log.add(actionSpec);
             console.log(6014,actionSpec);
@@ -427,7 +462,8 @@ $(document).ready(function() {
             value:          value,
             event_type:     'click',
             upper_selector: '#'+id,
-            local_selector: '[local_id="'+localId+'"]'
+            local_selector: '[local_id="'+localId+'"]',
+            speech:         'Click on a panel list item'
         }
         AKT.state.current_action_log.add(actionSpec);
     });
@@ -466,7 +502,8 @@ $(document).ready(function() {
                 prompt:'Click on a button',
                 value: value,
                 upper_selector: '#'+id,
-                local_selector: '[local_id="'+localId+'"]'
+                local_selector: '[local_id="'+localId+'"]',
+                speech:         'Click on a radio button'
            }
             AKT.state.current_action_log.add(actionSpec);
             console.log('\n\n== '+actionSpec);

@@ -1,0 +1,96 @@
+AKT.actionscripts.test2 = {
+meta:{label:'basic test2'},
+actions:[
+    {
+        "element_id": "menus",
+        "selector": "#menu_file > a",
+        "type": "click",
+        "message": "Clicked on a menu item",
+        "before": "previous_action",
+        "after": "next_action",
+        "prompt": "Click on a menu item",
+        "value": "none",
+        "speech": "Test2.  Click on the menu menu_file",
+        "datetime": "Thu Oct 30 2025 11:59:28 GMT+0000 (Greenwich Mean Time)"
+    },
+    {
+        "element_id": "menus",
+        "selector": "#menu_file_newkb > a",
+        "type": "click",
+        "message": "Clicked on a menu item",
+        "before": "previous_action",
+        "after": "next_action",
+        "prompt": "Click on a menu item",
+        "value": "none",
+        "speech": "Click on the menu menu_file_newkb",
+        "datetime": "Thu Oct 30 2025 11:59:34 GMT+0000 (Greenwich Mean Time)"
+    },
+    {
+        "element_id": "myprompt",
+        "selector": "[local_id=\"button_ok\"]",
+        "type": "click",
+        "message": "Clicked on a button",
+        "before": "previous_action",
+        "after": "next_action",
+        "prompt": "Click on a button",
+        "value": "value",
+        "event_type": "click",
+        "upper_selector": "#myprompt",
+        "local_selector": "[local_id=\"button_ok\"]",
+        "datetime": "Thu Oct 30 2025 11:59:37 GMT+0000 (Greenwich Mean Time)"
+    },
+    {
+        "element_id": "metadata_1",
+        "selector": "[local_id=\"button_close\"]",
+        "type": "click",
+        "message": "Clicked on a button",
+        "before": "previous_action",
+        "after": "next_action",
+        "prompt": "Click on a button",
+        "value": "🞫",
+        "event_type": "click",
+        "upper_selector": "#metadata_1",
+        "local_selector": "[local_id=\"button_close\"]",
+        "speech": "Click on the 🞫 button",
+        "datetime": "Thu Oct 30 2025 11:59:56 GMT+0000 (Greenwich Mean Time)"
+    },
+    {
+        "element_id": "menus",
+        "selector": "#menu_kb > a",
+        "type": "click",
+        "message": "Clicked on a menu item",
+        "before": "previous_action",
+        "after": "next_action",
+        "prompt": "Click on a menu item",
+        "value": "none",
+        "speech": "Click on the menu menu_kb",
+        "datetime": "Thu Oct 30 2025 12:00:00 GMT+0000 (Greenwich Mean Time)"
+    },
+    {
+        "element_id": "menus",
+        "selector": "#menu_kb_statements > a",
+        "type": "click",
+        "message": "Clicked on a menu item",
+        "before": "previous_action",
+        "after": "next_action",
+        "prompt": "Click on a menu item",
+        "value": "none",
+        "speech": "Click on the menu menu_kb_statements",
+        "datetime": "Thu Oct 30 2025 12:00:03 GMT+0000 (Greenwich Mean Time)"
+    },
+    {
+        "element_id": "source_collection_1",
+        "selector": "[local_id=\"button_new\"]",
+        "type": "click",
+        "message": "Clicked on a button",
+        "before": "previous_action",
+        "after": "next_action",
+        "prompt": "Click on a button",
+        "value": "New",
+        "event_type": "click",
+        "upper_selector": "#source_collection_1",
+        "local_selector": "[local_id=\"button_new\"]",
+        "speech": "Click on the New button",
+        "datetime": "Thu Oct 30 2025 12:00:07 GMT+0000 (Greenwich Mean Time)"
+    }
+]};

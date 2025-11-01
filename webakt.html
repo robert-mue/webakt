@@ -165,9 +165,9 @@ but check.
 
 
 <!-- ACTION LOGS (was events/recordings...) -->
-<script src="action_logs/log_test1.js"></script>
-<script src="action_logs/log_test2.js"></script>
-<script src="action_logs/log_test3.js"></script>
+<script src="actionscripts/test1.js"></script>
+<script src="actionscripts/test2.js"></script>
+<script src="actionscripts/add_source_and_statement.js"></script>
 
 
 <!-- TUTORIALS -->
@@ -211,12 +211,13 @@ but check.
                 <div style="float:left;margin-right:4px;margin-top:5px;">Recording</div>
                 <button class="inwidget_recording" style="float:left;padding:3px;" onclick="AKT.state.current_action_log = new ActionLog({actions:[],meta:{}}); AKT.state.use_mode = 'creating_action_log'; AKT.state.action_mode='recording'; console.log('New action_log');$('#message').text('New action log created.');
 ">New</button>
-                <button class="inwidget_recording do_not_log" style="float:left;padding:3px;" onclick="$('#div_action_log_open').css({display:'block'});">Open</button>
+                <button class="inwidget_recording do_not_log" style="float:left;padding:3px;" onclick="$('#div_actionscripts_open').css({display:'block'});">Open</button>
                 <button class="inwidget_recording do_not_log" style="float:left;padding:3px;" onclick="AKT.state.current_action_log.save()">Save</button>
                 <button class="inwidget_recording do_not_log" style="float:left;padding:3px;" onclick="AKT.state.current_action_log.stop()">Stop</button>
+                <button class="inwidget_recording do_not_log" style="float:left;padding:3px;" onclick="AKT.state.current_action_log.display()">Display</button>
                 <button class="inwidget_recording do_not_log" style="float:left;padding:3px;" onclick="AKT.state.current_action_log.play()">Play</button>
                 <div style="float:left;margin-left:5px;margin-top:5px;margin-right:2px;">Time step:</div>
-                <input class="inwidget_recording do_not_log" id="recording_timestep" style="float:left;width:40px;padding:3px;margin-right:15px;" type="text"></input>
+                <input id="input_actionscript_replay_timestep" class="inwidget_recording do_not_log" id="recording_timestep" style="float:left;width:40px;padding:3px;margin-right:15px;" type="text"></input>
                 <button class="inwidget_recordingxxx" style="float:left;padding:3px;" onclick="AKT.state.current_action_log.stepThroughRecording()">Step</button>
                 <!--button style="float:left;padding:3px;margin-right:15px;" onclick="AKT.showRecording()">Show</button-->
                 <!-..................--><span>
@@ -309,10 +310,10 @@ but check.
     </div>
 
 
-    <div id="div_action_log_open" style="display:none; position:absolute; left:100px;top:200px; width:300px;height:300px; padding:10px; background:#e0ffe0; border:solid 1px black; z-index:100000;">
-        <select id="select_action_log_open"></select>
-        <button id="button_action_log_cancel">Cancel</button>
-        <button id="button_action_log_open">Open</button>
+    <div id="div_actionscripts_open" style="display:none; position:absolute; left:100px;top:200px; width:300px;height:300px; padding:10px; background:#e0ffe0; border:solid 1px black; z-index:100000;">
+        <select id="select_actionscripts_open" size="10"></select>
+        <button id="button_actionscripts_open_cancel">Cancel</button>
+        <button id="button_actionscripts_open_ok">OK</button>
     </div>
 
  

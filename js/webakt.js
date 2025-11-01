@@ -36,6 +36,8 @@
     AKT.bulk = {};
     AKT.widgets = {};
     AKT.tutorials = {a:'b'};
+
+    AKT.actionscripts = {};
     AKT.action_logs = {};   // [Sept 2025] New version of events/recordings...
     AKT.eventRecord = [];   // [Sept 2025 Now absolete] A record of events, captured in Panel and elsewhere,
                             // which can be used to build a tutorial or UI test.
@@ -2137,6 +2139,11 @@ AKT.makeId = function(structure,args) {
     // ===========================================================================================================
     // Text-to-speech 
     AKT.text_to_speech = function (text) {
+        // Do not generate speech if AKT.state.actionscript_replay_speech=false, 
+        // currently because timestep is short (<7 seconds).
+        if (!AKT.state.actionscript_replay_speech) return;
+
+        window.speechSynthesis.cancel();
         const synth = window.speechSynthesis;
         speak(text);
         
@@ -2149,27 +2156,27 @@ AKT.makeId = function(structure,args) {
 
             var voices = synth.getVoices()
 
-                const utterThis = new SpeechSynthesisUtterance(text);
+            const utterThis = new SpeechSynthesisUtterance(text);
 
-                utterThis.onend = function (event) {
-                    console.log("SpeechSynthesisUtterance.onend");
-                };
+            utterThis.onend = function (event) {
+                console.log("SpeechSynthesisUtterance.onend");
+            };
 
-                utterThis.onerror = function (event) {
-                    console.error("SpeechSynthesisUtterance.onerror");
-                };
+            utterThis.onerror = function (event) {
+                console.error("SpeechSynthesisUtterance.onerror");
+            };
 
-                const selectedOption = 'Microsoft Hazel - English (United Kingdom)';
+            const selectedOption = 'Microsoft Hazel - English (United Kingdom)';
 
-                for (let i = 0; i < voices.length; i++) {
-                    if (voices[i].name === selectedOption) {
-                        utterThis.voice = voices[i];
-                        break;
-                    }
+            for (let i = 0; i < voices.length; i++) {
+                if (voices[i].name === selectedOption) {
+                    utterThis.voice = voices[i];
+                    break;
                 }
-                utterThis.pitch = 1.0;
-                utterThis.rate = 0.8;
-                synth.speak(utterThis);
+            }
+            utterThis.pitch = 1.0;
+            utterThis.rate = 0.8;
+            synth.speak(utterThis);
         }
     }
 
