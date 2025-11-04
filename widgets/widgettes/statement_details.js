@@ -450,7 +450,7 @@ AKT.widgets.statement_details.setup = function (widget) {
 
     // ----------------------------------------------------------------------- INPUT EVENTS
     $(widget.element).find('[local_id="textarea_formal"]').on('keyup', function (event) {
-        console.log('\n*** [statement_details.js] Input keyboard event');
+        console.log('[statement_details.js] Input keyboard event:',$(this).val());
         var kbId = widget.options.kbId;
         var kb = AKT.KBs[kbId];
 

@@ -15,6 +15,7 @@ class ActionLog{
 
     add (action) {  // See comment at top.   This is no longer an object defined by a Class,
                     // but a simple object-literal.
+        console.log(9655,AKT.state.event_recording,AKT.state.playing_events);
         if (!AKT.state.event_recording) return;
         if (AKT.state.playing_events) return;
 

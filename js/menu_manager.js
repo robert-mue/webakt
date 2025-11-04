@@ -166,16 +166,14 @@ AKT.processOneLevel = function (menus, element, level) {
 
 AKT.menusClickHandler = function (div) {
     $(div).find('li.menus-dropdown > a').on('click',function(event){
-        console.log(3301, 'AKT.menusClickHandler');
+        console.log('\n\n$$$ ACTION ',AKT.state.current_action_log._actions.length,': div:click:li.menus-dropdown > a (** NOTE: In menumanager.js)');
 
         if (AKT.state.pending_event) {
-        console.log(3302, 'AKT.menusClickHandler: AKT.processPendingEvent');
             AKT.processPendingEvent(event,AKT.state.pending_event);
             AKT.state.pending_event = null;
         }
 
         var menuItemId = $(this).parent().attr('id');
-        console.log(3303, 'AKT.menusClickHandler',menuItemId);
 
         var testElement = $(this).parent().parent().parent().parent()[0];
         if (testElement.id === 'menus') {
@@ -213,6 +211,7 @@ AKT.menusClickHandler = function (div) {
             AKT.state.current_action_log = new ActionLog({meta:{},actions:[]});
         }
         AKT.state.current_action_log.add(actionSpec);
+        console.log('$9',AKT.state.current_action_log);
 
 
         if ($('#'+menuItemId).attr('class').split(/\s+/).includes('leaf')) {
