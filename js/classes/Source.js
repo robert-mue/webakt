@@ -2,6 +2,7 @@ class Source {
 
     constructor(spec) {
 
+        //console.log('^Class Source^constructor^spec:'+AKT.simpleStringify(spec));
         // Legacy use of both spec.from_file and simple spec.
         // 'prop' refers to the property of a source.
         if (spec) {

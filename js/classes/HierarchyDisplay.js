@@ -1,6 +1,7 @@
 class HierarchyDisplay {
 
     constructor(spec) {
+        console.log('^New HierarchyDisplay');
 
         this.table = $('<table></table>');
 
@@ -31,7 +32,6 @@ class HierarchyDisplay {
             var indents = ['','-- ','-- -- ','-- -- -- '];
             for (var i=0; i<nodeIds.length; i++) {
                 var nodeId = nodeIds[i];
-                console.log(indents[level],nodeId);
                 if (tree[nodeId]) {
                     level += 1;
                     var subNodes = tree[nodeId];

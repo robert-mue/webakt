@@ -6,6 +6,7 @@ class Hierarchy {
      */
     constructor(spec) {
 
+        //console.log('^Class Hierarchy^constructor^spec:'+AKT.simpleStringify(spec));
         if (spec.kb) {
             this._kb = spec.kb;  // The Object, not its ID
         } else {

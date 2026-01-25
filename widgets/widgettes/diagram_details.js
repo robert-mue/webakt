@@ -16,8 +16,7 @@ AKT.widgets.diagram_details = {};
 
 
 AKT.widgets.diagram_details.setup = function (widget) {
-    console.log('\n\nXXX Starting akt.diagram: setup()');
-    console.log('XXX widget.options: ',widget.options);
+    console.log('^widgets.diagram_details^setup()^options='+AKT.simpleStringify(widget.options));
 
     AKT.state.current_widget = widget;
 
@@ -1442,7 +1441,8 @@ what I'll do.
 
 
 AKT.widgets.diagram_details.display = function (widget) {
-    console.log('\ndiagram:display() ',AKT.state,widget.options);
+
+    console.log('^widgets.diagram_details^display()^options='+AKT.simpleStringify(widget.options));
 
     var mode = widget.options.mode;
 

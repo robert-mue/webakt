@@ -30,8 +30,8 @@
         widgetEventPrefix: 'dialog_Generic:',
 
         _create: function () {
-            console.log('\n*** Widget _create() method for  "dialog_Generic":',
-                'Element ID:',this.element[0].id,'; Widget UUID:',this.uuid,'; Options:',this.options);
+            console.log('^widget.dialog_Generic^_create()',
+                '^Element ID:',this.element[0].id,'; Widget UUID:',this.uuid,'; Options:',this.options);
             var self = this;
             this.element.addClass('dialog_Generic-1');
 

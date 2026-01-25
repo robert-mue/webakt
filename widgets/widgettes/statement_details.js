@@ -3,10 +3,8 @@ AKT.widgets.statement_details = {};
 
 // ======================================================================== SETUP
 AKT.widgets.statement_details.setup = function (widget) {
-    console.log('\n*** [statement_details.js] AKT.widgets.statement_details.setup(): options=',widget.options);
+    console.log('^widgets.statement_details^setup()^options='+AKT.simpleStringify(widget.options));
     var self = this;
-
-
 
     //$(widget.element).on('clickxxxxx','buttonxxxx', function(event) {
     //    event.stopPropagation();
@@ -547,7 +545,7 @@ AKT.widgets.statement_details.setup = function (widget) {
 // ================================================================== DISPLAY
 AKT.widgets.statement_details.display = function (widget) {
 
-    console.log('\n*** [statement_details.js] AKT.widgets.statement_details.display(): options=',widget.options);
+    console.log('^widgets.statement_details^display()^options='+AKT.simpleStringify(widget.options));
 
     $(widget.element).find('.div_keywords > button').css({'padding-left':'3px','padding-right':'3px'});
 

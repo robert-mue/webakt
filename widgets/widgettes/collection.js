@@ -29,7 +29,7 @@ AKT.widgets.collection.settings = {
 // The widget's setup() function.
 // ============================================================================
 AKT.widgets.collection.setup = function (widget) {
-    console.log('\n*** AKT.widgets.collection.setup(): widget=',widget);
+    console.log('^widgets.collection^setup()^options='+JSON.stringify(widget.options));
     var self = this;
 
     var kbId = widget.options.kbId;
@@ -114,12 +114,10 @@ AKT.widgets.collection.setup = function (widget) {
         var filters = {};
         for (var i=0; i<categoryIds.length; i++) {
             var categoryId = categoryIds[i];
-            console.log(9501,categoryId,collectionSpec.filters[categoryId].control_type);
             var controlType = collectionSpec.filters[categoryId].control_type;
 
             //if (categoryId !== 'termtype') {  // TODO: Fix temporary hack to handle termtype as select element.
             if (controlType === 'checkboxes') {  
-                console.log('\n',5001,i,categoryId,$(widget.element).find('.div_'+categoryId).find('input:checked'));
                 var nChecked = $(widget.element).find('.div_'+categoryId).find('input:checked').length;  // Number of
                         // checked checkboxes for this category.
                 if (nChecked > 0) {   // if no checkboxes for this category are checked, then omit this filter
@@ -199,7 +197,7 @@ AKT.widgets.collection.setup = function (widget) {
     // Buttons to invoke operations on the Listbox (New/view/Edit/Delete/SelectAll/Invert)
 
     $(widget.element).find('[local_id="button_new"]').on('click', function (event) {   // New button
-        console.log('\n*** Click event on New button');
+        console.log('^Click event on New button');
         if (AKT.state.action_mode !== 'recording') {
             event.stopPropagation();
         }
@@ -217,7 +215,7 @@ AKT.widgets.collection.setup = function (widget) {
 
 
     $(widget.element).find('.button_view').on('click', function (event) {   // View button
-        console.log('\n*** Click event on View button');
+        console.log('^Click event on View button');
         if (AKT.state.action_mode !== 'recording') {
             event.stopPropagation();
         }
@@ -226,7 +224,7 @@ AKT.widgets.collection.setup = function (widget) {
 
 
     $(widget.element).find('.button_edit').on('click', function (event) {   // Edit button
-        console.log('\n*** Click event on Edit button');
+        console.log('^Click event on Edit button');
         if (AKT.state.action_mode !== 'recording') {
             event.stopPropagation();
         }
@@ -235,8 +233,7 @@ AKT.widgets.collection.setup = function (widget) {
 
 
     $(widget.element).find('.button_delete').on('click', function (event) {   // Delete button
-        console.log('\n*** Click event on Delete button');
-        console.log(widget.options);
+        console.log('^Click event on Delete button');
         event.stopPropagation();
         
         if (!confirm('Deleting the selected items WILL BE PERMANENT!\n\nYou cannot undo this operation!\n\nDo you REALLY want to delete them?')) {
@@ -263,7 +260,7 @@ AKT.widgets.collection.setup = function (widget) {
 	            item_id:    itemIds[0]});
 
             // I'm using this as a temporary measure.
-            AKT.trigger('item_changed_event',{kb:kb,item_type:itemType});
+            AKT.trigger('item_changed_event',{kb:kb,operation:'delete_items',item_type:itemType,item_ids:itemIds});
 
             AKT.saveKbInLocalStorage(kbId);
         }
@@ -297,8 +294,6 @@ AKT.widgets.collection.setup = function (widget) {
     // Functions to undertake operations on the Listbox (New/view/Edit/Delete/SelectAll/Invert)
 
     function openDetailsPanel(widget,mode)  {
-
-        console.log(8401,'collection.js:openDetailsPanel()',mode,widget);
 
         var itemType = widget.options.item_type;
 
@@ -369,30 +364,15 @@ AKT.widgets.collection.setup = function (widget) {
         });
     }
 
-    findCheckedIdsxxx = function () {
-        var itemKeys = [];
-        var checkedInputs = $(this.divElement).find('input:checked');
-        console.log('===++',checkedInputs);
-        for (var i=0; i<checkedInputs.length; i++) {
-            var checkedInput = checkedInputs[i];
-            var itemKey = $(checkedInput).parent().parent().attr('data-key');
-            itemKeys.push(itemKey);
-        }
-        return itemKeys;
-    }
-
     deleteCheckedIdsxxx = function () {
         var kbId = AKT.state.current_kb;
         var kb = AKT.KBs[kbId];
 
-        console.log('***',widget.options);
-        //var containerObject = this.args.container_object;
         var itemType = widget.options.item_type;
 
         //var itemKeys = [];
         //var checkedInputs = $(this.divElement).find('input:checked');
         var checkedInputs = widget.listbox.findCheckedIds();
-        console.log('+++',checkedInputs);
         // Replace following by two lookup tables: one for getting the items (i.e. the 
         // name for the collection in the KB); and one for the widget name.
         // Do not use the first one if mode='new' (so itemId is null).
@@ -412,15 +392,10 @@ AKT.widgets.collection.setup = function (widget) {
             var items = kb['_'+itemType+'s'];
             widgetName = itemType+'_details';
         }
-        console.log('...',items);
-
         var deletedItems = [];
         for (var i=0; i<checkedInputs.length; i++) {
             var checkedInput = checkedInputs[i];
-            console.log(i,checkedInput);
-            //var itemKey = $(checkedInput).parent().parent().attr('data-key');
             var itemKey = checkedInput;
-            console.log(itemKey);
             deletedItems.push(items[itemKey]);
             delete items[itemKey];
         }
@@ -479,7 +454,7 @@ AKT.widgets.collection.setup = function (widget) {
 
     // ?? Left in for legacy reasons...
     $(widget.element).find('.legend_formal_term_type').on('click', function (event) {    // Ghost click target for tutorial
-        console.log('BUTTON: Clicked on legend_formal_term_type');
+        console.log('^Clicked on legend_formal_term_type');
         //$(widget.element).find('.select_formalterms option[value="esre"]').attr('selected',true);
 /*
         event.stopPropagation();
@@ -502,15 +477,43 @@ AKT.widgets.collection.setup = function (widget) {
     // and saving to Local Storage.   This is because those tasks need to be done where the 
     // event is triggered, to ensure that it is done once and not more than once.
 
+    // Code to raise this panel to the top.
+    // We put this in primarily to raise any panel which subscribes to an item_changed_event.
+    // Otherwise the user may not see that it has been updated in response to an update command
+    // following a New command.
+    // This may not be the wanted behaviour in all cases.   In particular, maybe it shold be    
+    //restricted to a new_item_created_event?
     $(document).on('new_item_created_event', function(event,args) {
-        if (args.item_type && args.item_type===widget.options.item_type) {
-            self.display(widget);
+        console.log('args: ',args);
+        var panelCollectionType = widget.options.item_type;
+        if (args.item_type) {
+            var itemCollectionType = args.item_type;
+            if (itemCollectionType === panelCollectionType) { 
+                panelId = widget.element[0].id;
+                var zindex = AKT.incrementZindex("collection.js: $(document).on('new_item_created_event'): "+panelId, 1);
+                $('#'+panelId).css({display:'block','z-index':zindex});
+                self.display(widget);
+                $(widget.element).find('tr.'+args.item._id).css({background:'#ccf'});  // light-blue
+            }
         }
     });
 
+    // See comments for 'new_item_created_event' handler, above.
     $(document).on('item_changed_event', function(event,args) {
-        if (args.item_type && args.item_type===widget.options.item_type) {
-            self.display(widget);
+        var panelCollectionType = widget.options.item_type;
+        if (args.item_type) {
+            var itemCollectionType = args.item_type;
+            if (itemCollectionType === panelCollectionType) { 
+                panelId = widget.element[0].id;
+                var zindex = AKT.incrementZindex("collection.js: $(document).on('item_changed_event'): "+panelId, 1);
+                $('#'+panelId).css({display:'block','z-index':zindex});
+                self.display(widget);
+                if (args.operation && args.operation === 'delete_items') {
+                    // do nothing!
+                } else {
+                    $(widget.element).find('tr.'+args.item._id).css({background:'#ccf'});   // light-blue
+                }
+            }
         }
     });
 
@@ -526,9 +529,8 @@ AKT.widgets.collection.setup = function (widget) {
     // the dialog, and adds in a heading for the widget type (or the collection 
     // type, if it is a collection).
     $(document).on('created_widget_settings_dialog_event', function(event,args) {
-        console.log('##1 created_widget_settings_dialog_event',args);
+        console.log('^created_widget_settings_dialog_event',args);
         if (true || args.item_type && args.item_type===widget.options.item_type) {
-            console.log('##2 created_widget_settings_dialog_event',args);
             $('#div_settings_container').css({display:'block'});
             var settingsDiv = $('#div_settings_container').find('.div_settings');
             $(settingsDiv).empty();
@@ -592,19 +594,8 @@ AKT.widgets.collection.setup = function (widget) {
                 var widge = $('#'+args.panel_id)[args.dialog_id]('instance');
                 AKT.widgets.collection.display(widge);
 
-/*
-                var styles = AKT.widgets.collection.settings['statement'].styles[0];
-                if ($(tableAlternateRowsCheckbox).find('input').prop('checked')) {
-                    // Temporary:
-                    styles.current_css = styles.sample_css;
-                    $(widget.element).find(styles.selector).css(styles.current_css);
-                } else {
-                    $(widget.element).find(styles.selector).css(styles.default_css);
-                }
-*/
                 var styleSelector = $('#div_settings_container').find('.input_style_selector').val();
                 var styleCss = $('#div_settings_container').find('.input_style_css').val();
-                console.log(styleSelector,styleCss);
                 if (styleSelector && styleCss) {
                     var cssObject = JSON.parse(styleCss);
                     $(widget.element).find(styleSelector).css(cssObject);
@@ -626,7 +617,7 @@ AKT.widgets.collection.setup = function (widget) {
 // ============================================================================
 AKT.widgets.collection.display = function (widget) {
 
-    console.log('\n*** AKT.widgets.collection.display(): options=',options);
+    console.log('^widgets.collection^display()^options=',JSON.stringify(widget.options));
     var options = widget.options;
     
     var itemType = options.item_type;   // 'statement', 'source', ....

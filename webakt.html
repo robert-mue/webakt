@@ -35,6 +35,78 @@ table.sortable thead {
     cursor: default;
 }
 </style>
+
+<style>
+    :root {
+        --link-color: #80800;
+        --link-active-color: blue;
+        --menu-background:rgb(212,208,200);
+    }
+
+    nav ul {
+        list-style: none;
+        padding-left: 0;
+        background:var(--menu-background);
+        font-family:helvetica;
+        font-size:12px;
+    }
+
+    nav ul li {
+        display: inline-block;
+        text-align: left;
+    }
+
+    nav a {
+        display: block;
+        padding: 0 6px;
+        transition: color 0.2s;
+        color: var(--link-color);
+        line-height: 2;
+        text-decoration: none;
+    }
+
+    nav ul ul li a {
+        color: var(--link-color);
+    }
+    nav ul ul l
+    i a:focus,
+    nav ul ul li a:active {
+        color: var(--link-active-color);
+    }
+    nav a:hover,
+    nav a:focus,
+    nav a:active,
+    nav a:focus:hover,
+    nav a:active:hover {
+        color: var(--link-active-color);
+    }
+
+    nav ul ul {
+        display: none;
+        position: absolute;
+        padding: 0px 0 0px 0;
+        background:var(--menu-background);
+        border:solid 1px #808080;
+        box-shadow: rgba(0, 0, 0, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
+    }
+    nav ul ul li {
+        display: list-item;
+        position: relative;
+        margin: 3px 9px 5px 10px;
+    }
+
+    nav ul li:focus > ul,
+    nav ul li:active > ul {
+        display: inherit;
+    }
+
+    nav a:focus + ul,
+    nav a:active + ul {
+        display: inherit;
+    }
+</style>
+
+
 <!--script src="https://code.jquery.com/jquery-3.5.0.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script-->
 <script src="libraries/jquery-3.5.0.js"></script>
@@ -188,6 +260,66 @@ but check.
 <div style="position:fixed; top:0;z-index:10000;width:100%;padding-right:20px;">
     <!-- The menubar -->
     <div id="menus" style="z-index:10000; height:22px; width:100%; background:#e0e0e0;">
+        <nav>
+            <ul>
+                <li class="menu"><a href="#" local_id="file">File</a>
+                    <ul>
+                        <li local_id="file_new" onclick="AKT.menuHandler.menu_file_newkb()">New</li>
+                        <li local_id="file_open_recent" onclick="AKT.menuHandler.menu_file_openkbrecent()">Open recent</li>
+                        <li id="file_open_from_file" local_id="file_open_from_file" onclick="AKT.menuHandler.menu_file_openkb()">Open from file</li>
+                        <li local_id="file_open_sample_kbs" onclick="AKT.menuHandler.menu_file_opensamplekbs()">Open sample KBs</li>
+                            <ul>
+                                <li class="xxx" local_id="file_kb_atwima" onclick="AKT.menuHandler.menu_file_atwima()">Atwima</li>
+                                <li class="xxx" local_id="file_kb_ego" onclick="AKT.menuHandler.menu_file_ego()">Ego</li>
+                            </ul>
+                        <li id="file_save_as" local_id="file_save_as" onclick="AKT.menuHandler.menu_file_saveas()">Save as</li>
+                        <li local_id="file_close" onclick="AKT.menuHandler.menu_file_close()"><Close</li>
+                        <li local_id="file_select_kb" onclick="AKT.menuHandler.menu_file_selectkb()">Select KB</li>
+                        <li local_id="file_clear_cache" onclick="AKT.menuHandler.menu_file_clearcache()">Clear cache</li>
+                        <li local_id="file_copy_kb" onclick="AKT.menuHandler.menu_file_copykb()">Copy KB</li>
+                    </ul>
+                </li>
+
+                <li class="menu"><a href="#" local_id="kb">KB</a>
+                    <ul>
+                        <li class="collection" local_id="summary" onclick="AKT.menuHandler.menu_kb_summary()">Summary</li>
+                        <li class="collection" local_id="metadata" onclick="AKT.menuHandler.menu_kb_metadata()">Metadata</li>
+                        <li class="collection" local_id="statements" onclick="AKT.menuHandler.menu_kb_statements()">Statements</li>
+                        <li class="collection" local_id="sources" onclick="AKT.menuHandler.menu_kb_sources()">Sources</li>
+                        <li class="collection" local_id="formal_terms" onclick="AKT.menuHandler.menu_kb_formalterms()">Formal terms</li>
+                        <li class="collection" local_id="object_hierarchies" onclick="AKT.menuHandler.menu_kb_objecthierarchies()">Object hierarchies</li>
+                        <li class="collection" local_id="topics" onclick="AKT.menuHandler.menu_kb_topics()">Topics</li>
+                        <li class="collection" local_id="topic_hierarchies" onclick="AKT.menuHandler.menu_kb_topichierarchies()">Topic hierarchies</li>
+                        <li local_id="images" onclick="AKT.menuHandler.menu_kb_images()">Images</li>
+                        <li local_id="boolean_search" onclick="AKT.menuHandler.menu_kb_booleansearch()">Boolean search</li>
+                    </ul>
+                </li>
+
+                <li class="menu"><a href="#" local_id="diagram">Diagram</a>
+                    <ul>
+                        <li local_id="diagrams" onclick="AKT.menuHandler.menu_diagram_diagrams()">Diagrams</li>
+                        <li local_id="nodes" onclick="AKT.menuHandler.menu_diagram_nodes()">Nodes</li>
+                        <li local_id="arcs" onclick="AKT.menuHandler.menu_diagram_arcs()">Arcs</li>
+                    </ul>
+                </li>
+
+                <li class="menu"><a href="#" local_id="tools">Tools</a>
+                    <ul>
+                        <li local_id="load_tool" onclick="AKT.menuHandler.menu_tools_loadtool()">Load tool</li>
+                        <li local_id="load_toolbox" onclick="AKT.menuHandler.menu_tools_loadtoolbox()">Load toolbox</li>
+                        <li local_id="use_tool" onclick="AKT.menuHandler.menu_tools_usetool()">Use tool</li>
+                    </ul>
+                </li>
+
+                <li class="menu"><a href="#" local_id="help">Help</a></li>
+
+                <li style="margin-left:100px;">
+                    <span>Current KB:</span>
+                    <span id="span_current_kb" style="font-weight:bold;">Atwima</span>
+                </li>
+            </ul>
+        </nav>
+
     </div>
     
 
@@ -219,7 +351,7 @@ but check.
                 <button class="inwidget_recording do_not_log" style="float:left;padding:3px;" onclick="AKT.state.current_action_log.play()">Play</button>
                 <div style="float:left;margin-left:5px;margin-top:5px;margin-right:2px;">Time step:</div>
                 <input id="input_actionscript_replay_timestep" class="inwidget_recording do_not_log" id="recording_timestep" style="float:left;width:40px;padding:3px;margin-right:15px;" type="text" value="0.1"></input>
-                <button class="inwidget_recordingxxx" style="float:left;padding:3px;" onclick="AKT.state.current_action_log.stepThroughRecording()">Step</button>
+                <button class="inwidget_recording" style="float:left;padding:3px;" onclick="AKT.state.current_action_log.stepThroughRecording()">Step</button>
                 <!--button style="float:left;padding:3px;margin-right:15px;" onclick="AKT.showRecording()">Show</button-->
                 <!-..................--><span>
                 4 Nov 2025 2025</span>

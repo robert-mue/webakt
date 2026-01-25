@@ -6,6 +6,7 @@ AKT.widgets.topic_details = {};
 
 
 AKT.widgets.topic_details.setup = function (widget) {
+    console.log('^widgets.topic_details^setup()^options='+AKT.simpleStringify(widget.options));
     var kbId = widget.options.kbId;
     var kb = AKT.KBs[kbId];
 
@@ -136,7 +137,7 @@ AKT.widgets.topic_details.setup = function (widget) {
 
 
 AKT.widgets.topic_details.display = function (widget) {
-    console.log('AKT.widgets.topic_details.display: ',widget.options);
+    console.log('^widgets.topic_details^display()^options='+AKT.simpleStringify(widget.options));
     var kbId = widget.options.kbId;
     var kb = AKT.KBs[kbId];
 

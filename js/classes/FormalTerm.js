@@ -1,7 +1,7 @@
 class FormalTerm {
 
     constructor(spec) {
-    console.log('\n*** Class FormalTerm: constructor');
+        //console.log('^Class FormalTerm^cnstructor^spec:'+AKT.simpleStringify(spec));
         if (spec) {
             this._id = spec.id;
             if (spec.from_file){
@@ -9,7 +9,7 @@ class FormalTerm {
                 this._kb = spec.kb;
                 this._definition = s.definition;
                 this._formal = s.formal;
-                this._images = s.images;
+                this._imageIds = s.images;
                 this._memo = s.memo;
                 this._synonyms = s.synonyms;
                 this._type = s.type;
@@ -19,7 +19,7 @@ class FormalTerm {
                 this._kb = spec.kb;
                 this._definition = spec.definition;
                 this._formal = spec.formal;
-                this._images = spec.images;
+                this._imageIds = spec.imageIds;
                 this._memo = spec.memo;
                 this._synonyms = spec.synonyms;
                 this._language = spec.language;
@@ -30,6 +30,7 @@ class FormalTerm {
             this._kb = AKT.state.current_kb;
             this._definition = '';
             this._formal = '';
+            this._imageIds = [];
             this._memo = '';
             this._synonyms = [];
             this._type = 'object';
@@ -95,7 +96,7 @@ class FormalTerm {
             type: this._type,
             language: this._language,
             definition:this._definition,
-            images: this._images,
+            images: this._imageIds,
             synonyms:this._synonyms,
             memo: this._memo
         }
@@ -116,7 +117,6 @@ class FormalTerm {
             var hierarchy = allHierarchies[hierarchyId];
             if (hierarchy._tree_up[this._id]) {
                 myHierarchies.push(hierarchy);
-                console.log('\nHIERARCHY\n',hierarchyId,hierarchy);
             }
         }
         return myHierarchies;

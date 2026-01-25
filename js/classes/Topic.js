@@ -1,6 +1,7 @@
 class Topic {
 
     constructor(spec) {
+        //console.log('^Class Topic^constructor^spec:'+AKT.simpleStringify(spec));
         if (spec.from_file){
             var s = spec.from_file;
             this._id = s.name.replace(/ /g,'_');

@@ -5,6 +5,7 @@ AKT.widgets.image_details.settings = {width:'400px',height:'440px'};
 
 
 AKT.widgets.image_details.setup = function (widget) {
+    console.log('^widgets.image_details^setup()^options='+AKT.simpleStringify(widget.options));
 
     var mode = widget.options.mode;
     if (mode === 'new') {
@@ -119,7 +120,7 @@ AKT.widgets.image_details.setup = function (widget) {
 
 
 AKT.widgets.image_details.display = function (widget) {
-    console.log(widget.options);
+    console.log('^widgets.image_details^display()^options='+AKT.simpleStringify(widget.options));
     var kbId = widget.options.kbId;
     var kb = AKT.kbs[kbId];
     var image = widget.options.image; 

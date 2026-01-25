@@ -280,12 +280,13 @@ AKT.menuHandler.menu_file_opensamplekbs = function() {
 // 		AKT.processFileSystemAccessAPI();
 // in js/webakt1.js
 
-AKT.menuHandler.menu_file_savekb = function() {
-    console.log('\n** Doing menu_file_savekb: state: ',AKT.state);
+AKT.menuHandler.menu_file_saveas = function() {
+    console.log('\n** Doing menu_file_saveas: state: ',AKT.state);
     //var kbId = AKT.state.current_kb;
     var kbId = AKT.state.current_kb;
     AKT.changeKb(kbId);
-    var kb = AKT.kbs[kbId];
+    var kb = AKT.KBs[kbId];
+    console.log(kb);
     var source = 2;   // 1=current, 2=from file
     if (source === 1) {
         console.log(kbId);
@@ -297,7 +298,7 @@ AKT.menuHandler.menu_file_savekb = function() {
         $(this).find('a').css({background:'#d0d0d0',color:'black'});       
 
     } else if (source === 2) {
-        AKT.incrementZindex("menu_handlers.js: AKT.menuHandler.menu_kb_savekb()");
+        AKT.incrementZindex("menu_handlers.js: AKT.menuHandler.menu_kb_saveas()");
         $(this).find('a').css({background:'#d0d0d0',color:'black'});         
     }
 };

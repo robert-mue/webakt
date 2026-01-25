@@ -7,7 +7,7 @@ It's correctable, but that can wait.
 class Listbox {
 
     constructor(args) {
-        console.log('\n*** Class Listbox constructor: args=',args);
+        console.log('^Class Listbox^constructor^args='+args);
         // This is weird.   Each table needs a unique ID.   I use the widget instance id,
         // e.g. statements_1 (which rules out having more than 1 table in a widget...).
         //  But... it seems that the id cannot have an underscore in it!    You get a 

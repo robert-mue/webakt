@@ -15,7 +15,8 @@ AKT.processFileSystemAccessAPI = function () {
 	
 	// LOADING A FILE
     // This handles the loading of a KB from a local file, using the File System Access API.
-    let el1 = document.getElementById('menu_file_openkb');
+    //let el1 = document.getElementById('menu_file_openkb');  //Relic from old menu system
+    let el1 = document.getElementById('file_open_from_file');
     el1.addEventListener('click', async () => {
 		
 		
@@ -49,7 +50,7 @@ AKT.processFileSystemAccessAPI = function () {
 
 	// SAVING A FILE
     // This handles the saving of a KB to local file, using the File System Access API.
-    let el2 = document.getElementById('menu_file_savekb');
+    let el2 = document.getElementById('file_save_as');
     el2.addEventListener('click', async () => {
 
       var kbId = AKT.state.current_kb;

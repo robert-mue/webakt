@@ -31,7 +31,7 @@ AKT.widgets.hierarchy_details = {};
 
 
 AKT.widgets.hierarchy_details.setup = function (widget) {
-	console.log(180,widget.options);
+    console.log('^widgets.hierarchy_details^setup()^options='+AKT.simpleStringify(widget.options));
     var widgetSettings = $('<div></div>');
     $(widget.element).append(widgetSettings);
     widget.state = {};
@@ -246,7 +246,7 @@ AKT.widgets.hierarchy_details.setup = function (widget) {
             value: '',
             message:'Clicked on the accept (green tick) button in the hierarchy_details panel.'});
 
-        AKT.trigger('new_item_created_event',{hierarchy:hierarchy,item_type:'object_hierarchy'});
+        AKT.trigger('new_item_created_event',{item:hierarchy,item_type:'object_hierarchy'});
         self.display(widget);
     });
 
@@ -457,7 +457,7 @@ AKT.widgets.hierarchy_details.setup = function (widget) {
 // ======================================================================================
 
 AKT.widgets.hierarchy_details.display = function (widget) {
-    console.log('\n\n\n***************************** \ndisplay:options:\n',widget.options);
+    console.log('^widgets.hierarchy_details^display()^options='+AKT.simpleStringify(widget.options));
 
     var kbId = widget.options.kbId;
     var kb = AKT.KBs[kbId];

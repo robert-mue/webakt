@@ -5,7 +5,7 @@ class Statement {
      * @param {object} spec - an object-literal containing initialising data.
      */
     constructor(spec) {
-        //console.log(spec);
+        //console.log('^Class Statement^constructor^spec:'+AKT.simpleStringify(spec));
         if (spec.kb) {
             var kb = spec.kb;
         } else {
@@ -1500,7 +1500,6 @@ class Statement {
     }
 
     makeEnglishFromJson (options) {
-        console.log(99901,this._json);
         if (options && options.colours) {
             var colours = options.colours;
         } else {

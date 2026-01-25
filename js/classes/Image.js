@@ -1,6 +1,7 @@
 class Image {
 
     constructor(id,spec) {
+        //console.log('^Class Image^constructor^id:'+id+' spec:'+AKT.simpleStringify(spec));
         this._id = id;
 
         if (spec.label) {

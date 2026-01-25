@@ -26,7 +26,7 @@
     AKT.tools = {};
     AKT.diagrams ={};  // Temporary measure, to hold the JSON for diagrams (currently just acheampong).
     AKT.options = {
-        show_zindex_incrementing: true,
+        show_zindex_incrementing: false,
         layout_max_number_of_nodes: 300
     };
 
@@ -160,8 +160,8 @@ AKT.processQueryString = function () {
 
     AKT.changeKb = function (kbId) {
         AKT.state.current_kb = kbId;
-        $('#current_kb_title').text(kbId);
-        console.log('\n*** Change to knowledge base: '+kbId);
+        $('#span_current_kb').text(kbId);
+        console.log('^Change to knowledge base: '+kbId);
     };
 
 
@@ -1749,7 +1749,8 @@ $.each(allPanels,function(i,panel) {
 // this as an intermediate function (rather than calling $(document).trigger() directly) is
 // to intercept the triggering, for logging or some other purpose.
 AKT.trigger = function (event_type, args) {
-    console.log('\n*** AKT.trigger(): event_type=',event_type,'; args=',args);
+    //console.log('\n*** AKT.trigger(): event_type=',event_type,'; args=',args);
+    console.log('^^AKT.trigger(): ^event_type=',event_type,'; args=',args);
     $(document).trigger(event_type, args);
 };
 
@@ -2180,3 +2181,44 @@ AKT.makeId = function(structure,args) {
         }
     }
 
+/*
+From: https://www.30secondsofcode.org/js/s/stringify-circular-json/
+
+const stringifyCircularJSON = obj => {
+  const seen = new WeakSet();
+  return JSON.stringify(obj, (k, v) => {
+    if (v !== null && typeof v === 'object') {
+      if (seen.has(v)) return;
+      seen.add(v);
+    }
+    return v;
+  });
+};
+const obj = { n: 42 };
+obj.obj = obj;
+stringifyCircularJSON(obj); // '{"n": 42}'
+*/
+    AKT.stringifyCircularJson = function(obj) {
+        return stringifyCircularJSON(obj);
+        const stringifyCircularJSON = obj => {
+            const seen = new WeakSet();
+            return JSON.stringify(obj, (k, v) => {
+                if (v !== null && typeof v === 'object') {
+                  if (seen.has(v)) return;
+                  seen.add(v);
+                }
+                return v;
+            });
+        };
+    };
+
+    AKT.simpleStringify = function (obj) {
+        var result = {};
+        for (var key in obj) {
+            var item = obj[key];
+            if (typeof item !== 'object') {
+                result[key] = item;
+            }
+        }
+        return JSON.stringify(result);
+    }

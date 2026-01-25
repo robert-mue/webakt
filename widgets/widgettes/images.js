@@ -10,7 +10,7 @@ AKT.widgets.images.settings = {width:'500px',height:'300px'};
 AKT.widgets.images.setup = function (widget) {
 
     var self = this;
-    console.log('\nIMAGES setup: ',widget.options);
+    console.log('^AKT.widgets.collection.setup()^options=',JSON.stringify(widget.options));
     var widgetContent = $(widget.element).find('.content');
 
     var widgetSettings = $('<div></div>');
@@ -92,7 +92,7 @@ AKT.widgets.images.setup = function (widget) {
 
 
 AKT.widgets.images.display = function (widget) {
-    console.log('\nIMAGES display: ',widget.options);
+    console.log('^AKT.widgets.collection.display()^options=',JSON.stringify(widget.options));
 
     var filters = widget.options.filters;
     if (filters && filters.formal_term) {
@@ -115,7 +115,6 @@ AKT.widgets.images.display = function (widget) {
 
     $(widget.element).find('.div_images').empty();
     for (var id in kb._images) {
-        console.log(formaltermId,id);
         //if (formaltermId === 'akata' && (id==='ciat1026' || id==='ciat1027')) {
             var image = kb._images[id];
             var caption = image._caption

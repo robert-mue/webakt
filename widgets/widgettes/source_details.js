@@ -24,7 +24,7 @@ AKT.widgets.source_details = {};
 
 
 AKT.widgets.source_details.setup = function (widget) {
-    console.log('\n*** [source_details.js] AKT.widgets.source_details.setup(): options=',widget.options);
+    console.log('^widgets.source_details^setup()^options='+AKT.simpleStringify(widget.options));
 
     $(widget.element).find('.source_type_'+widget.options.type).css({display:'block'});
     
@@ -306,7 +306,7 @@ AKT.widgets.source_details.setup = function (widget) {
 // ===============================================================================
 
 AKT.widgets.source_details.display = function (widget) {
-    console.log('\n*** [source_details.js] AKT.widgets.source_details.display(): options=',widget.options);
+    console.log('^widgets.source_details^display()^options='+AKT.simpleStringify(widget.options));
 
     var kbId = widget.options.kbId;
     var kb = AKT.KBs[kbId];

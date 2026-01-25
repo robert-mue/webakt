@@ -14,7 +14,7 @@ class Kb {
      */
     constructor(spec) {     
 
-        console.log('\n*** Class KB: constructor: spec:',spec);	
+        console.log('^Class KB^constructor^spec:',AKT.simpleStringify(spec));	
         this.from_local_storage = spec.from_local_storage;
 
 		// Create properties for all collections.
@@ -264,11 +264,7 @@ class Kb {
 
 
     getFormalTerms (filters) {
-        console.log('\n####################################################')
-        console.log('Kb.findFormalterms(filters)');
-        console.log(filters);
-        console.log('>>>\nfindFormalterms',filters,'\n',this._formalTerms);
-
+        console.log('^^function call^Kb.getFormalTerms');
         var okFormalterms= {};
 /*
         if (filters.filters && typeof filters.filters === 'object') {
@@ -892,7 +888,7 @@ class Kb {
                 title: image._title,
                 caption: image._caption,
                 url: image._url,
-                memo: image._url
+                memo: "This is the image's URL: "+image._url
             }
             kbSpec.images[itemId] = imageSpec;
         }

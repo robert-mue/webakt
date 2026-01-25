@@ -16,16 +16,8 @@
 
 $(document).ready(function() {
 
-    //AKT.cola = cola;
-    //console.log('webakt1: ',cola);
 
     //AKT.KBs['atwima'].generateCsv();
-    
-    //var termx = new Termx({term:'a1'});
-    //console.log(termx);
-
-
-    //console.log($('#my_iframe').contents().find("p").text());
 
     $('section').css({display:'none'});
 
@@ -38,35 +30,20 @@ $(document).ready(function() {
     //AKT.text_to_speech('Click on the View button');
 
 
-
-
     // Load action scripts
     for (var scriptId in AKT.actionscripts) {
         $('#select_actionscripts_open').append('<option id="actionscript_'+scriptId+'" value="'+scriptId+'">'+scriptId+'</option>');
     }
 
-    //$('#select_actionscripts').change(function(){
-    //    var selectedActionscript = $(this).children("option:selected").val();
-    //    console.log('You have selected the country - ' + selectedActionscript);
-    //    AKT.state.current_action_log = new ActionLog(AKT.actionscripts[selectedActionscript]);
-    //});
     $('#button_actionscripts_open_cancel').on('click',function(){
-        console.log('cancel');
         $('#div_actionscripts_open').css({display:'none'});
     });
     $('#button_actionscripts_open_ok').on('click',function(){
-        console.log('ok');
         var selectedActionscript = $(this).parent().find('option:selected').val();
-        console.log('You have selected the actionscript - ' + selectedActionscript);
         AKT.state.current_action_log = new ActionLog(AKT.actionscripts[selectedActionscript]);
         $('#div_actionscripts_open').css({display:'none'});
     });
 
-
-    //    var selectedActionscript = $(this).children("option:selected").val();
-    //    console.log('You have selected the country - ' + selectedActionscript);
-    //    AKT.state.current_action_log = new ActionLog(AKT.actionscripts[selectedActionscript]);
-    //});
     // -----------------------------------------------------------------------------
     // ACTION LOGS
 
@@ -79,11 +56,10 @@ $(document).ready(function() {
 /*
     $('#select_action_log').on('change', function() {
         var logId = $(this).selected();
-        console.log('open_action_log:',logId);
         var current_action_log = AKT.action_logs[logId];
         AKT.state.current_action_log = current_action_log;
     })
- */
+*/
 
 
     // -----------------------------------------------------------------------------
@@ -96,25 +72,85 @@ $(document).ready(function() {
             AKT.state.current_action_log = new ActionLog(JSON.parse(actionLogString));
         }
         catch(error) {
-            console.log('ERROR - cannot parse current_action_log in LocalStorage.');
-            console.log('error:',error);
+            console.log('^ERROR - cannot parse current_action_log in LocalStorage.');
+            console.log('^error:',error);
             localStorage.removeItem('current_action_log');
             AKT.state.current_action_log = new ActionLog({actions:[],meta:{}})       }
     } else {
-        console.log('WARNING - No current_action_log in LocalStorage.');
+        console.log('^WARNING - No current_action_log in LocalStorage.');
         AKT.state.current_action_log = new ActionLog({actions:[],meta:{}});
     }
 
 
+    $('body').on('click','.menu a', function(event) {
+        console.log($(event.target).attr('local_id'));
+        var menuId = $(event.target).attr('local_id');
+        var actionSpec = {
+            element_id: 'menus',
+            selector:   menuId,
+            type:       'click',
+            message:    'Clicked on a menu item',
+            before:     'previous_action',
+            after:      'next_action',
+            prompt:     'Click on a menu item',
+            value:      'none',
+            speech:     'Click on the menu '+menuId
+        }
+        if (!AKT.state.current_action_log) {
+            AKT.state.current_action_log = new ActionLog({meta:{},actions:[]});
+        }
+        AKT.state.current_action_log.add(actionSpec);
+    });
+
+
+    $('body').on('clickxxxx','.menu ul li', function(event) {
+
+       var localId = $(event.target).attr('local_id');
+       var actionSpec = {
+            element_id: 'menus',
+            selector:   localId,
+            type:       'click',
+            message:    'Clicked on a menu item',
+            before:     'previous_action',
+            after:      'next_action',
+            prompt:     'Click on a menu item',
+            value:      'none',
+            speech:     'Click on the menu '+localId
+        }
+        if (!AKT.state.current_action_log) {
+            AKT.state.current_action_log = new ActionLog({meta:{},actions:[]});
+        }
+        AKT.state.current_action_log.add(actionSpec);
+ 
+        var lookup = {
+            formal_terms:'formal_term',
+            sources:'source',
+            statements:'statement',
+            object_hierarchies:'object_hierarchy',
+            topics:'topic',
+            topic_hierarchies:'topic_hierarchy'
+        }
+        console.log(local_id);
+        var collectionId = lookup[local_id];
+        var panel = AKT.panelise({
+            widget_name:'collection',
+            position:{left:'20px',top:'20px'},
+            size:{width:'470px',height:'390px'},
+            shift_key: eventShiftKey,
+            options:{kbId:AKT.state.current_kb,item_type:collectionId}
+        });
+
+   });
+
+
     $('body').on('click','button', function(event) {
 
-        console.log('\n\n$$$$ ACTION: ',AKT.state.current_action_log._actions.length,'body:click:button');
+        console.log('^ACTION: ^',AKT.state.current_action_log._actions.length,'body:click:button');
         if (AKT.state.action_mode !== 'recording') return;
 
         var localId = $(event.target).attr('local_id');
 
         var value = $(event.target).text();
-        console.log('$1 ',' value,localId: ',value,localId);
         event.stopPropagation();
 
         if (AKT.state.pending_event) {
@@ -155,7 +191,6 @@ $(document).ready(function() {
                 speech:         'Click on the '+event.target.innerText+' button'
             }
             AKT.state.current_action_log.add(actionSpec);
-            console.log('$9',AKT.state.current_action_log);
         }
     });
 
@@ -164,10 +199,9 @@ $(document).ready(function() {
 
     $('body').on('click','div.panel',function(event) {
         if (AKT.state.action_mode !== 'recording') return;
-        console.log('\n\n$$$$ ACTION: ',AKT.state.current_action_log._actions.length,'body:click:div.panel');
+        console.log('^ACTION: ^',AKT.state.current_action_log._actions.length,'body:click:div.panel');
 
         var localId = $(event.target).attr('local_id');
-        console.log('$1 ',' localId: '+localId);
         var value = $(event.target).text();
         event.stopPropagation();
 
@@ -196,14 +230,6 @@ $(document).ready(function() {
                 speech:         'Click anywhere in the panel labelled '+id
             }
             AKT.state.current_action_log.add(actionSpec);
-            console.log('$9',AKT.state.current_action_log);
-/*
-            var zindex = $('#'+panelId).css('z-index');
-            console.log('zindex before:',panelId,zindex);
-            var zindex = AKT.incrementZindex("webakt1.js: $('body').on('click','div.panel',...): click. ID:"+panelId,1);
-            $('#'+panelId).css('z-index',zindex);
-            console.log('zindex after:',panelId,zindex);
-*/
         }
     });
 
@@ -211,20 +237,17 @@ $(document).ready(function() {
 
     $('body').on('mousedown','div.div_title',function(event) {
         if (AKT.state.action_mode !== 'recording') return;
-        console.log('\n\n$$$ ACTION xxx: body:mousedown:div.div_title');
+        console.log('^ACTION xxx:^ body:mousedown:div.div_title');
         AKT.state.panel_start = {x:event.clientX,y:event.clientY};
-        console.log('$1 ',AKT.state.current_action_log._actions.length,' x,y: ',event.clientX,event.clientY);
-        console.log('$9',AKT.state.current_action_log);
     });
 
 
     $('body').on('mouseup','div.div_title',function(event) {
         if (AKT.state.action_mode !== 'recording') return;
-        console.log('\n\n$$$ ACTION: body:mouseup:div.div_title');
+        console.log('^ACTION: ^body:mouseup:div.div_title');
 
         var start = AKT.state.panel_start;
         var end = {x:event.clientX,y:event.clientY}
-        console.log('$1 x,y: ',start,end);
         if (Math.abs(start.x-start.y,end.x-end.y)<10) {
             return;
         } else {
@@ -252,7 +275,6 @@ $(document).ready(function() {
                     speech:         'Drag the panel labelled '+id+' by dragging its titlebar'
                 }
                 AKT.state.current_action_log.add(actionSpec);
-                console.log('$9',AKT.state.current_action_log);
             } else {
                 return;
             }
@@ -264,11 +286,10 @@ $(document).ready(function() {
 
     $('body').on('click','div.div_expand_collapse', function(event) {
         if (AKT.state.action_mode !== 'recording') return;
-        console.log('\n\n$$$ ACTION: ',AKT.state.current_action_log._actions.length,'body:click:div.div_expand_collapse');
+        console.log('^ACTION: ^',AKT.state.current_action_log._actions.length,'body:click:div.div_expand_collapse');
 
         var localId = $(event.target).parent().attr('local_id');
         var value = $(event.target).text();
-        console.log('$1 ',AKT.state.current_action_log._actions.length+' localId,value: ',localId,value);
         event.stopPropagation();
 
         if (AKT.state.pending_event) {
@@ -278,11 +299,6 @@ $(document).ready(function() {
         var top = $(event.target.closest('.panel'));
         if (top && top[0]) {
             
-            console.log(top[0].id);
-            console.log($(event.target));
-            console.log($(event.target).parent());
-            console.log($(event.target).parent().parent());
-            console.log($(event.target).parent().parent().parent());
             var id = top[0].id;
             var localId = $(event.target).attr('local_id');
             var value = $(event.target).text();
@@ -304,7 +320,6 @@ $(document).ready(function() {
                 speech:         'Click on the expand/collapse symbol'
             }
             AKT.state.current_action_log.add(actionSpec);
-            console.log('$9',AKT.state.current_action_log);
         }
     });
 
@@ -313,11 +328,10 @@ $(document).ready(function() {
 
     $('body').on('click','div.div_id', function(event) {
         if (AKT.state.action_mode !== 'recording') return;
-        console.log('$$$ ACTION: ',AKT.state.current_action_log._actions.length,'body:click:div.div_expand_collapse');
+        console.log('^ACTION: ^',AKT.state.current_action_log._actions.length,'body:click:div.div_expand_collapse');
 
         var localId = $(event.target).parent().attr('local_id');
         var value = $(event.target).text();
-        console.log('$1 localId,value: ',localId,value);
         event.stopPropagation();
 
         if (AKT.state.pending_event) {
@@ -348,7 +362,6 @@ $(document).ready(function() {
                 speech:         'Click on the table ID'
             }
             AKT.state.current_action_log.add(actionSpec);
-            console.log('$9',AKT.state.current_action_log);
         }
     });
 
@@ -356,7 +369,7 @@ $(document).ready(function() {
 
     $('body').on('input','textarea', function(event) {
         if (AKT.state.action_mode !== 'recording') return;
-        console.log('\n\n$$$ ACTION xxx: body:input:textarea');
+        console.log('^ACTION ^body:input:textarea');
 
         event.stopPropagation();
 
@@ -369,7 +382,7 @@ $(document).ready(function() {
 
     $('body').on('input','input[type="text"]', function(event) {
         if (AKT.state.action_mode !== 'recording') return;
-        console.log('\n\n$$$ ACTION xxx: body:input:input[type="text"]');
+        console.log('^ACTION ^body:input:input[type="text"]');
 
         event.stopPropagation();
 
@@ -383,7 +396,7 @@ $(document).ready(function() {
     $('body').on('click','input[type="checkbox"]', function(event) {
         if (AKT.state.action_mode !== 'recording') return;
 
-        console.log('$$$ ACTION: ',AKT.state.current_action_log._actions.length,'body:input:input[type="text"]');
+        console.log('^ACTION: ^',AKT.state.current_action_log._actions.length,'body:input:input[type="text"]');
         event.stopPropagation();
 
         if (AKT.state.pending_event) {
@@ -391,15 +404,12 @@ $(document).ready(function() {
         }
 
         var top = $(event.target.closest('.panel'));
-        console.log(6012,top);
         if (top && top[0]) {
-            console.log(6013,top[0]);
             var id = top[0].id;
             var localId = $(event.target).attr('local_id');
             var value = $(event.target).is(':checked');
             var eventType = event.currentTarget.type;
             var elementType = event.target.localName;
-            console.log('$1 topId,localId,value: ',id,localId,value);
             var actionSpec = {
                 element_id:   id,
                 element_type: elementType,
@@ -416,7 +426,6 @@ $(document).ready(function() {
                 speech:       'Click a checkbox for the required item'
            }
             AKT.state.current_action_log.add(actionSpec);
-            console.log('$9',AKT.state.current_action_log);
         }
     });
 
@@ -425,12 +434,11 @@ $(document).ready(function() {
 
     $('#panel_list').on('click','.panel_list_item', function(event) {
         if (AKT.state.action_mode !== 'recording') return;
-        console.log('$$$ ACTION ',AKT.state.current_action_log._actions.length,' #panel_list:click:.panel_list_item');
+        console.log('^ACTION ^',AKT.state.current_action_log._actions.length,' #panel_list:click:.panel_list_item');
 
         var localId = $(event.target).attr('local_id');
 
         var value = $(event.target).text();
-        console.log('$1 localId,value :',localId,value);
         event.stopPropagation();
 
         if (AKT.state.pending_event) {
@@ -459,13 +467,12 @@ $(document).ready(function() {
             speech:         'Click on a panel list item'
         }
         AKT.state.current_action_log.add(actionSpec);
-        console.log('$9',AKT.state.current_action_log);
     });
 
 
     $('body').on('click','input[type="radio"]', function(event) {
         if (AKT.state.action_mode !== 'recording') return;
-        console.log('$$$ ACTION: ',AKT.state.current_action_log._actions.length,'body:click:input[type="radio"]');
+        console.log('^ACTION: ^',AKT.state.current_action_log._actions.length,'body:click:input[type="radio"]');
         event.stopPropagation();
 
         if (AKT.state.pending_event) {
@@ -475,7 +482,6 @@ $(document).ready(function() {
         var top = $(event.target.closest('.panel'));
         console.log(6002,top);
         if (top && top[0]) {
-            console.log(6003,top[0]);
             var id = top[0].id;
             var localId = $(event.target).attr('local_id');
             var value = $(event.target).is(':checked');
@@ -504,8 +510,9 @@ $(document).ready(function() {
 
 
     $('body').on('change','select', function(event) {
+        console.log('AKT.state.action_mode: ',AKT.state.action_mode);
         if (AKT.state.action_mode !== 'recording') return;
-        console.log('\n\n$$$ ',AKT.state.current_action_log._actions.length,'body:change:select');
+        console.log('^',AKT.state.current_action_log._actions.length,'body:change:select');
         event.stopPropagation();
 
         if (AKT.state.pending_event) {
@@ -520,7 +527,6 @@ $(document).ready(function() {
             var value = $(event.target).val();
             var eventType = event.type;
             var elementType = event.target.localName;
-            console.log('$1: topId,localId,value: ',id,localId,value);
 
             var actionSpec = {
                 element_id: id,
@@ -535,7 +541,6 @@ $(document).ready(function() {
                 local_selector: '[local_id="'+localId+'"]'
             }
             AKT.state.current_action_log.add(actionSpec);
-            console.log('$9',AKT.state.current_action_log);
         }
     });
 
@@ -550,15 +555,14 @@ $(document).ready(function() {
     var termx = new Termx({term_id:'a1'});
     termx.addTerm('b1');
 
-            var URL = 'help.html';
-            //var URL = 'help.html#ref_'+subname;
-            //var URL = 'help.html ref_'+'formal_term_details';
-            //$(this).append('<a href="'+URL+'" class="popup">+</a>');
-            var name = '_blank';
-            var specs = 'location=yes,height=570,width=520,scrollbars=yes,status=yes';
-            //window.open(URL, name, specs);
-            //window.open('https://www.bbc.co.uk', name, specs);
-            console.log('AKT.state:',AKT.state);
+    var URL = 'help.html';
+    //var URL = 'help.html#ref_'+subname;
+    //var URL = 'help.html ref_'+'formal_term_details';
+    //$(this).append('<a href="'+URL+'" class="popup">+</a>');
+    var name = '_blank';
+    var specs = 'location=yes,height=570,width=520,scrollbars=yes,status=yes';
+    //window.open(URL, name, specs);
+    //window.open('https://www.bbc.co.uk', name, specs);
 
     // Dialog windows
     $( "#dialog1" ).dialog({
@@ -652,7 +656,7 @@ $(document).ready(function() {
 
     //var objectTree = AKT.makeTree(kbId,"subobjects");
 
-    AKT.processMenus();
+    //AKT.processMenus();
 	AKT.processFileSystemAccessAPI(); 
 
 /*
@@ -701,18 +705,17 @@ el1.addEventListener('click', async () => {
     //console.log(AKT.KBs.atwima._filteredStatements);
 
     $('#zoom_in').on('click', function() {
-        console.debug('zoom_in');
+        console.log('zoom_in');
         $('#workspace').css({transform:'scale(1)'});
     });
     $('#zoom_out').on('click', function() {
-        console.debug('zoom_out');
+        console.log('zoom_out');
         $('#workspace').css({transform:'scale(0.6)','transform-origin': '0 0 0'});
     });
 
     // Miscellaneous event handlers for built-in dialog windows
     $('#button_file_new').on('click',function() {
         var a = $('#input_file_new').val();
-        console.log('.button_file_new button clicked');
         alert('clicked '+a+'...'+b);
     });
 
@@ -802,34 +805,25 @@ el1.addEventListener('click', async () => {
         var mode = 'text';   // 'json'
         var fileReader = new FileReader();
         fileReader.fileName = document.getElementById('file_open').files[0].name;
-        console.log('##1 ',fileReader.fileName);
         fileReader.onload = function(event) {
             var fileName = event.target.fileName;
             var fname = fileName.substring(0,fileName.lastIndexOf('.'));
             var kbId = fname;
-            console.log('\n===', fname);
             var kbText = event.target.result;
-            console.debug(kbText);
             if (mode === 'json') {
                 var kbObject = JSON.parse(kbText);
-                console.log(kbObject);
-                //AKT.state.current_kb = kbId;
                 AKT.changeKb(kbId);
                 AKT.kbs[kbId] = kbObject;
             } else {    // text
                 var lines = kbText.split('\n');
                 for (var i=0; i<lines.length; i++) {
                     if (lines[i].charAt(0) !== '%' && lines[i].charAt(0) !== '') {
-                        console.log('\n',lines[i]);
                         var bits = lines[i].split(':');
                         var sourceId = bits[0];
                         var formal = bits[1];
-                        console.log('...'+formal+'...');
                         var json = AKT.convert_formal_to_json(formal);
-                        console.log(json);
                         if (json) {
                             var english = AKT.translate(json);
-                            //console.debug(english);
                         } else {
                             //alert('Error in the line "'+lines[i]);
                         }

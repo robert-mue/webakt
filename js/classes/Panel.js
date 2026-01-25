@@ -1,10 +1,10 @@
 class Panel {
 
     constructor(dialogId, shiftKey, size, options, calledFromPanelise) {
+        console.log('^Class Panel^constructor^dialogId'+dialogId+'; options:'+AKT.simpleStringify(options)+'; calledFromPanelise:'+calledFromPanelise);
         if (!calledFromPanelise) {
-            console.log('\n*** ATTENTION *** newPanel() not called from AKT.panelise()!  Widgette: ',options.widget_name);
+            console.log('^*** ATTENTION *** ^^newPanel() not called from AKT.panelise()!  Widgette: ',options.widget_name);
         }
-        console.log('\n\n=================================================================\n*** Class Panel: constructor: dialogId=',dialogId,'; options=',options);
 
         this._dialogId = dialogId;
         this._shiftKey = shiftKey;
@@ -16,7 +16,6 @@ class Panel {
         this._index = AKT.state.panels_counter;
         //var side = (this._index-1) % 2;    // 0 or 1
         var subname = options.widget_name;
-        console.log(9200,options);
         if (subname === 'hierarchies') {
             subname = options.tree_type+'_hierarchies';
         } else if (subname === 'hierarchy_details') {
@@ -64,7 +63,7 @@ class Panel {
         }
         var offset = column_counter*10;  // both horizontal and vertical
         var left = side*600 + offset;
-        var top = 40+offset*2;
+        var top = 70+offset*2;
 
         //var settings = AKT.widgets[options.widget_name].settings;
 
@@ -86,16 +85,14 @@ class Panel {
 
         if (subname ==='diagram_details') {
             left = 50;
-            top = 50;
+            top = 70;
         }
         if (subname ==='node_details') {
             left = 300;
-            top = 60;
+            top = 80;
         }
 
-        console.log(5601,AKT.state.zindex);
         var zindex = AKT.incrementZindex('Panel.js: constructor.'+panelId,1);
-        console.log(5602,zindex,AKT.state.zindex);
 
         var panelDiv = $('<div id="'+panelId+'" class="panel dialog" style="z-index:'+zindex+'; position:absolute; display:block; left:'+left+'px; top:'+top+'px;"></div>');
         $('#workspace').append(panelDiv);
@@ -228,9 +225,7 @@ class Panel {
             // generic event-recording block, each guarded by an appropriate condition for AKT.state.action_mode.
             if (AKT.state.action_mode === 'recording') return;
 
-            console.log('\n\n### CLICKED ON PANEL CLOSE BUTTON!!');
-            console.log('#'+panelId);
-            console.log(dialogId);
+            console.log('^ACTION:Clicked on Panel Close button.','^panelId:#'+panelId+'; dialogId:'+dialogId);
             $('#panel_list').find('.'+panelId).remove();
             $('#'+panelId).remove();
             $('#'+panelId)[dialogId]('destroy');
@@ -275,8 +270,9 @@ width=pixels	The width of the window. Min. value is 100
             var helpname = helpName(subname);
             var elementId = '#ref_'+helpname;
             var URL = 'help.html#ref_'+subname;
-            var URL = 'https://www.bbc.co.uk';
+            //var URL = 'https://www.bbc.co.uk';
             //var URL = 'help.html ref_'+'formal_term_details';
+            //var URL = 'reference_manual.html#ref_'+'formal_term_details';
             //$(this).append('<a href="'+URL+'" class="popup">+</a>');
             var name = '_blank';
             var specs = 'location=yes,height=570,width=520,scrollbars=yes,status=yes';

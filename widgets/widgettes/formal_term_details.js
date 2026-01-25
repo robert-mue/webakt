@@ -9,7 +9,7 @@ AKT.widgets.formal_term_details = {};
 
 AKT.widgets.formal_term_details.setup = function (widget) {
 
-    console.log(7201,widget.options);
+    console.log('^widgets.formal_term_details^setup()^options='+AKT.simpleStringify(widget.options));
     AKT.state.current_widget = widget;
     var self = this;
 
@@ -21,14 +21,11 @@ AKT.widgets.formal_term_details.setup = function (widget) {
     var kb = AKT.KBs[kbId];
 
     if (widget.options.mode === 'new') {
-        var tempFormalTerm = new FormalTerm({kb:kb});
+        var formalTerm = new FormalTerm({kb:kb});
     } else if (widget.options.mode === 'view' || widget.options.mode === 'edit') {
         var formalTerm = widget.options.item;
         var formalTermSpec = formalTerm.makeSpec();
-        tempFormalTerm = new FormalTerm(formalTermSpec);
     }
-
-    widget.temp_formal_term = tempFormalTerm;  // So it's available. 
 
     //var widgetSettings = $('<div></div>');
     //$(widget.element).find('.content').prepend(widgetSettings);
@@ -45,39 +42,11 @@ AKT.widgets.formal_term_details.setup = function (widget) {
         $(widget.element).find('button').filter('.modal').attr('disabled',false);
         $(widget.element).find('div').filter('.editable').attr('contenteditable',true);
 
-        var selectElement = AKT.makeReprocessSelector(
-            widget.element, 
-            widget.widgetName,
-            '',                    // Label: here, provided for container element with class .div_type
-            ['Select term type...','action','attribute','comparison','link','object','process','value'], 
-            '---',                 // Default value.
-            'term_type',           // Name of the widget option that is assigned the listbox (<select>) option.
-            'formal_term_type',    // Class name for the listbox (<select>) element.
-            'div_type');           // Class name for this widget's container element for the <select> element.
-            // Note that the last argument will either hold the non-editable formal term type (for modes view
-            // and edit), or the <select> element (for mode new).
-
-        $(widget.element).find('.div_type').append(selectElement);
-        $(widget.element).find('.button_in_hierarchy').css({display:'none'});
-        $(selectElement).css({'margin-left':'0px',padding:'3px;'});
-        //$(widget.element).find('.div_name').prop('disabled',false);
-
-        var selectElement = AKT.makeReprocessSelector(
-            widget.element, 
-            widget.widgetName,
-            '',                    // Label: here, provided for container element with class .div_type
-            ['Select language...','english','french','latin','local','blank'], 
-            '---',                 // Default value.
-            'language',           // Name of the widget option that is assigned the listbox (<select>) option.
-            'formal_term_language',    // Class name for the listbox (<select>) element.
-            'div_language');           // Class name for this widget's container element for the <select> element.
-            // Note that the last argument will either hold the non-editable formal term type (for modes view
-            // and edit), or the <select> element (for mode new).
-
-        $(widget.element).find('.div_language').append(selectElement);
-        $(selectElement).css({'margin-left':'0px',padding:'3px;'});
-        //$(widget.element).find('.div_name').prop('disabled',false);
-		
+        $(widget.element).find('[local_id="button_update"]').on('change', function(event) {
+            console.log('\n***on_change\nwidgetName: ',widgetName, '\noptionId: ',optionId, '\n$(this).val(): ',$(this).val());
+            $(widgetElement).blur();
+        });
+	
 	} else if (mode === 'view') {
 		$(widget.element).find('.button_update').css({display:'none'});
         $(widget.element).find('button').filter('.modal').attr('disabled',true);
@@ -85,18 +54,19 @@ AKT.widgets.formal_term_details.setup = function (widget) {
 		$(widget.element).find('.button_remove_image').css({display:'none'});
         $(widget.element).find('div').filter('.editable').attr('contenteditable',false);
         $(widget.element).find('.input_id').val(widget.options.item_id);
-        $(widget.element).find('.div_type').append('<div class="modes_view_and_edit" disabled style="padding-left:3px;font-weight:bold; background:white;">'+tempFormalTerm._type+'</div>');
-        $(widget.element).find('.div_language').append('<div class="modes_view_and_edit" disabled style="padding-left:3px;font-weight:bold; background:white;">'+tempFormalTerm._language+'</div>');
+        $(widget.element).find('.div_type').append('<div class="modes_view_and_edit" disabled style="padding-left:3px;font-weight:bold; background:white;">'+formalTerm._type+'</div>');
+        $(widget.element).find('.div_language').append('<div class="modes_view_and_edit" disabled style="padding-left:3px;font-weight:bold; background:white;">'+formalTerm._language+'</div>');
         //$(widget.element).find('.div_name').prop('disabled',true);
         if (widget.options.item._type !== 'object') {
             $(widget.element).find('.button_in_hierarchy').css({display:'none'});
 		}
+
 	} else if (mode === 'edit') {
         $(widget.element).find('button').filter('.modal').attr('disabled',false);
         $(widget.element).find('div').filter('.editable').attr('contenteditable',true);
         $(widget.element).find('.input_id').val(widget.options.item_id);
-        $(widget.element).find('.div_type').append('<div class="modes_view_and_edit" disabled style="padding-left:3px;font-weight:bold; background:white;">'+tempFormalTerm._type+'</div>');
-        $(widget.element).find('.div_language').append('<div class="modes_view_and_edit" disabled style="padding-left:3px;font-weight:bold; background:white;">'+tempFormalTerm._language+'</div>');
+        $(widget.element).find('.div_type').append('<div class="modes_view_and_edit" disabled style="padding-left:3px;font-weight:bold; background:white;">'+formalTerm._type+'</div>');
+        $(widget.element).find('.div_language').append('<div class="modes_view_and_edit" disabled style="padding-left:3px;font-weight:bold; background:white;">'+formalTerm._language+'</div>');
         //$(widget.element).find('.div_name').prop('disabled',true);
         if (widget.options.item._type !== 'object') {
             $(widget.element).find('.button_in_hierarchy').css({display:'none'});
@@ -110,6 +80,16 @@ AKT.widgets.formal_term_details.setup = function (widget) {
 
     // ----------------------------------------------------------------------
     // User interaction event handlers
+
+    $(widget.element).find('[local_id="select_type"]').on('change', function(event) {
+        console.log(4503,event);
+        console.log(4504,$(this).val());
+        //$(this).prop('selected',false);
+    });
+
+
+
+
 
     $(widget.element).find('[local_id="button_statements"]').on('click', function(event) {
         if (AKT.state.action_mode !== 'recording') {
@@ -134,7 +114,7 @@ AKT.widgets.formal_term_details.setup = function (widget) {
             position:{left:'20px',top:'20px'},
             size:{width:'550px',height:'540px'},
             shift_key: eventShiftKey,
-            options:{kbId:AKT.state.current_kb,item_type:'statement',filters:{formal_term:{[tempFormalTerm._id]:true}}}
+            options:{kbId:AKT.state.current_kb,item_type:'statement',filters:{formal_term:{[formalTerm._id]:true}}}
         });
 /*
         var action = new Action({
@@ -242,7 +222,7 @@ AKT.widgets.formal_term_details.setup = function (widget) {
                 position:{left:'20px',top:'20px'},
                 size:{width:'450px',height:'540px'},
                 shift_key: event.shiftKey,
-                options:{kbId:kbId, mode:'view', tree_type:'object', item_type:'object_hierarchy', item:hierarchy, item_id:hierarchyId, extra:tempFormalTerm._id}
+                options:{kbId:kbId, mode:'view', tree_type:'object', item_type:'object_hierarchy', item:hierarchy, item_id:hierarchyId, extra:formalTerm._id}
             });
         }
 
@@ -253,7 +233,7 @@ AKT.widgets.formal_term_details.setup = function (widget) {
             element:widget.element,
             finds:['.button_in_hierarchy'],
             event:'click',
-            value: tempFormalTerm._id,
+            value: formalTerm._id,
             message:'Clicked on the In Hierarchy button in the formal_term_details panel.'
         });
 
@@ -290,11 +270,15 @@ AKT.widgets.formal_term_details.setup = function (widget) {
 	});
 
 
+    // Jan 2026: Changed back to *NOT* use temp_formal_term pattern.
+    // See next update event handler below.
     // Adapted from source_details
-    $(widget.element).find('[local_id="button_update"]').on('click', function(event) {
+/*
+    $(widget.element).find('[local_id="button_updateXXXXXXX"]').on('click', function(event) {
         if (AKT.state.action_mode !== 'recording') {
             event.stopPropagation();
         }
+        console.log(9999,$(widget.element).find('[local_id="select_type"]').find('option:selected').val());
         console.log('update',widget.options);
         //var kbId = widget.options.kbId;
         var kbId = AKT.state.current_kb;
@@ -308,7 +292,12 @@ AKT.widgets.formal_term_details.setup = function (widget) {
                 $(widget.element).find('.dialog_close_button').click();
                 return;
             }
-            var type = widget.options.term_type;
+            if (widget.options.term_type) {
+                var type = widget.options.term_type;
+            } else {
+                type = $(widget.element).find('[local_id="select_type"]').find('option:selected').val();
+                widget.options.term_type = type;
+            }
             console.log('id:',id,':   type:',type);
             if (!type || type === 'Select the term type...') {
                 alert('Please select the type of formal term from the drop-down box.');
@@ -357,7 +346,8 @@ AKT.widgets.formal_term_details.setup = function (widget) {
             var id = formalTerm._id;
             var type = formalTerm._type;
             var definition = $(widget.element).find('.textarea_definition').val();
-            var synonyms = $(widget.element).find('.textarea_synonyms').val().split(',');
+            //var synonyms = $(widget.element).find('.textarea_synonyms').val().split(',');
+            var synonyms = [];
             var memo = $(widget.element).find('.textarea_memo').val();
  
             var images = {};
@@ -383,13 +373,66 @@ AKT.widgets.formal_term_details.setup = function (widget) {
         $('#message').text('The Formal Terms list has been updated');
 
         if (widget.options.mode==='new') {
-            AKT.trigger('new_item_created_event',{kb:kb,item_type:'formal_term',item:formalTerm});
+            AKT.trigger('new_item_created_event',{kb:kb,item_type:'formal_term',item:tempFormalTerm});
         } else if (widget.options.mode==='edit') {
-            AKT.trigger('item_changed_event',{kb:kb,item_type:'formal_term',item:formalTerm});
+            AKT.trigger('item_changed_event',{kb:kb,item_type:'formal_term',item:tempFormalTerm});
         }
 
         //AKT.trigger('new_formal_term_created_event',{kb:kb,formal_term:formalTerm});
         $('#message').text('The Formal Terms list has been updated');
+	    AKT.saveKbInLocalStorage(kbId);
+    });
+*/
+
+    $(widget.element).find('[local_id="button_update"]').on('click', function(event) {
+        if (AKT.state.action_mode !== 'recording') {
+            event.stopPropagation();
+        }
+        console.log(9999,$(widget.element).find('[local_id="select_type"]').find('option:selected').val());
+        console.log('update',widget.options);
+        //var kbId = widget.options.kbId;
+        var kbId = AKT.state.current_kb;
+        var kb = AKT.KBs[kbId];
+        console.log(kbId,kb);
+
+        if (widget.options.mode ==='new') {
+            var id = $(widget.element).find('[local_id="input_id"]').val();
+            if (kb._formalTerms[id]) {
+                alert('The formal term "' + id + '" already exists.   Please click the "Edit" button in the formal_terms panel instead.');
+                $(widget.element).find('.dialog_close_button').click();
+                return;
+            } else if (id==='') {
+                alert('You must provide a name for the new formal term.');
+                return;
+            }
+
+            var type = $(widget.element).find('[local_id="select_type"]').val();
+            var formalTerm = new FormalTerm({id:id,type:type});
+            kb._formalTerms[id] = formalTerm;
+            widget.options.item = formalTerm;
+            console.log(id,type,formalTerm,kb._formalTerms);
+
+        } else if (widget.options.mode === 'edit') {
+            var formalTerm = widget.options.item;
+        }
+
+        formalTerm._definition = $(widget.element).find('[local_id="textarea_definition"]').val();
+        formalTerm._memo = $(widget.element).find('[local_id="textarea_memo"]').val();
+        //var synonyms = $(widget.element).find('.textarea_synonyms').val().split(',');
+        formalTerm._synonyms = [];   // !!! Fix!
+
+        var ftImageIds = [];   // These are the image IDs for this formal term.
+        $(widget.element).find('.div_image').each(function(event){  
+            var ftImageId = $(this).find('input').val();
+            ftImageIds.push(ftImageId);
+        });
+        formalTerm._imageIds = ftImageIds;
+
+        if (widget.options.mode === 'new') {
+            $('#message').text('A new formal term, '+id+', has been created.');
+        } else if (widget.options.mode === 'edit') {
+            $('#message').text('The formal term '+id+' has been updated.');
+        }
 	    AKT.saveKbInLocalStorage(kbId);
     });
 
@@ -417,7 +460,7 @@ AKT.widgets.formal_term_details.setup = function (widget) {
     // Image-related buttons
 
 
-    $(widget.element).find('[local_id="button_add_image"]').on('click', function (event) {   // add_source button
+    $(widget.element).find('[local_id="button_add_image"]').on('click', function (event) {   // add_image button
         console.log('BUTTON: Clicked on Add image button');
         if (AKT.state.action_mode !== 'recording') {
             event.stopPropagation();
@@ -493,20 +536,14 @@ AKT.widgets.formal_term_details.setup = function (widget) {
             var kb = AKT.KBs[kbId];
             var imageId = args.item_id;
             var image = kb._images[imageId];
-            console.log(7004,image);
-            var formalTerm = widget.options.item;
-            if (formalTerm && formalTerm._images) {
-                formalTerm._images[imageId] = image;
-            } else {
-                tempFormalTerm._images = {imageId:image};
-            }
+            console.log('BBB1 ',image);
 
             $(widget.element).find('.slides-container').append(`
                 <li class="slide">
-                    <div style="width:100%;height:100%;">
+                    <div class="div_image" local_id="div_`+imageId+`" style="width:100%;height:100%;">
                         <img src="`+image._url+`" style="width:100%;height:90%;"></img>
-                        <div>`+image._caption+`</div>
-                        <div class="div_image_id">`+imageId+`</div>
+                        <textarea readonly style="width:100%;height:30px;">`+image._caption+`</textarea>
+                        <input readonly style="width:100%;height:20px;" value="`+ftImageId+`">
                     </div>
                 </li>
             `);
@@ -521,35 +558,45 @@ AKT.widgets.formal_term_details.setup = function (widget) {
 
 
 AKT.widgets.formal_term_details.display = function (widget) {
-    console.log('formal_term_details options:/n',widget.options);
+    console.log('^widgets.formal_term_details^setup()^options='+AKT.simpleStringify(widget.options));
+    console.log(widget.options.item);
     var kbId = widget.options.kbId;
     var kb = AKT.KBs[kbId];
 
-    var tempFormalTerm = widget.temp_formal_term;  // For convenience.
 
-    $(widget.element).find('.input_term').val(tempFormalTerm._id);
-    $(widget.element).find('.div_type').text(tempFormalTerm._type);
-    $(widget.element).find('.input_language').val(tempFormalTerm._language);
-    $(widget.element).find('.textarea_definition').val(tempFormalTerm._definition);
-    $(widget.element).find('.textarea_memo').val(tempFormalTerm._memo);
+    // Jan 2026 - Reverted to *NOT* using the temp_formal_term pattern.
+    if (widget.options.mode !== 'new') {
+    var formalTerm = widget.options.item;
+        $(widget.element).find('[local_id="input_term"]').val(formalTerm._id);
+        $(widget.element).find('[local_id="select_type"]').val(formalTerm._type);
+        $(widget.element).find('[local_id="input_language"]').val(formalTerm._language);
+        $(widget.element).find('[local_id="textarea_definition"]').val(formalTerm._definition);
+        $(widget.element).find('[local_id="textarea_memo"]').val(formalTerm._memo);
 
-    //AKT.loadOptions(widget.element, 'select_synonyms', formalTerm.synonyms, true);
-    AKT.loadTable(widget.element, 'table_synonyms', tempFormalTerm._synonyms, true);   // Loads rows into a one-column table,
-            // one <tr><td>...</td></tr> for each instance of the 3rd argument.
+        var images = kb._images;   // The KB's image collection
+        console.log('AAA1 ',images);
+        if (formalTerm._imageIds) {
+            var ftImageIds = formalTerm._imageIds;  // The IDs for the images for this formal term.
+        } else {
+            ftImageIds = [];
+        }
+        console.log('AAA2 ',ftImageIds);
+        for (var i=0; i<ftImageIds.length; i++) {
+            var ftImageId = ftImageIds[i];
+            var image = images[ftImageId];
+            console.log('AAA3 ',i,ftImageId,image);
+            $(widget.element).find('.slides-container').append(`
+                <li class="slide">
+                    <div class="div_image" local_id="div_`+ftImageId+`" style="width:100%;height:100%;">
+                        <img src="`+image._url+`" style="width:100%;height:90%;"></img>
+                        <textarea readonly style="width:100%;height:30px;">`+image._caption+`</textarea>
+                        <input readonly style="width:100%;height:20px;" value="`+ftImageId+`">
+                    </div>
+                </li>
+            `);
 
-    var images = tempFormalTerm._images;
-    for (var imageId in images) {
-        var image = images[imageId];
-        $(widget.element).find('.slides-container').append(`
-            <li class="slide">
-                <div style="width:100%;height:100%;">
-                    <img src="`+image._url+`" style="width:100%;height:90%;"></img>
-                    <div>`+image._caption+`</div>
-                    <div class="div_image_id">`+imageId+`</div>
-                </div>
-            </li>
-        `);
-        AKT.slidersCss(widget);
+            AKT.slidersCss(widget);
+        }
     }
     
     // See bottom of file for test code for local images.
@@ -558,18 +605,35 @@ AKT.widgets.formal_term_details.display = function (widget) {
 
 AKT.widgets.formal_term_details.html = `
 <div class="content" style="background:inherit;border:none; padding:10px;">
-    <div>
-        <div style="float:left;height:20px;padding-right:5px;">ID:</div>
+    <div class="id" style="float:left;">
+        <legend style="float:left;height:20px;padding-right:5px;">ID</legend><br/>
         <input type="text" class="input_id" local_id="input_id" style="font-weight:bold; float:left; background:white; width:170px; height:20px; resize:horizontal; padding-left:3px;"></input>
-        
-        <div style="float:left;">
-            <div style="float:left;height:20px;width:65px;margin-left:15px;padding-right:5px;">Type:</div>
-            <div class="div_type" local_id="div_type" style="float:left; width:100px; height:20px;"></div>
-        <div style="clear:both;"></div>
-            <div style="float:left;height:20px;width:65px;margin-left:15px;padding-right:5px;">Language:</div>
-            <div class="div_language" local_id="div_language" style="float:left; width:100px; height:20px;"></div>
-        <div style="clear:both;"></div>
     </div>
+        
+    <div style="float:left;margin-left:18px;">
+        <legend>Type</legend>
+        <select class="select_type" local_id="select_type" style="margin-top:4px;">
+            <option value="object">Object</option>
+            <option value="action">Action</option>
+            <option value="attribute">Attribute</option>
+            <option value="comparison">Comparison</option>
+            <option value="link">Link</option>
+            <option value="process">Process</option>
+            <option value="value">Value</option>
+        </select>
+    </div>
+    <div style="float:left;margin-left:18px;">
+        <legend>Language</legend>
+        <select class="select_language" local_id="select_language" style="margin-top:4px;">
+            <option value="english" selected>English</option>
+            <option value="french">French</option>
+            <option value="latin">Latin</option>
+            <option value="local1">Local1</option>
+            <option value="local2">Local2</option>
+       </select>
+    </div>
+
+    <div style="clear:both;"></div>
 
     <div style="margin-top:15px; display:none;">
 
@@ -592,7 +656,7 @@ AKT.widgets.formal_term_details.html = `
             <!-- DEFINITION -->
             <div style="margin-top:10px;">
                 <div style="width:70px;height:20px;">Definition: </div>
-                <textarea class="textarea_definition" local_id="testarea_definition" style="border:solid 1px black; background:white; width:180px;height:65px;"></textarea>
+                <textarea class="textarea_definition" local_id="textarea_definition" style="border:solid 1px black; background:white; width:180px;height:65px;"></textarea>
             </div>
 
 
@@ -634,7 +698,7 @@ AKT.widgets.formal_term_details.html = `
         <!-- Thanks to https://webdesign.tutsplus.com/how-to-build-a-simple-carousel-with-vanilla-javascript--cms-41734t -->
         <!-- Orginal HTML first, then my adapted version.   Eventually all code will be packaged in a single function -->
         <!-- Aug 2025 *** IMPORTANT NOTE *** Currently not integrated into the event-action-log system. -->
-        <div class="div_image" style="float:left;width:252px;height:252px;margin:7px;margin-top:30px;background:white;border:solid 1px black;">
+        <div class="div_images" style="float:left;width:252px;height:252px;margin:7px;margin-top:30px;background:white;border:solid 1px black;">
             <section class="slider-wrapper">
                 <button class="slide-arrow" local_id="slide_arrow_prev" id="slide-arrow-prev">&#8249;</button>
                 <button class="slide-arrow" local_id="slide_arrow_next" id="slide-arrow-next">&#8250;</button>
@@ -654,8 +718,8 @@ AKT.widgets.formal_term_details.html = `
         <button class="button_in_hierarchy" local_id="button_in_hierarchy" style="float:left;width:80px;height:25px;margin-left:10px;" title="If this term is an object, shows where it occurs in its object hierarchy." >In Hierarchy</button>
 
         <div class="div_images_buttons" style="float:left;">
-            <button class="button_images" local_id="button_images" style="float:left;width:50px;height:25px;margin-left:10px;" title="Open the Images panel to display all images" >Images</button>
-            <button class="button_add_image" local_id="button_add_image" style="float:left;width:40px;height:25px;margin-left:0px;" title="To add an image, click on the Images button if not already done, then click on an image in the images panel.">Add</button>
+            <button class="button_images" local_id="button_images" style="float:left;width:50px;height:25px;margin-left:10px;" title="Open the Images panel to display all images">Images</button>
+            <button class="button_add_image" local_id="button_add_image" style="float:left;width:40px;height:25px;margin-left:0px;">Add</button>
             <button class="button_remove_image" local_id="button_remove_image" style="float:left;width:50px;height:25px;margin-left:0px;" title="Remove image">Remove</button>
             <div style="clear:both;"></div>
         </div>

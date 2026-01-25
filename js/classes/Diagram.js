@@ -2,7 +2,7 @@
 class Diagram {
     
     constructor(id,spec) {
-        console.log(9120,spec);
+        console.log('^Class Diagram^constructor^id:'+id+'; spec:'+AKT.simpleStringify(spec));
         self = this;
         //thisDiagram = this;
         if (id) {

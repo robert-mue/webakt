@@ -69,13 +69,13 @@ AKT.processOneLevel = function (menus, element, level) {
         var menu = menus[i];
         if (menu !== '-----') {
             if (level === 1) {
-                //var li = $('<li id="menu_'+menu.id+'" class="menus-dropdown"><a href="#">'+menu.caption+'</a></li>');
+                //var li = $('<li id="menu_'+menu.id+'" class="menus-dropdown mainmenu"><a href="#">'+menu.caption+'</a></li>');
                 if (menu.status === 'inactive') {
-                    var li = $('<li id="menu_'+menu.id+'" class="menus-dropdown inactive"><a href="#">'+menu.caption+'</a></li>');
+                    var li = $('<li id="menu_'+menu.id+'" class="menus-dropdown mainmenu inactive"><a href="#">'+menu.caption+'</a></li>');
                 } else if (menu.status === 'live') {
-                    var li = $('<li id="menu_'+menu.id+'" class="menus-dropdown live" style="margin-left:5px; background:#d4d0c8;"><a href="#">'+menu.caption+'</a></li>');
+                    var li = $('<li id="menu_'+menu.id+'" class="menus-dropdown mainmenu live" style="margin-left:5px; background:#d4d0c8;"><a href="#">'+menu.caption+'</a></li>');
                 } else {
-                    var li = $('<li id="menu_'+menu.id+'" class="menus-dropdown active"><a href="#">'+menu.caption+'</a></li>');
+                    var li = $('<li id="menu_'+menu.id+'" class="menus-dropdown mainmenu active"><a href="#">'+menu.caption+'</a></li>');
                 }
             } else {
                 if (menu.submenu) {
@@ -166,7 +166,7 @@ AKT.processOneLevel = function (menus, element, level) {
 
 AKT.menusClickHandler = function (div) {
     $(div).find('li.menus-dropdown > a').on('click',function(event){
-        console.log('\n\n$$$ ACTION ',AKT.state.current_action_log._actions.length,': div:click:li.menus-dropdown > a (** NOTE: In menumanager.js)');
+        console.log('^menusClickHandler^click^current_action_log.length:',AKT.state.current_action_log._actions.length,': div:click:li.menus-dropdown > a');
 
         if (AKT.state.pending_event) {
             AKT.processPendingEvent(event,AKT.state.pending_event);
@@ -211,7 +211,6 @@ AKT.menusClickHandler = function (div) {
             AKT.state.current_action_log = new ActionLog({meta:{},actions:[]});
         }
         AKT.state.current_action_log.add(actionSpec);
-        console.log('$9',AKT.state.current_action_log);
 
 
         if ($('#'+menuItemId).attr('class').split(/\s+/).includes('leaf')) {
