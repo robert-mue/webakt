@@ -433,6 +433,12 @@ AKT.widgets.formal_term_details.setup = function (widget) {
         } else if (widget.options.mode === 'edit') {
             $('#message').text('The formal term '+id+' has been updated.');
         }
+
+        if (widget.options.mode==='new') {
+            AKT.trigger('new_item_created_event',{kb:kb,item_type:'formal_term',item:formalTerm});
+        } else if (widget.options.mode==='edit') {
+            AKT.trigger('item_changed_event',{kb:kb,item_type:'formal_term',item:formalTerm});
+        }
 	    AKT.saveKbInLocalStorage(kbId);
     });
 
@@ -543,7 +549,7 @@ AKT.widgets.formal_term_details.setup = function (widget) {
                     <div class="div_image" local_id="div_`+imageId+`" style="width:100%;height:100%;">
                         <img src="`+image._url+`" style="width:100%;height:90%;"></img>
                         <textarea readonly style="width:100%;height:30px;">`+image._caption+`</textarea>
-                        <input readonly style="width:100%;height:20px;" value="`+ftImageId+`">
+                        <input readonly style="width:100%;height:20px;" value="`+imageId+`">
                     </div>
                 </li>
             `);
