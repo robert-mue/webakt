@@ -164,7 +164,7 @@ AKT.processOneLevel = function (menus, element, level) {
 
       
 
-AKT.menusClickHandler = function (div) {
+AKT.menusClickHandlerxxx = function (div) {
     $(div).find('li.menus-dropdown > a').on('click',function(event){
         console.log('^menusClickHandler^click^current_action_log.length:',AKT.state.current_action_log._actions.length,': div:click:li.menus-dropdown > a');
 

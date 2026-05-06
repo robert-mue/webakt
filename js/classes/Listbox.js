@@ -469,15 +469,26 @@ class Listbox {
     addColumn () {
     }
 
+    findAllIds () {
+        var inputs = $(this.divElement).find('input');
+        var itemIds = [];
+        for (var i=0; i<inputs.length; i++) {
+            var input = inputs[i];
+            var itemId = $(input).parent().parent().attr('data-key');
+            itemIds.push(itemId);
+        }
+        return itemIds;
+    }
+
     findCheckedIds () {
-        var itemKeys = [];
+        var itemIds = [];
         var checkedInputs = $(this.divElement).find('input:checked');
         for (var i=0; i<checkedInputs.length; i++) {
             var checkedInput = checkedInputs[i];
-            var itemKey = $(checkedInput).parent().parent().attr('data-key');
-            itemKeys.push(itemKey);
+            var itemId = $(checkedInput).parent().parent().attr('data-key');
+            itemIds.push(itemId);
         }
-        return itemKeys;
+        return itemIds;
     }
 
     deleteCheckedIds () {

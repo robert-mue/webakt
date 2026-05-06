@@ -22,26 +22,26 @@ AKT.widgets.images.setup = function (widget) {
 
 
     // BUTTON EVENT HANDLERS
-    $(widgetContent).find('.button_new').on('click', function (event) {
+    $(widget.element).find('[local_id="button_new"]').on('click', function (event) {
         var kbId = widget.options.kbId;
         var kb = AKT.KBs[kbId];
         console.log('BUTTON: Clicked on image New button');
-        event.stopPropagation();
+        //event.stopPropagation();
 
         var panel = new Panel('dialog_Generic', 
             event.shiftKey, 
-            {left:'400px',top:'20px',width:'470px',height:'440px'}, 
+            {left:'400px',top:'20px',width:'600px',height:'440px'}, 
             {widget_name:'image_details', kbId:kbId, mode:'new'});   
        
     });
 
 
-    $(widgetContent).find('.button_view').on('click', function (event) {
+    $(widget.element).find('[local_id="button_view"]').on('click', function (event) {
         console.debug(widget.options);
         var kbId = widget.options.kbId;
         var kb = AKT.KBs[kbId];
         console.debug('BUTTON: Clicked on image Details button');
-        event.stopPropagation();
+        //event.stopPropagation();
 
         //var id = $(widgetContent).find('.select_images').val();
         var id = widget.options.current_id;
@@ -57,17 +57,17 @@ AKT.widgets.images.setup = function (widget) {
 
         var panel = new Panel('dialog_Generic', 
             event.shiftKey, 
-            {left:'400px',top:'20px',width:'500px',height:'440px'}, 
+            {left:'400px',top:'20px',width:'600px',height:'440px'}, 
             {widget_name:'image_details', kbId:kbId, mode:'view', image_id:id, image:image});
            });
 
 
-    $(widgetContent).find('.button_edit').on('click', function (event) {
+    $(widget.element).find('[local_id="button_edit"]').on('click', function (event) {
         console.debug(widget.options);
         var kbId = widget.options.kbId;
         var kb = AKT.KBs[kbId];
         console.debug('BUTTON: Clicked on image Details button');
-        event.stopPropagation();
+        //event.stopPropagation();
 
         //var id = $(widgetContent).find('.select_images').val();
         var id = widget.options.current_id;
@@ -77,7 +77,7 @@ AKT.widgets.images.setup = function (widget) {
 
         var panel = new Panel('dialog_Generic', 
             event.shiftKey, 
-            {left:'400px',top:'20px',width:'500px',height:'440px'}, 
+            {left:'400px',top:'20px',width:'600px',height:'440px'}, 
             {widget_name:'image_details', kbId:kbId, mode:'edit', image:image});
        
         //$('#dialog_SourceDetails').dialog_SourceDetails();
@@ -157,10 +157,10 @@ AKT.widgets.images.html = `
 <div class="content" style="padding:6px;border:none;">
 
     <div style="margin-top:7px;margin-left:0x;">
-        <button class="button_new" style="float:left;margin-left:10px;width:60px;height:30px;">New</button>
-        <button class="button_view" style="float:left;width:60px;height:30px;">View</button>
-        <button class="button_edit" style="float:left;width:60px;height:30px;">Edit</button>
-        <button class="button_delete" disabled style="float:right;width:60px;height:30px;">Delete</button>
+        <button class="button_new" local_id="button_new" style="float:left;margin-left:10px;width:60px;height:30px;">New</button>
+        <button class="button_view" local_id="button_view" style="float:left;width:60px;height:30px;">View</button>
+        <button class="button_edit" local_id="button_edit" style="float:left;width:60px;height:30px;">Edit</button>
+        <!--button class="button_delete" local_id="button_delete" disabled style="float:right;width:60px;height:30px;">Delete</button-->
         <div style="clear:both;"></div>
     </div>
 

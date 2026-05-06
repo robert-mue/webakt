@@ -363,6 +363,20 @@ class Kb {
     }
 
 
+    getStatementsFromIds (statementIds) {
+        var kbId = AKT.state.current_kb;
+        var kb = AKT.KBs[kbId];
+        console.log('Kb.js:statementIds:',kb,statementIds);
+        var statements = {};
+        for (var statementId in statementIds) {
+            var statement = kb._statements[statementId];
+            statements[statementId] = statement;
+        }
+        console.log('Kb.js:statements:',statements);
+        return statements;
+    }
+
+
     getObjectHierarchies () {
         return this._objectHierarchies;
     }
@@ -904,9 +918,10 @@ class Kb {
                 for (var arcId in arcs1) {
                     arcs2[arcId] = {
                         id:arcId,
-                        akt_type:arcs1[arcId].akt_type,
+                        akt_type:     arcs1[arcId].akt_type,
                         start_node_id:arcs1[arcId].start_node_id,
-                        end_node_id:arcs1[arcId].end_node_id
+                        end_node_id:  arcs1[arcId].end_node_id,
+                        statement_ids:arcs1[arcId].statement_ids
                     }
                 }
                 var diagramSpec = {

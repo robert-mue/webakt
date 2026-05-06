@@ -196,14 +196,48 @@ class Diagram {
         console.log(1601,links);
         for (var i=0; i<links.length; i++) {
             var link = links[i];
+            console.log(1602,link);
+            var statementIds = [];
+/*            if (link.arc && link.arc.statements) {
+                var statements = link.arc.statements;
+                console.log(1603,link.arc,statements);
+                for (var j=0;j<statements.length;j++) {
+                    var statement = statements[j];
+                    statementIds.push(statement._id);
+                    console.log('  ',1604,j,statements,statement,statement._id,statementIds);
+                }
+                var startNodeId = link.arc.start_node_id;
+                var endNodeId = link.arc.end_node_id;
+                var systoArc = {
+                    akt_type: link.arc.akt_type,
+                    start_node_id: startNodeId.replace(/\n/g,"_").replace(/__/g,"_"),
+                    end_node_id: endNodeId.replace(/\n/g,"_").replace(/__/g,"_"),
+                    statement_ids: statementIds
+                };
+                var temp = startNodeId + '_TO_' + endNodeId;
+                var systoArcId = temp.replace(/\n/g,"_").replace(/__/g,"_");
+                systoArc.id = systoArcId;
+                subgraph.arcs[systoArcId] = systoArc;
+            }
+*/
             if (link.arc) {
                 var startNodeId = link.arc.start_node_id;
                 var endNodeId = link.arc.end_node_id;
                 var systoArc = {
                     akt_type: link.arc.akt_type,
                     start_node_id: startNodeId.replace(/\n/g,"_").replace(/__/g,"_"),
-                    end_node_id: endNodeId.replace(/\n/g,"_").replace(/__/g,"_")
+                    end_node_id: endNodeId.replace(/\n/g,"_").replace(/__/g,"_"),
                 };
+                if (link.arc.statements) {
+                    var statements = link.arc.statements;
+                    console.log(1603,link.arc,statements);
+                    for (var j=0;j<statements.length;j++) {
+                        var statement = statements[j];
+                        statementIds.push(statement._id);
+                        console.log('  ',1604,j,statements,statement,statement._id,statementIds);
+                    }
+                    systoArc.statement_ids = statementIds;
+                }
                 var temp = startNodeId + '_TO_' + endNodeId;
                 var systoArcId = temp.replace(/\n/g,"_").replace(/__/g,"_");
                 systoArc.id = systoArcId;
@@ -212,7 +246,7 @@ class Diagram {
         };
 
         this._subgraph = subgraph;
-        console.log(4503,this._subgraph);
+        console.log(1605,this._subgraph);
         return subgraph;
 
         function getNodeIdFromJointNodeId(jnodes,jnodeId) {
@@ -311,7 +345,7 @@ class Diagram {
                     //var n = arc.statements.length;
                     var jlink = this.createJlink(arc);
                     if (jlink) {   // In case something has gone wrong...
-                        //console.log(81011,jlink);
+                        console.log(81011,jlink);
                         jlink.addTo(jgraph);
                     }
                 }
@@ -640,6 +674,7 @@ class Diagram {
                     console.log(5703);
                     var jlink = new joint.shapes.standard.Link({
                         akt_id: id,
+                        statement_ids: arc.statement_ids,
                         id: id,
                         source: source,
                         target: target,
@@ -702,6 +737,7 @@ class Diagram {
                         smooth: true,
                         z: -1,
                         type:'causes1way',
+                        statement_ids: arc.statement_ids,
                         attrs: {
                             line: {
                                 stroke: col,
@@ -952,7 +988,8 @@ springyGraphJSON = {
 
 
 
-    makeSubgraph (topic,show) {
+    //makeSubgraph (filters,show) {  2026 03 26
+    makeSubgraph(statements,show) {
         if (show) console.log('\n\ndiagram.makeSubgraph');
         // kb.getStatements(filtering by causal and searchExpression)
         
@@ -963,8 +1000,8 @@ springyGraphJSON = {
 
         //var statements = kb.findStatements({att_value:false,comparison:false,topic:true,topic_value:searchExpression});
 
-        var filters = {type:{causal:true},topic:{[topic._id]:true}};
-        var statements = kb.getStatements(filters);
+        //var filters = {type:{causal:true},topic:{[topic._id]:true}};
+        //var statements = kb.getStatements(filters);  2026 03 26
 
         
         console.log(9301,Object.keys(statements).length);
@@ -1112,12 +1149,12 @@ springyGraphJSON = {
                 id:           arc.id,
                 start_node_id:arc.start_node_id,
                 start_value:  arc.start_value,
-                statement_id: arc.statement_id
+                statement_id: arc.statement_ids
             }
             arcs1[arcId] = arc1;
         }
         var arcs2 = JSON.parse(JSON.stringify(arcs1));
-        
+        console.log(3301,arcs,arcs2);
         return {meta:meta1, nodes:nodes1, arcs:arcs2};
     }
 

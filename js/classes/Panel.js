@@ -326,6 +326,7 @@ width=pixels	The width of the window. Min. value is 100
             // The following div is for the widget-specific settings themselves, to be
             // inserted by each widget as appropriate..
             $(settingsDialog).append('<div class="div_settings")</div>');
+            $(settingsDialog).append('<div style="font-size:8px;">table td:contains("xxx")</button>');
             $(settingsDialog).append('<button class="button_cancel">Cancel</button>');
             $(settingsDialog).append('<button class="button_ok">OK</button>');
             $(settingsDialog).css({display:'block'});

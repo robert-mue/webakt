@@ -4,6 +4,7 @@ AKT.widgets.statement_details = {};
 // ======================================================================== SETUP
 AKT.widgets.statement_details.setup = function (widget) {
     console.log('^widgets.statement_details^setup()^options='+AKT.simpleStringify(widget.options));
+    console.log(widget.options);
     var self = this;
 
     //$(widget.element).on('clickxxxxx','buttonxxxx', function(event) {

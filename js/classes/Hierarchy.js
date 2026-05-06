@@ -72,6 +72,11 @@ class Hierarchy {
 
 
     addNode (parentId, nodeId) {
+        if (this.containsNode(nodeId) || nodeId === this._root) {
+            alert('The hierarchy '+this._id+' with root '+this._root+' already contains the item '+nodeId+'.\nA hierarchy can only contain an item once.');
+            return false;
+        }
+            
         if (!this._tree_down[parentId]) {
             this._tree_down[parentId] = [];
         }
@@ -276,6 +281,19 @@ class Hierarchy {
 	}
 
 
+    // This is called from this.addNode(), since we can't have the same item (node) more than
+    // once in the same hierarchy (and we can get a catastrophic infinite loop if we tried to,
+    // accidentally or on purpose).
+    containsNode (nodeId) {
+        for (var parentId in this._tree_down) {
+            var childIds = this._tree_down[parentId];
+            for (var i=0; i<childIds.length; i++) {
+                if (childIds[i] === nodeId) return true;
+            }
+        }
+        return false;
+    }
+
     // This is a generic template for any task that requires recursing down through the 
     // hierarchy tree.   
     // For any specific use, I suggest copying this code then adapting it as required.
@@ -322,12 +340,22 @@ class Hierarchy {
 
     makeTreetable (widget) {
         console.log('TREETABLE makeTreetable:::', widget.options);
+/*
         var hierarchyId = widget.options.item._id;
         var type = widget.options.item._type;
         var kb = widget.options.item._kb;
         var rootId = widget.options.item._root;
         var treeDown = widget.options.item._tree_down;
         var self = widget.options.item;
+*/        
+        console.log(this);
+        console.log(self);
+        var hierarchyId = this._id;
+        var type = this._type;
+        var kb = this._kb;
+        var rootId = this._root;
+        var treeDown = this._tree_down;
+        var self = this;
 
         var table = $('<table class="table_treetable '+this._id+'" data-hierarchy-id="' + hierarchyId + '"style="margin:2px;font-size:10px;"></table>');
         //var thead = $('<thead><tr><th>Object</th><th>Position</th></tr></thead>');
@@ -449,7 +477,9 @@ class Hierarchy {
 
 
         function buildTableRow (parentId,node_id,level,isEmptyBranch,hierType,propertyIds) {
-            console.log('TREETABLE - buildTableRow');
+            console.log('\nTREETABLE - buildTableRow');
+            console.log(self);
+            console.log(self._tree_down);
             console.log(parentId,node_id,level,isEmptyBranch,hierType);
 
             var kbId = AKT.state.current_kb;

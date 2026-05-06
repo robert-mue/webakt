@@ -246,7 +246,7 @@ AKT.widgets.hierarchy_details.setup = function (widget) {
             value: '',
             message:'Clicked on the accept (green tick) button in the hierarchy_details panel.'});
 
-        AKT.trigger('new_item_created_event',{item:hierarchy,item_type:'object_hierarchy'});
+        AKT.trigger('new_item_created_event',{item:hierarchy,item_type:hierarchy._type+'_hierarchy'});
         self.display(widget);
     });
 
@@ -357,6 +357,8 @@ AKT.widgets.hierarchy_details.setup = function (widget) {
             } else {
                 hierarchy = AKT.state.current_hierarchy;
             }
+            console.log('\n\n==========================\n',hierarchy);
+            console.log('\n',hierarchy.containsNode(args.item_id));
             var hierarchyType = hierarchy._type;   // 'object' or 'topic'
             var hierarchyId = hierarchy._id;
 
@@ -377,7 +379,8 @@ AKT.widgets.hierarchy_details.setup = function (widget) {
 			var parentId = widget.selected_node_id;
 			var newnode_id = args.item_id;  // The ID of the topic or formal term object that is being added.
 				// This is picked up from e.g. a click in a formal_terms myListbox.
-			hierarchy.addNode(parentId,newnode_id);  
+            // Note that hierarchy.addNode() fails if the new node (item) is already in the hierarchy.
+			if (hierarchy.addNode(parentId,newnode_id)) return;  
 			console.log(7777,hierarchy);
 
             $(widget.element).find('.div_treetable').empty();

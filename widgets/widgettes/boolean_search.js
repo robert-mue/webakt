@@ -36,7 +36,7 @@ AKT.widgets.boolean_search.setup = function (widget) {
     $(widgetSettings).append(selectElement);
 
 
-    $(widgetContent).find('.button_select').on('click', function () {
+    $(widgetContent).find('[local_id="button_select"]').on('click', function () {
 /*
         // Allow for multiple selection, interpreted as disjunction.
         var selecteds = $(widgetContent).find('.listbox_type_values').val();
@@ -55,32 +55,32 @@ AKT.widgets.boolean_search.setup = function (widget) {
         $(widgetContent).find('.textarea_search_expression').val(currentSearchExpression+selectedsString);
     });
 
-    $(widgetContent).find('.button_and').on('click', function () {
+    $(widgetContent).find('[local_id="button_and"]').on('click', function () {
         var currentSearchExpression = $(widgetContent).find('.textarea_search_expression').val();
         $(widgetContent).find('.textarea_search_expression').val(currentSearchExpression+' and ');
     });
 
-    $(widgetContent).find('.button_or').on('click', function () {
+    $(widgetContent).find('[local_id="button_or"]').on('click', function () {
         var currentSearchExpression = $(widgetContent).find('.textarea_search_expression').val();
         $(widgetContent).find('.textarea_search_expression').val(currentSearchExpression+' or ');
     });
 
-    $(widgetContent).find('.button_not').on('click', function () {
+    $(widgetContent).find('[local_id="button_not"]').on('click', function () {
         var currentSearchExpression = $(widgetContent).find('.textarea_search_expression').val();
         $(widgetContent).find('.textarea_search_expression').val(currentSearchExpression+' not ');
     });
 
-    $(widgetContent).find('.button_clear').on('click', function () {
+    $(widgetContent).find('[local_id="button_clear"]').on('click', function () {
         $(widgetContent).find('.textarea_search_expression').val('');
     });
 
 
-    $(widget.element).find('.button_create_topic').on('click', function (event) {    // The New button
+    $(widget.element).find('[local_id="button_create_topic"]').on('click', function (event) {    // The create_topic button
         console.debug('BUTTON: Clicked on boolean_search create_topic button');
         event.stopPropagation();
         var kbId = widget.options.kbId;
 
-        var searchExpression = $(widget.element).find('.textarea_search_expression').val();
+        var searchExpression = $(widget.element).find('[local_id="textarea_search_expression"]').val();
         var searchExpressionJs = AKT.convertSearchExpressionToJavascript(searchExpression);
         console.log(2010,searchExpressionJs);
         var panel = AKT.panelise({
@@ -100,7 +100,7 @@ AKT.widgets.boolean_search.setup = function (widget) {
     // we must delete this topic each time we do a search, to avoid reatin lots with the 
     // same name.  Messy, but it does mean that we use the standard filtering mechanism for
     //generating the list of statements.
-    $(widgetContent).find('.button_search').on('click', function () {
+    $(widgetContent).find('[local_id="button_search"]').on('click', function () {
         event.stopPropagation();
         var kbId = widget.options.kbId;
         var kb = AKT.KBs[kbId];
@@ -109,7 +109,7 @@ AKT.widgets.boolean_search.setup = function (widget) {
         if (kb._topics[id]) {
             delete kb._topics[id];
         }
-        var searchExpression = $(widget.element).find('.textarea_search_expression').val();
+        var searchExpression = $(widget.element).find('[local_id="textarea_search_expression"]').val();
         //var description = $(widget.element).find('.div_description').text();
         var objects = 'object';
         var topic = new Topic({id:id,description:'null',search_expression:searchExpression,objects:objects});
@@ -219,8 +219,8 @@ AKT.widgets.boolean_search.html = `
         <textarea class="textarea_search_expression" local_id="textarea_search_expression" style="margin-top:4px;width:100%;height:45px;" title="Try entering: &#10&nbsp;&nbsp;trees&#10or &#10&nbsp;&nbsp;trees and (water or moisture)"></textarea>
     </fieldset>
 
-    <button class="button_create_topic" style="float:right;width:80px;height:30px;margin:10px;">Create topic</button>
-    <button class="button_search" style="float:right;width:70px;height:30px;margin:10px;">Search</button>
+    <button class="button_create_topic" local_id="button_create_topic" style="float:right;width:80px;height:30px;margin:10px;">Create topic</button>
+    <button class="button_search" local_id="button_search" style="float:right;width:70px;height:30px;margin:10px;">Search</button>
 
 <div style="clear:both"></div>
 </div>

@@ -710,6 +710,25 @@ class Statement {
         if (!result) return false;
 
 
+        // filter: diagram
+        result = false;  
+        if (filters.hasOwnProperty('diagram')) {
+            var filter = filters.diagram;  // The "filter" is a digram
+                        // that the statement is included.
+                        // Currently (March 2026) filter is a single term, not an
+                        //  array of terms.  (Or not: hard to see a use-case for it)
+            for (var id in filter) {
+                if (this.inDiagram(id)) {
+                    //console.log('Y',this._id,this._formal);
+                    result = true;
+                }
+            }
+        } else {
+            result = true;
+        }
+        if (!result) return false;
+
+
         // filter: topic
         result = false;  
         if (filters.hasOwnProperty('topic')) {
@@ -929,6 +948,25 @@ class Statement {
         for (var i=0; i<sources.length;i++) {
             if (sources[i] === sourceId) {
                 return true;
+            }
+        }
+        return false;
+    }
+
+    inDiagram (diagramId) {
+        var kbId = AKT.state.current_kb;
+        var kb = AKT.KBs[kbId];
+
+        var diagram = kb._diagrams[diagramId];
+        var arcs = diagram.arcs;
+        
+        for (var arcId in arcs) {
+            var arc = arcs[arcId];
+            var statementIds = arc.statement_ids;
+            for (var i=0; i<statementIds.length; i++) {
+                if (this._id === statementsIds[i]) {
+                    return true;
+                }
             }
         }
         return false;

@@ -264,6 +264,7 @@ AKT.widgets.statement_template.setup = function (widget) {
         $(widget.element).find('.attval_options > input').attr('disabled',false);
         $(widget.element).find('.attval_options > label').css({color:'black'});
         $(widget.element).find('.attval').css({display:"block"});
+        $(widget.element).find('.attval_object_template').css({display:'none'});
     }
 
     function displayCausalOptions() {
@@ -276,6 +277,7 @@ AKT.widgets.statement_template.setup = function (widget) {
         $(widget.element).find('.attval_options').css({display:'block'});
         $(widget.element).find('.attval_options > input').attr('disabled',true);
         $(widget.element).find('.attval_options > label').css({color:'#808080'});
+        $(widget.element).find('.attval_object_template').css({display:'none'});
     }
 
 

@@ -30,6 +30,9 @@ $(document).ready(function() {
     //AKT.text_to_speech('Click on the View button');
 
 
+    var allItems = {...localStorage};
+    console.log('=====',allItems);
+
     // Load action scripts
     for (var scriptId in AKT.actionscripts) {
         $('#select_actionscripts_open').append('<option id="actionscript_'+scriptId+'" value="'+scriptId+'">'+scriptId+'</option>');
@@ -81,7 +84,7 @@ $(document).ready(function() {
         AKT.state.current_action_log = new ActionLog({actions:[],meta:{}});
     }
 
-
+/*  Obsoleted 28 Feb 2026
     $('body').on('click','.menu a', function(event) {
         console.log($(event.target).attr('local_id'));
         var menuId = $(event.target).attr('local_id');
@@ -95,6 +98,47 @@ $(document).ready(function() {
             prompt:     'Click on a menu item',
             value:      'none',
             speech:     'Click on the menu '+menuId
+        }
+        if (!AKT.state.current_action_log) {
+            AKT.state.current_action_log = new ActionLog({meta:{},actions:[]});
+        }
+        AKT.state.current_action_log.add(actionSpec);
+    });
+*/
+    $('body').on('click','li.menu>a', function(event) {
+        console.log('Clicked on li.menu>a :',$(event.target).attr('local_id'));
+        var localId = $(event.target).attr('local_id');
+        var actionSpec = {
+            element_id: 'menus',
+            selector:   '[local_id="'+localId+'"]',
+            type:       'click',
+            message:    'Clicked on a menu item',
+            before:     'previous_action',
+            after:      'next_action',
+            prompt:     'Click on a menu item',
+            value:      'none',
+            speech:     'Click on the menu '+localId
+        }
+        if (!AKT.state.current_action_log) {
+            AKT.state.current_action_log = new ActionLog({meta:{},actions:[]});
+        }
+        AKT.state.current_action_log.add(actionSpec);
+    });
+
+
+    $('body').on('click','li.menu>ul>li', function(event) {
+        console.log('Clicked on li.menu>ul>li :',$(event.target).attr('local_id'));
+        var localId = $(event.target).attr('local_id');
+        var actionSpec = {
+            element_id: 'menus',
+            selector:   '[local_id="'+localId+'"]',
+            type:       'click',
+            message:    'Clicked on a menu item',
+            before:     'previous_action',
+            after:      'next_action',
+            prompt:     'Click on a menu item',
+            value:      'none',
+            speech:     'Click on the menu '+localId
         }
         if (!AKT.state.current_action_log) {
             AKT.state.current_action_log = new ActionLog({meta:{},actions:[]});
@@ -771,8 +815,6 @@ el1.addEventListener('click', async () => {
     $('#viewallstatements400').css({background:'yellow'});
 
     $('.panel').draggable({containment:'#workspace',handle:".title-bar"});
-
-    AKT.menusClickHandler($('#menus'));
 
 /*
     if (!AKT.kbs[kbId].extras) {

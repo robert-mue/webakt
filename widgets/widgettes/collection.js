@@ -194,7 +194,7 @@ AKT.widgets.collection.setup = function (widget) {
 
 
     // ===================================================================================
-    // Buttons to invoke operations on the Listbox (New/view/Edit/Delete/SelectAll/Invert)
+    // Buttons to invoke operations on the Listbox (New/view/Edit/Delete/SelectAll/Invert/Accept)
 
     $(widget.element).find('[local_id="button_new"]').on('click', function (event) {   // New button
         console.log('^Click event on New button');
@@ -264,6 +264,57 @@ AKT.widgets.collection.setup = function (widget) {
 
             AKT.saveKbInLocalStorage(kbId);
         }
+    });
+
+
+    // This is a bit of a misnomer, but can't think of a better one.  Basically, it is
+    // for when another widget is waiting for a selection of (one or sometimes more) items,
+    // tp transmit the current selection to that widget.
+    // Two use cases so far:
+    // - Building an object or topic hierarchy, when the user needs to select an object-type 
+    //   formal term or topic.   (Incidentally, this allows for multiple items to be selected
+    //   and added to the hierarchy in one go, a big improvement on previously);
+    // - Building a causal diagram from statements.   The new (March 2026) mechanism allows
+    //   a group of statements to be added to the current diagram; and so this is best done from
+    // - the statement_collection window, sinc ethis already has a powerful filtering mechanism.
+    $(widget.element).find('.button_accept_selected').on('click', function (event) {   // accept_selected button
+        console.log('^Click event on Accept button');
+        event.stopPropagation();
+        
+        var kbId = AKT.state.current_kb;
+        var kb = AKT.KBs[kbId];
+
+        var itemType = widget.options.item_type;
+        //var kbCollectionId = AKT.collection_specs[itemType].plural;  // I.e. 'statement' becomes 'statements'
+
+        var itemIds = widget.listbox.findCheckedIds();
+        console.log('collection.js:button_accept_selected:',itemIds);
+        AKT.trigger(itemType+'_accept_event',{ 
+            item_type:  itemType,
+            item_ids:   itemIds
+        });
+    });
+
+
+    $(widget.element).find('.button_accept_all').on('click', function (event) {   // accept_all button
+        console.log('^Click event on Accept_all button');
+        event.stopPropagation();
+        
+        var kbId = AKT.state.current_kb;
+        var kb = AKT.KBs[kbId];
+
+        var itemType = widget.options.item_type;
+        //var kbCollectionId = AKT.collection_specs[itemType].plural;  // I.e. 'statement' becomes 'statements'
+
+        var itemIds = widget.listbox.findAllIds();
+        console.log('itemIds:',itemIds);
+
+        // Usng AKT.state is a temporary hack.   Enable the publish/subscribe mechanism.
+        AKT.state.item_ids = itemIds;
+        AKT.trigger(itemType+'_accept_event',{ 
+            item_type:  itemType,
+            item_ids:   itemIds
+        });
     });
 
 
@@ -354,6 +405,7 @@ AKT.widgets.collection.setup = function (widget) {
         }  
 
         var options = {kbId:kbId, mode:mode, item_type:itemType, item_id:itemId, item:item};
+        console.log('options',options);
 
         var panel = AKT.panelise({
             widget_name:  widgetName,
@@ -500,6 +552,8 @@ AKT.widgets.collection.setup = function (widget) {
 
     // See comments for 'new_item_created_event' handler, above.
     $(document).on('item_changed_event', function(event,args) {
+        console.log(4701,'args',args.item_type);
+        console.log(4702,'widget.options.item_type',widget.options.item_type);
         var panelCollectionType = widget.options.item_type;
         if (args.item_type) {
             var itemCollectionType = args.item_type;
@@ -616,7 +670,7 @@ AKT.widgets.collection.setup = function (widget) {
 // The widget's display() function.
 // ============================================================================
 AKT.widgets.collection.display = function (widget) {
-
+    console.log(4711,widget.options.item_type);
     console.log('^widgets.collection^display()^options=',JSON.stringify(widget.options));
     var options = widget.options;
     
@@ -708,6 +762,8 @@ AKT.widgets.collection.html = `
         <button class="button_select_all" local_id="button_select_all" style="width:70px;height:27px;">Select all</button>
         <button class="button_deselect_all" local_id="button_deselect_all" style="width:70px;height:27px;">Deselect all</button>
         <button class="button_invert" local_id="button_invert" style="width:70px;height:27px;">Invert</button>
+        <button class="button_accept_selected" local_id="button_accept_selected" style="width:70px;height:40px;margin-top:20px;" title="Send selected item(s) to a panel waiting for the selection.">Accept<br/>selected</button>
+        <button class="button_accept_all" local_id="button_accept_all" style="width:70px;height:40px;" title="Send all items to a panel waiting for the selection.">Accept<br/>all</button>
     </div>
 
     <div class="w3-rest w3-container div_widget_listbox_container"></div>

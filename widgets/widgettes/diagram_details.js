@@ -12,11 +12,23 @@
 // 17 May 2024 Copied from diagram.js and renamed diagram_details.js to fit in with
 // new "collection" approach.
 
+// 9 April 2026 
+// 1. When you create statement(s) by double-clicking on a link, add the statement(s)
+//    to widget.statement{} as well as to the kb.statements.
+// 2. Check that subgraph can be redrawn without invoking springy, in case this is a useful
+//    way of handling update to the subgraph arc statements (unlikely).
+// 3. Check whether 1. above is enough for mouseover-ing an arc to display statements?
+// 4. Incorporate the current (a) statements and (b) attribute values into the meta dialog.
+// 5. Get causes2way to behave like causes1way.
+// 6. Check other node types, not just attribute(object,attribute,value).
+
 AKT.widgets.diagram_details = {};
 
 
 AKT.widgets.diagram_details.setup = function (widget) {
     console.log('^widgets.diagram_details^setup()^options='+AKT.simpleStringify(widget.options));
+
+    widget.statements = {};
 
     AKT.state.current_widget = widget;
 
@@ -388,15 +400,12 @@ AKT.widgets.diagram_details.setup = function (widget) {
         if (mode === 'new') {
             $(widget.element).find('.div_meta').css({display:'block'});
         } else if (mode === 'view') {
-            alert('You cannot sace changes to the diagram in View mode.');
+            alert('You cannot save changes to the diagram in View mode.');
         } else if (mode === 'edit') {
-            console.log(8402,jgraph);
             widget.diagram._joint = jgraph;   // Hopefully, redundant, if the function-like approach works.
             widget.diagram._jgraph = jgraph;   // Ditto.  Duplicate properties are retained during the refactoring process!
             widget.diagram._subgraph = widget.diagram.convertJointToSysto(jgraph);
-            console.log(8403,widget.diagram._subgraph);
             var id = widget.diagram._id;
-            console.log(8404,widget.diagram);
             kb._diagrams[id] = widget.diagram;
             AKT.saveKbInLocalStorage(kbId)
             $('#message').text('The Diagram list has been updated');
@@ -506,18 +515,37 @@ relevant statements?   The latter is in keeping with DRY.  It involves a bit mor
 work whenever a causal link is opened (we have to extract the attribute's value from 
 the statement's JSON) but hey, that's not hard, and ensures consistency.   I think that's
 what I'll do.   
+Update March 2026: In fact, that's what I *have* to do.    Consider the sitution where we
+have several diagrams each displaying the same causal statement.   It is pretty clear that
+we should not represent the statement-specific stuff (principally an attribute's value) in
+the diagram's JSON, for the following reasons:
+- DRY, parsimony
+- If users' edit the statement, then we have to avoid the statement and its representation
+getting out of sync.
+- Ditto if a statement is deleted.
+- Any change to a causal statement should automatically be represented in any diagram that 
+  displays that statement (a sort-of publish/subscribe issue, though making it instantaneous 
+  would require looking at each diagram to see if it contains that statement.
+So...
+The diagram's JSON *must* include nodes and arcs, since diagrammatic attributes of nodes and arcs
+*must* be stored separately from the statements they're derived from, e.g. position for nodes,
+curvature for arcs.  This means that when a statement is deleted (but *only* then?), then either:
+- all diagrams must be checked to see if they display that statement; or:
+- missing statements are simply ignored when the diagram is drawn.
 */
     $(widget.element).find('.link_causes1way_dialog_ok').on('click', function() {
         console.log('\nEVENT Clicked on link_causes1way_dialog_ok in diagram_details.js');
+
+        var jlink = widget.current_jlink;
+        console.log(jlink);
+
         var kbId = AKT.state.current_kb;
         var kb = AKT.KBs[kbId];
 
         var sourceJson = JSON.parse(JSON.stringify(AKT.state.currentSourceNode.json));    // There has to be a better way.   Maybe
         var targetJson = JSON.parse(JSON.stringify(AKT.state.currentTargetNode.json));    // use a data-attribute, or a text field?
-        console.log(6661,sourceJson,targetJson);
 
         var rows = $(widget.element).find('.table_values').find('tr');
-        console.log(rows);
 
         var values = {};   // Convenience storage of attribute values from table,
                            // one entry for each statement.
@@ -534,21 +562,16 @@ what I'll do.
 
             console.log(i,'existing',$(rows[i]).find('[data-status="existing_statement"][data-role="cause"]').text(),'===>',$(rows[i]).find('[data-status="existing_statement"][data-role="effect"]').text());
         }
-        console.log('@@@',values);
 
         // Now modify values in existing statement, create a new statement, or delete a statement,
         // depending on the value of the 'status' property.
         for (var statementId in values) {
-            console.log('@',statementId,values[statementId]);
             if (values[statementId].status === 'existing_statement') {
                 var statement = kb._statements[statementId];
-                console.log('@@',statement);
                 if (values[statementId].cause) {
-                    console.log('@cause');
                     statement.resetValue('cause',values[statementId].cause);
                 }
                 if (values[statementId].effect) {
-                    console.log('@effect');
                     statement.resetValue('effect',values[statementId].effect);
                 }
 
@@ -558,45 +581,36 @@ what I'll do.
 
                 var sourceJson = JSON.parse(JSON.stringify(AKT.state.currentSourceNode.json));    // There has to be a better way.   Maybe
                 var targetJson = JSON.parse(JSON.stringify(AKT.state.currentTargetNode.json));    // use a data-attribute, or a text field?
-                console.log(6001,AKT.state);
-                console.log(6002,JSON.stringify(sourceJson));
-                console.log(6003,JSON.stringify(targetJson));
                 // TODO: att_value must be treated separately for each of source and target nodes, since 
                 // object/process/action don't have a value!
                 if (sourceJson[0] === 'attribute') {
                     sourceJson[0] = 'att_value';
-                    //sourceJson.pop();
                 }
                 if (targetJson[0] === 'attribute') {
                     targetJson[0] = 'att_value';
-                    //targetJson.pop();
                 }
                 if (sourceValue) {
-                    //sourceJson.push(sourceValue);
                     sourceJson[3] = sourceValue;
                 }
                 if (targetValue) {
-                    //targetJson.push(targetValue);
                     targetJson[3] = targetValue;
                 }
-                console.log(6004,JSON.stringify(sourceJson));
-                console.log(6005,JSON.stringify(targetJson));
                 var json = ['causes1way',sourceJson, targetJson];
-                console.log(6006,JSON.stringify(json));
                 var n = kb.findLargestIndex(kb._statements,'s')+1;
                 var id = 's'+n;
-                console.log(6007,id);
                 var statement = new Statement({id:id,json:json,type:'causal'});
-                console.log(6008,statement);
                 var formal = statement.makeFormalFromJson();
-                console.log(6009,formal);
                 var english = statement.makeEnglishFromJson();
                 statement.makeNodesAndArc();
                 statement._formal = formal;
-                console.log(i,n,id);
-                console.log(json);
-                console.log(formal);
+                if (!jlink.arc.statements) {
+                    jlink.arc.statements = [];
+                }
+                jlink.arc.statements.push(statement);
+                //var filters = {type:{causal:true},topic:{[topic._id]:true}};
+                //var statements = kb.getStatements(filters);
                 kb._statements[id] = statement;
+                widget.statements[id] = statement;
 
                 var formalTerms = statement.classifyFormalTerms();
                 for (var id in formalTerms) {
@@ -615,64 +629,6 @@ what I'll do.
         for (var i=0;i<rows.length;i++) {
             console.log(i,'new',$(rows[i]).find('[data-status="new_statement"]').text());
         }
-/*
-        for (var i=1; i<=3; i++) {
-            console.log('\n**',i);
-            var sourceValue = $(this).parent().parent().find('.cause_value_'+i+' input').val();
-            var targetValue = $(this).parent().parent().find('.effect_value_'+i+' input').val();
-            if (sourceValue === '' && targetValue === '') break;
-
-            console.log(i,sourceValue,targetValue);
-            var sourceJson = JSON.parse(JSON.stringify(AKT.state.currentSourceNode.json));    // There has to be a better way.   Maybe
-            var targetJson = JSON.parse(JSON.stringify(AKT.state.currentTargetNode.json));    // use a data-attribute, or a text field?
-            console.log(6001,AKT.state);
-            console.log(6002,JSON.stringify(sourceJson));
-            console.log(6003,JSON.stringify(targetJson));
-            // TODO: att_value must be treated separately for each of source and target nodes, since 
-            // object/process/action don't have a value!
-            if (sourceJson[0] === 'attribute') {
-                sourceJson[0] = 'att_value';
-                sourceJson.pop();
-            }
-            if (targetJson[0] === 'attribute') {
-                targetJson[0] = 'att_value';
-                targetJson.pop();
-            }
-            if (sourceValue) {
-                sourceJson.push(sourceValue);
-            }
-            if (targetValue) {
-                targetJson.push(targetValue);
-            }
-            console.log(6004,JSON.stringify(sourceJson));
-            console.log(6005,JSON.stringify(targetJson));
-            var json = ['causes1way',sourceJson, targetJson];
-            console.log(6006,JSON.stringify(json));
-            var n = kb.findLargestIndex(kb._statements,'s')+1;
-            var id = 's'+n;
-            console.log(6007,id);
-            var statement = new Statement({id:id,json:json,type:'causal'});
-            console.log(6008,statement);
-            var formal = statement.makeFormalFromJson();
-            console.log(6009,formal);
-            var english = statement.makeEnglishFromJson();
-            statement.makeNodesAndArc();
-            statement._formal = formal;
-            console.log(i,n,id);
-            console.log(json);
-            console.log(formal);
-            kb._statements[id] = statement;
-
-            var formalTerms = statement.classifyFormalTerms();
-            for (var id in formalTerms) {
-                var formalTerm = new FormalTerm({id:id,type:formalTerms[id][0],kb:kb,synonyms:[],description:''});
-                kb._formalTerms[id] = formalTerm;
-            }
-
-            AKT.trigger('new_item_created_event',{kb:kb,item_type:'statement',item:statement});
-            AKT.trigger('item_changed_event',{kb:kb,item_type:'statement',item:statement});
-        }
-*/
         $(this).parent().parent().css({display:'none'});
     });
 
@@ -833,7 +789,8 @@ what I'll do.
 
 // =========================== LISTBOX HANDLERS  ==============================
 
-    $(widget.element).find('.button_display').on('click', function() {
+    // $(widget.element).find('.button_display_topic').on('click', function() { 2026 03 26
+    $(widget.element).find('.button_display_topic').on('click', function() {
         console.log('.button_display');
         event.stopPropagation();
         var kbId = widget.options.kbId;
@@ -845,7 +802,11 @@ what I'll do.
         AKT.state.current_diagram = diagram;  // The object, not the ID
 
         console.log('\n\nCalling diagram.makeSubgraph() from button_display');
-        diagram._subgraph = diagram.makeSubgraph(topic,true);
+        var filters = {type:{causal:true},topic:{[topic._id]:true}};
+        var statements = kb.getStatements(filters);
+
+        // diagram._subgraph = diagram.makeSubgraph(filters,true); 2026 03 26
+        diagram._subgraph = diagram.makeSubgraph(statements,true); 
         console.log('\n==+++',diagram._subgraph);
         if (Object.keys(diagram._subgraph.arcs).length > 0) {
             diagram.graphLayoutSpringy(widget);
@@ -856,6 +817,98 @@ what I'll do.
         jlinkInfobox.addTo(jgraph);
     });
 
+
+    $(widget.element).find('.button_display_diagram').on('click', function() {
+        console.log('.button_display');
+        event.stopPropagation();
+        var kbId = widget.options.kbId;
+        var kb = AKT.KBs[kbId];
+        jgraph.clear();
+        //var topicId = $(widget.element).find('.listbox_topics').val();
+        //var topic = kb._topics[topicId];
+        AKT.state.diagram_counter += 1;
+        AKT.state.current_diagram = diagram;  // The object, not the ID
+
+        console.log('\n\nCalling diagram.makeSubgraph() from button_display');
+        //var filters = {type:{causal:true},topic:{[topic._id]:true}};
+
+
+        //var statementIds = AKT.state.item_ids;
+        var statements = widget.statements;
+        console.log(8001,statements);
+
+        // diagram._subgraph = diagram.makeSubgraph(filters,true); 2026 03 26
+        diagram._subgraph = diagram.makeSubgraph(statements,true); 
+        console.log('\n==+++',diagram._subgraph);
+        if (Object.keys(diagram._subgraph.arcs).length > 0) {
+            diagram.graphLayoutSpringy(widget);
+            $(widget.element).blur();
+        } else {
+            alert('There are no causal statements for the chosen topic.');
+        }
+        jlinkInfobox.addTo(jgraph);
+    });
+
+
+    // 25 March 2026
+    // Total change in the design of the method for adding statements to the diagram.
+    // For any diagram (new or existing), statements can be added by selecting the ones you
+    // want in the statement_collection panel.  These will then be *added* to the current
+    // diagram, rather than *replacing* whatever is in the current diagram (as happens now
+    // when you select a topic).    This:
+    // 1. gives you much greater power in buidling a diagram, since you can combine statements
+    //    from more than one topic, selecting individual statements, etc; and
+    // 2. uses the familiar filtering mechanism already in place for filtering statements.
+    // Obviously, any duplicate references to the same statement in this way will simply be
+    // ignored.
+
+    // See the custom event handler 
+    //    $(document).on('statement_accept_event', function(event,args) {
+    // below, and
+    //    $(widget.element).find('.button_display_diagram').on('click', function() {
+    // above.
+ 
+    $(widget.element).find('[local_id="button_add_statements"]').on('click', function() {
+        event.stopPropagation();
+        var kbId = widget.options.kbId;
+        var kb = AKT.kbs[kbId];
+
+        console.log(4441,widget.options);
+
+        var panel = AKT.panelise({
+            widget_name:'collection',
+            position:{left:'20px',top:'20px'},
+            size:{width:'550px',height:'540px'},
+            options:{kbId:AKT.state.current_kb,item_type:'statement',filters:{type:{causal:true}}}
+        });
+    });
+
+/*
+        console.log('Clicked on .button_add_statements');
+        event.stopPropagation();
+        var kbId = widget.options.kbId;
+        var kb = AKT.KBs[kbId];
+        jgraph.clear();
+        var topicId = $(widget.element).find('.listbox_topics').val();
+        var topic = kb._topics[topicId];
+        AKT.state.diagram_counter += 1;
+        AKT.state.current_diagram = diagram;  // The object, not the ID
+
+        console.log('\n\nCalling diagram.makeSubgraph() from button_display');
+        var filters = {type:{causal:true},topic:{[topic._id]:true}};
+        var statements = kb.getStatements(filters);
+
+        diagram._subgraph = diagram.makeSubgraph(filters,true);
+        console.log('\n==+++',diagram._subgraph);
+        if (Object.keys(diagram._subgraph.arcs).length > 0) {
+            diagram.graphLayoutSpringy(widget);
+            $(widget.element).blur();
+        } else {
+            alert('There are no causal statements for the chosen topic.');
+        }
+        jlinkInfobox.addTo(jgraph);
+    });
+*/
 
     $(widget.element).find('.checkbox_arc_info').on('click', function () {
 
@@ -890,6 +943,7 @@ what I'll do.
         //var scale = V(paper.viewport).scale(); 
         var scale = widget.scale;
         console.log('scale:',scale);
+        console.log(jgraph);
         widget.dragStartPosition = { x: x * scale, y: y * scale};    
  
         jlinkInfobox.attr({
@@ -1134,13 +1188,14 @@ what I'll do.
         //if ($(widget.element).find('.checkbox_arc_info').is(':checked')) {
         if (true) {
             var jlink = linkView.model;
-            //console.log(jlink);
-            //console.log(jlink.arc.statements);
+            console.log(7301,jlink);
+            console.log(7302,jlink.arc.statements);
             //var x = jlink.attributes.vertices[0].x;
             //var y = jlink.attributes.vertices[0].y;
             if (jlink.arc && jlink.arc.statements) {
                 jlinkInfobox.position(event.originalEvent.offsetX+15,event.originalEvent.offsetY);
                 //jlinkInfobox.position(x+15,y);  //This is set according to current mouse position.
+                jlinkInfobox.resize(300, 60);
                 var statements = jlink.arc.statements;
                 var text = '';
                 for (var i=0; i<statements.length; i++) {
@@ -1153,6 +1208,20 @@ what I'll do.
                     label:{
                         //text:statement._id+': '+text,
                         textWrap:{text:text,width:200,height:null},
+                        display:'block'
+                    }
+                });
+                jlinkInfobox.toFront();
+            } else {
+                jlinkInfobox.position(event.originalEvent.offsetX+15,event.originalEvent.offsetY);
+                //jlinkInfobox.position(x+15,y);  //This is set according to current mouse position.
+                jlinkInfobox.resize(120, 40);
+                var text = 'There are no statements for this causal link.';
+                jlinkInfobox.attr({
+                    body:{display:'block'},
+                    label:{
+                        //text:statement._id+': '+text,
+                        textWrap:{text:text,width:100,height:null},
                         display:'block'
                     }
                 });
@@ -1199,13 +1268,24 @@ what I'll do.
     });
 
 
+    // This opens up the dialog for viewing/adding/deleting statements for this link,
+    // i.e. a causes1way arc (currently *just* causes1way).
+    // See the event handlers for .link_causes1way_dialog_XXX for the buttons in the dialog:
+    // .link_causes1way_dialog_add to add another row in the attribute-value table, i.e. to
+    //    create a new causal statement for this causal arc;
+    // .link_causes1way_dialog_cancel to cancel the dialog;
+    // .link_causes1way_dialog_ok' to actually confirm any changes.
+
     paper.on('link:pointerdblclick', function(linkView) {
         console.log('diagram.js: paper.on("link:pointerdblclick"');
 
+        console.log(widget);
         widget.tentativeNewStatementCounter = 0;
 
         var jlink = linkView.model;
+        widget.current_jlink = jlink;
         console.log(3101,jlink);
+        console.log(31011,jlink.arc.id);
 
         var arc = jlink.arc;
         AKT.state.current_arc = arc;
@@ -1303,6 +1383,9 @@ what I'll do.
     });
 
 
+
+
+
 // ==================================== CUSTOM EVENT LISTENERS =====================
 
     // This custom event is triggered when the graph is ready to be rendered,
@@ -1321,6 +1404,27 @@ what I'll do.
     // clicked.
     $(document).on('node_edited_event', function(event,args) {
         console.log(args);
+    });
+
+
+    // This custom event is triggered when user clicks an 'Accept selected' or
+    // 'Accept all' button in the the statement_collection panel.
+    // Note that this automatically merges the accepted statements with those already held for
+    // this diagram, since widget.statements is a map (consisting of key:value pairs, where the
+    // key is the statement Id and the value is the statement object).   So any repeat acceptance
+    // of the same statement is simply ignored.
+    $(document).on('statement_accept_event', function(event,args) {
+        console.log('diagram_details.js:statement_accept_event:',args);
+        var kbId = widget.options.kbId;
+        var kb = AKT.KBs[kbId];
+        console.log(8002,widget.statements);
+        for (var i=0; i<args.item_ids.length; i++) {
+            var statementId = args.item_ids[i];
+            var statement = kb._statements[statementId];
+            widget.statements[statementId] = statement;
+        }
+        console.log(8003,widget.statements);
+        //AKT.state.item_ids = args.item_ids;
     });
 
 
@@ -1443,6 +1547,7 @@ what I'll do.
 AKT.widgets.diagram_details.display = function (widget) {
 
     console.log('^widgets.diagram_details^display()^options='+AKT.simpleStringify(widget.options));
+    console.log(widget.statements);
 
     var mode = widget.options.mode;
 
@@ -1507,18 +1612,13 @@ AKT.widgets.diagram_details.html = `
         <div class="div_topics">
             <div style="float:left;margin-left:30px;">Topic</div>
             <select class="listbox_topics" style="float:left; margin-left:5px;"></select>
-            <input type="button" style="float:left;margin-left:10px;" class="button_display" value="Display">
+            <!--input type="button" style="float:left;margin-left:10px;" class="button_display_topic" value="Display topic"-->
         </div>
 
-        <button class="button_topic_details" title="This opens up the standard topic_details panel for the selected topic.">Topic details</button>
-        <button class="button_topic_display" title="This generates a layout for the selected topic, and displays it.">Display topic</button>
-        <button class="button_diagram_redisplay" title="This generates a new layout for the whole diagram, and re-displays it.">Re-display diagram</button>
-        <button class="button_update" title="This adds the diagram to the current knowledge base, or modifies it if it exists alread.">Update</button>
-
-        <!-- Pension off the following 3 lines -->
-        <input type="button" class="button_update" style="float:left;margin-left:10px;" value="Update">
-        <input type="button" class="button_load" style="float:left;margin-left:10px;" id="'+instance+'_load diagram_load" value="Load">
-        <input type="button" onclick="layout();" style="float:left;margin-left:3%;" id="'+instance+'_menu" value="Menu">
+        <button class="button_display_topic" title="This generates a layout for the selected topic, and displays it.">Display topic</button>
+        <button class="button_add_statements" local_id="button_add_statements" title="This allows you to add statements from the statement_collection panel">Add statements</button>
+        <button class="button_display_diagram" title="This generates a new layout for the whole diagram, and displays it.">Display diagram</button>
+        <button class="button_update" title="This adds the diagram to the current knowledge base, or modifies it if it exists already.">Update</button>
     </div>
 
     <!-- ============== main div ================= -->

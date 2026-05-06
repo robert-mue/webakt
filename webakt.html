@@ -68,8 +68,7 @@ table.sortable thead {
     nav ul ul li a {
         color: var(--link-color);
     }
-    nav ul ul l
-    i a:focus,
+    nav ul ul li a:focus,
     nav ul ul li a:active {
         color: var(--link-active-color);
     }
@@ -282,36 +281,40 @@ but check.
 
                 <li class="menu"><a href="#" local_id="kb">KB</a>
                     <ul>
-                        <li class="collection" local_id="summary" onclick="AKT.menuHandler.menu_kb_summary()">Summary</li>
-                        <li class="collection" local_id="metadata" onclick="AKT.menuHandler.menu_kb_metadata()">Metadata</li>
-                        <li class="collection" local_id="statements" onclick="AKT.menuHandler.menu_kb_statements()">Statements</li>
-                        <li class="collection" local_id="sources" onclick="AKT.menuHandler.menu_kb_sources()">Sources</li>
-                        <li class="collection" local_id="formal_terms" onclick="AKT.menuHandler.menu_kb_formalterms()">Formal terms</li>
-                        <li class="collection" local_id="object_hierarchies" onclick="AKT.menuHandler.menu_kb_objecthierarchies()">Object hierarchies</li>
-                        <li class="collection" local_id="topics" onclick="AKT.menuHandler.menu_kb_topics()">Topics</li>
-                        <li class="collection" local_id="topic_hierarchies" onclick="AKT.menuHandler.menu_kb_topichierarchies()">Topic hierarchies</li>
-                        <li local_id="images" onclick="AKT.menuHandler.menu_kb_images()">Images</li>
-                        <li local_id="boolean_search" onclick="AKT.menuHandler.menu_kb_booleansearch()">Boolean search</li>
+                        <li class="collection" local_id="kb_summary" onclick="AKT.menuHandler.menu_kb_summary()">Summary</li>
+                        <li class="collection" local_id="kb_metadata" onclick="AKT.menuHandler.menu_kb_metadata()">Metadata</li>
+                        <li class="collection" local_id="kb_statements" onclick="AKT.menuHandler.menu_kb_statements()">Statements</li>
+                        <li class="collection" local_id="kb_sources" onclick="AKT.menuHandler.menu_kb_sources()">Sources</li>
+                        <li class="collection" local_id="kb_formal_terms" onclick="AKT.menuHandler.menu_kb_formalterms()">Formal terms</li>
+                        <li class="collection" local_id="kb_object_hierarchies" onclick="AKT.menuHandler.menu_kb_objecthierarchies()">Object hierarchies</li>
+                        <li class="collection" local_id="kb_topics" onclick="AKT.menuHandler.menu_kb_topics()">Topics</li>
+                        <li class="collection" local_id="kb_topic_hierarchies" onclick="AKT.menuHandler.menu_kb_topichierarchies()">Topic hierarchies</li>
+                        <li local_id="kb_images" onclick="AKT.menuHandler.menu_kb_images()">Images</li>
+                        <li local_id="kb_boolean_search" onclick="AKT.menuHandler.menu_kb_booleansearch()">Boolean search</li>
                     </ul>
                 </li>
 
                 <li class="menu"><a href="#" local_id="diagram">Diagram</a>
                     <ul>
-                        <li local_id="diagrams" onclick="AKT.menuHandler.menu_diagram_diagrams()">Diagrams</li>
-                        <li local_id="nodes" onclick="AKT.menuHandler.menu_diagram_nodes()">Nodes</li>
-                        <li local_id="arcs" onclick="AKT.menuHandler.menu_diagram_arcs()">Arcs</li>
+                        <li local_id="diagram_diagrams" onclick="AKT.menuHandler.menu_diagram_diagrams()">Diagrams</li>
+                        <li local_id="diagram_nodes" onclick="AKT.menuHandler.menu_diagram_nodes()">Nodes</li>
+                        <li local_id="diagram_arcs" onclick="AKT.menuHandler.menu_diagram_arcs()">Arcs</li>
                     </ul>
                 </li>
 
                 <li class="menu"><a href="#" local_id="tools">Tools</a>
                     <ul>
-                        <li local_id="load_tool" onclick="AKT.menuHandler.menu_tools_loadtool()">Load tool</li>
-                        <li local_id="load_toolbox" onclick="AKT.menuHandler.menu_tools_loadtoolbox()">Load toolbox</li>
-                        <li local_id="use_tool" onclick="AKT.menuHandler.menu_tools_usetool()">Use tool</li>
+                        <li local_id="tools_load_tool" onclick="AKT.menuHandler.menu_tools_loadtool()">Load tool</li>
+                        <li local_id="tools_load_toolbox" onclick="AKT.menuHandler.menu_tools_loadtoolbox()">Load toolbox</li>
+                        <li local_id="tools_use_tool" onclick="AKT.menuHandler.menu_tools_usetool()">Use tool</li>
                     </ul>
                 </li>
 
-                <li class="menu"><a href="#" local_id="help">Help</a></li>
+                <li class="menu"><a href="#" local_id="help">Help</a>
+                    <ul>
+                        <li local_id="help_help" onclick="AKT.menuHandler.menu_help_help()">Use tool</li>
+                    </ul>
+                </li>
 
                 <li style="margin-left:100px;">
                     <span>Current KB:</span>
@@ -350,11 +353,11 @@ but check.
                 <button class="inwidget_recording do_not_log" style="float:left;padding:3px;" onclick="AKT.state.current_action_log.display()">Display</button>
                 <button class="inwidget_recording do_not_log" style="float:left;padding:3px;" onclick="AKT.state.current_action_log.play()">Play</button>
                 <div style="float:left;margin-left:5px;margin-top:5px;margin-right:2px;">Time step:</div>
-                <input id="input_actionscript_replay_timestep" class="inwidget_recording do_not_log" id="recording_timestep" style="float:left;width:40px;padding:3px;margin-right:15px;" type="text" value="0.1"></input>
+                <input id="input_actionscript_replay_timestep" class="inwidget_recording do_not_log" id="recording_timestep" style="float:left;width:40px;padding:3px;margin-right:15px;" type="text" value="2"></input>
                 <button class="inwidget_recording" style="float:left;padding:3px;" onclick="AKT.state.current_action_log.stepThroughRecording()">Step</button>
                 <!--button style="float:left;padding:3px;margin-right:15px;" onclick="AKT.showRecording()">Show</button-->
                 <!-..................--><span>
-                25 Feb 2026</span>
+                24 March 2026</span>
                 <!-.....................-->
             </div>
         </div>

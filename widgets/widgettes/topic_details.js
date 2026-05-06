@@ -20,28 +20,28 @@ AKT.widgets.topic_details.setup = function (widget) {
     // depends on the mode (i.e. new,view or edit).
     var mode = widget.options.mode;
     if (mode === 'new'){
-        $(widget.element).find('.div_id').attr('disabled',false);
+        $(widget.element).find('.input_id').attr('disabled',false);
         $(widget.element).find('.button_update').attr('disabled',false);
 
     } else if (mode === 'view'){
         $(widget.element).find('div').attr('contenteditable',false);
-        $(widget.element).find('.div_id').attr('readonly',true);
+        $(widget.element).find('.input_id').attr('readonly',true);
         $(widget.element).find('.button_statements').attr('disabled',false);
         $(widget.element).find('.button_update').css({display:'none'});
 
     } else if (mode === 'edit'){
-        $(widget.element).find('.div_id').attr('contenteditable',true);
-        $(widget.element).find('.div_id').attr('readonly',true);
-        $(widget.element).find('.div_id').css({background:'#e0e0e0'});
+        $(widget.element).find('.input_id').attr('contenteditable',true);
+        $(widget.element).find('.input_id').attr('readonly',true);
+        $(widget.element).find('.input_id').css({background:'#e0e0e0'});
         $(widget.element).find('.button_update').attr('disabled',false);
     }
 
     // ----------------------------------------------------------------------------------
 
     // TODO: fix this inconsistency; and add in type checking, error message etc
-    if (widget.options.topic) { // The formal term object
+    if (widget.options.topic) { // The topic object
         var topic = widget.options.topic; 
-    } else if (widget.options.item_id) {   // The formal term id
+    } else if (widget.options.item_id) {   // The topic id
         var topic = kb._topics[widget.options.item_id]; 
     }
 /*
@@ -58,7 +58,7 @@ AKT.widgets.topic_details.setup = function (widget) {
     });
 */
 
-    $(widget.element).find('.button_in_hierarchy').on('click', function() {
+    $(widget.element).find('[local_id="button_in_hierarchy"]').on('click', function() {
         event.stopPropagation();
         console.debug('Clicked on topic_details In hierarchy button');
         var kbId = widget.options.kbId;
@@ -112,12 +112,39 @@ AKT.widgets.topic_details.setup = function (widget) {
     });
 
 
-    $(widget.element).find('.button_update').on('click', function() {
+    $(widget.element).find('[local_id="button_statements"]').on('click', function() {
+        event.stopPropagation();
+        var kbId = widget.options.kbId;
+        var kb = AKT.kbs[kbId];
+
+        console.log(4441,widget.options);
+
+        if (widget.topic){
+            var topic = widget.topic;
+        } else if (widget.options.item) {
+            var topic = widget.options.item;
+        } else {
+            alert('Please click the Update button first.');
+        }
+
+        var eventShiftKey = event ? event.shiftKey : null;
+
+        var panel = AKT.panelise({
+            widget_name:'collection',
+            position:{left:'20px',top:'20px'},
+            size:{width:'550px',height:'540px'},
+            shift_key: eventShiftKey,
+            options:{kbId:AKT.state.current_kb,item_type:'statement',filters:{topic:{[topic._id]:true}}}
+        });
+    });
+
+
+    $(widget.element).find('[local_id="button_update"]').on('click', function() {
         var kbId = widget.options.kbId;
         var kb = AKT.KBs[kbId];
-        var id = $(widget.element).find('.div_id').text();
-        var searchExpression = $(widget.element).find('.div_search_expression').text();
-        var description = $(widget.element).find('.div_description').text();
+        var id = $(widget.element).find('.input_id').val();
+        var searchExpression = $(widget.element).find('.textarea_search_expression').val();
+        var description = $(widget.element).find('.textarea_description').val();
         var objects = 'object';
         var topic = new Topic({id:id,description:description,search_expression:searchExpression,objects:objects});
         widget.topic = topic;
@@ -143,7 +170,7 @@ AKT.widgets.topic_details.display = function (widget) {
 
 
     if (widget.options.mode === 'new') {
-        $(widget.element).find('.div_search_expression').text(widget.options.search_expression);
+        $(widget.element).find('.textarea_search_expression').val(widget.options.search_expression);
 
     } else {
         // TODO: fix this inconsistency; and add in type checking, error message etc
@@ -152,9 +179,9 @@ AKT.widgets.topic_details.display = function (widget) {
         } else if (widget.options.item_id) {   // The topic id
             topic = kb._topics[widget.options.item_id]; 
         }
-        $(widget.element).find('.div_id').text(topic._id);
-        $(widget.element).find('.div_search_expression').text(topic._search_term);
-        $(widget.element).find('.div_description').text(topic._description);
+        $(widget.element).find('.input_id').val(topic._id);
+        $(widget.element).find('.textarea_search_expression').val(topic._search_term);
+        $(widget.element).find('.textarea_description').val(topic._description);
 
         // TODO: Need to rename the _objects property!  It's really confusing...
         var objectCategories = topic._objects.split('+');  // object, objects+subobjects, object+superobjects
@@ -221,31 +248,6 @@ AKT.widgets.topic_details.display = function (widget) {
         diagram.graphLayoutSpringy(widget);
     });
 */
-    $(widget.element).find('.button_statements').on('click', function() {
-        event.stopPropagation();
-        var kbId = widget.options.kbId;
-        var kb = AKT.kbs[kbId];
-
-        console.log(4441,widget.options);
-
-        if (widget.topic){
-            var topic = widget.topic;
-        } else if (widget.options.item) {
-            var topic = widget.options.item;
-        } else {
-            alert('Please click the Update button first.');
-        }
-
-        var eventShiftKey = event ? event.shiftKey : null;
-
-        var panel = AKT.panelise({
-            widget_name:'collection',
-            position:{left:'20px',top:'20px'},
-            size:{width:'550px',height:'540px'},
-            shift_key: eventShiftKey,
-            options:{kbId:AKT.state.current_kb,item_type:'statement',filters:{topic:{[topic._id]:true}}}
-        });
-    });
 
 
 };
@@ -256,25 +258,25 @@ AKT.widgets.topic_details.html = `
 
     <div>
         <div style="float:left;width:40px;height:20px;">Topic</div>
-        <div class="div_id" contenteditable style="float:left;width:220px;height:20px;border:1px solid #808080;background:white;"></div>
+        <input type="text" class="input_id" local_id="input_id" style="float:left;width:220px;height:20px;border:1px solid #808080;background:white;"></input>
     </div>
 
 
     <fieldset>
         <legend>Boolean Search String</legend>
-        <div class="div_search_expression" contenteditable style="width:250px;height:50px;border:1px solid #808080;background:white;"></div>
+        <textarea class="textarea_search_expression" local_id="textarea_search_expression" style="width:250px;height:50px;border:1px solid #808080;background:white;"></textarea>
     </fieldset>
 
     <div>
         <fieldset style="float:left;">
             <legend>Search Mode</legend>
-            <input class="checkbox checkbox_object" type="checkbox">
+            <input type="checkbox" class="checkbox checkbox_object" local_id="checkbox_object"></input>
             <label for="topicDetail200">object</label><br/>
 
-            <input class="checkbox checkbox_subobjects" type="checkbox" disabled>
+            <input type="checkbox" class="checkbox checkbox_subobjects" local_id="checkbox_subobjects" disabled></input>
             <label for="topicDetail201">subobjects</label><br/>
 
-            <input class="checkbox checkbox_superobjects" type="checkbox" disabled>
+            <input type="checkbox" class="checkbox checkbox_superobjects" local_id="checkbox_superobjects" disabled></input>
             <label for="topicDetail202">superobjects</label><br/>
         </fieldset>
         <div style="clear:both;"></div>
@@ -282,13 +284,13 @@ AKT.widgets.topic_details.html = `
 
     <fieldset>
         <legend>Description</legend>
-        <div class="div_description" conteteditable style="width:250px;height:130px;border:1px solid #808080;background:white;"></div>
+        <textarea class="textarea_description" local_id="textarea_description" style="width:250px;height:130px;border:1px solid #808080;background:white;"></textarea>
     </fieldset>
 
-    <button class="button_statements" style="width:80px;height:25px;" title="Show all statements for this topic.">Statements</button>
-    <button class="button_in_hierarchy" style="width:80px;height:25px;" title="Show this topic in the topic hierarchies.">In hierarchy</button>
-    <button class="button_update" style="width:80px;height:25px;" title="Update the KB">Update</button>
-    <button class="button_diagram" style="display:none;width:140px;height:35px;" title="Generate and display the causal diagram for all causal statements for this topic.">Diagram</button>
+    <button class="button_statements" local_id="button_statements" style="width:80px;height:25px;" title="Show all statements for this topic.">Statements</button>
+    <button class="button_in_hierarchy" local_id="button_in_hierarchy" style="width:80px;height:25px;" title="Show this topic in the topic hierarchies.">In hierarchy</button>
+    <button class="button_update" local_id="button_update" style="width:80px;height:25px;" title="Update the KB">Update</button>
+    <button class="button_diagram" local_id="button_diagram" style="display:none;width:140px;height:35px;" title="Generate and display the causal diagram for all causal statements for this topic.">Diagram</button>
 
 </div>     <!-- End of content div -->
 `;
